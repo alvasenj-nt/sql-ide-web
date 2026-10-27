@@ -1,0 +1,1314 @@
+[
+ {
+  "linea": 2,
+  "texto": "CREATE DATABASE tienda",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 3,
+  "texto": "USE tienda",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 4,
+  "texto": "CREATE TABLE producto (\n  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,\n  referencia CHAR(8) NOT NULL,\n  nombre VARCHAR(100) NOT NULL,\n  descripcion TEXT,\n  precio DECIMAL(8,2) NOT NULL DEFAULT 0,\n  peso_g SMALLINT UNSIGNED,\n  valoracion TINYINT,\n  activo BOOLEAN NOT NULL DEFAULT TRUE,\n  alta DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  modificado TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,\n  entrega DATE,\n  hora TIME,\n  anio YEAR,\n  categoria ENUM('ropa','calzado','material') NOT NULL DEFAULT 'material',\n  etiquetas SET('oferta','nuevo','eco'),\n  foto MEDIUMBLOB,\n  medida FLOAT,\n  ratio DOUBLE,\n  codigo BIGINT,\n  pequeno MEDIUMINT,\n  ceros INT(6) ZEROFILL,\n  UNIQUE (referencia)\n)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 2
+ },
+ {
+  "linea": 28,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Warning",
+    "1681",
+    "The ZEROFILL attribute is deprecated and will be removed in a future release. Use the LPAD function to zero-pad numbers, or store the formatted numbers in a CHAR column."
+   ],
+   [
+    "Warning",
+    "1681",
+    "Integer display width is deprecated and will be removed in a future release."
+   ]
+  ]
+ },
+ {
+  "linea": 29,
+  "texto": "SHOW CREATE TABLE producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "producto",
+    "CREATE TABLE `producto` (\n  `id` int unsigned NOT NULL AUTO_INCREMENT,\n  `referencia` char(8) NOT NULL,\n  `nombre` varchar(100) NOT NULL,\n  `descripcion` text,\n  `precio` decimal(8,2) NOT NULL DEFAULT '0.00',\n  `peso_g` smallint unsigned DEFAULT NULL,\n  `valoracion` tinyint DEFAULT NULL,\n  `activo` tinyint(1) NOT NULL DEFAULT '1',\n  `alta` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `modificado` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,\n  `entrega` date DEFAULT NULL,\n  `hora` time DEFAULT NULL,\n  `anio` year DEFAULT NULL,\n  `categoria` enum('ropa','calzado','material') NOT NULL DEFAULT 'material',\n  `etiquetas` set('oferta','nuevo','eco') DEFAULT NULL,\n  `foto` mediumblob,\n  `medida` float DEFAULT NULL,\n  `ratio` double DEFAULT NULL,\n  `codigo` bigint DEFAULT NULL,\n  `pequeno` mediumint DEFAULT NULL,\n  `ceros` int(6) unsigned zerofill DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `referencia` (`referencia`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 30,
+  "texto": "DESCRIBE producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "id",
+    "int unsigned",
+    "NO",
+    "PRI",
+    null,
+    "auto_increment"
+   ],
+   [
+    "referencia",
+    "char(8)",
+    "NO",
+    "UNI",
+    null,
+    ""
+   ],
+   [
+    "nombre",
+    "varchar(100)",
+    "NO",
+    "",
+    null,
+    ""
+   ],
+   [
+    "descripcion",
+    "text",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "precio",
+    "decimal(8,2)",
+    "NO",
+    "",
+    "0.00",
+    ""
+   ],
+   [
+    "peso_g",
+    "smallint unsigned",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "valoracion",
+    "tinyint",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "activo",
+    "tinyint(1)",
+    "NO",
+    "",
+    "1",
+    ""
+   ],
+   [
+    "alta",
+    "datetime",
+    "NO",
+    "",
+    "CURRENT_TIMESTAMP",
+    "DEFAULT_GENERATED"
+   ],
+   [
+    "modificado",
+    "timestamp",
+    "YES",
+    "",
+    null,
+    "on update CURRENT_TIMESTAMP"
+   ],
+   [
+    "entrega",
+    "date",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "hora",
+    "time",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "anio",
+    "year",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "categoria",
+    "enum('ropa','calzado','material')",
+    "NO",
+    "",
+    "material",
+    ""
+   ],
+   [
+    "etiquetas",
+    "set('oferta','nuevo','eco')",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "foto",
+    "mediumblob",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "medida",
+    "float",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "ratio",
+    "double",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "codigo",
+    "bigint",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "pequeno",
+    "mediumint",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "ceros",
+    "int(6) unsigned zerofill",
+    "YES",
+    "",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 31,
+  "texto": "SHOW FULL COLUMNS FROM producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Collation",
+   "Null",
+   "Key",
+   "Default",
+   "Extra",
+   "Privileges",
+   "Comment"
+  ],
+  "filas": [
+   [
+    "id",
+    "int unsigned",
+    null,
+    "NO",
+    "PRI",
+    null,
+    "auto_increment",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "referencia",
+    "char(8)",
+    "utf8mb4_0900_ai_ci",
+    "NO",
+    "UNI",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "nombre",
+    "varchar(100)",
+    "utf8mb4_0900_ai_ci",
+    "NO",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "descripcion",
+    "text",
+    "utf8mb4_0900_ai_ci",
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "precio",
+    "decimal(8,2)",
+    null,
+    "NO",
+    "",
+    "0.00",
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "peso_g",
+    "smallint unsigned",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "valoracion",
+    "tinyint",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "activo",
+    "tinyint(1)",
+    null,
+    "NO",
+    "",
+    "1",
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "alta",
+    "datetime",
+    null,
+    "NO",
+    "",
+    "CURRENT_TIMESTAMP",
+    "DEFAULT_GENERATED",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "modificado",
+    "timestamp",
+    null,
+    "YES",
+    "",
+    null,
+    "on update CURRENT_TIMESTAMP",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "entrega",
+    "date",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "hora",
+    "time",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "anio",
+    "year",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "categoria",
+    "enum('ropa','calzado','material')",
+    "utf8mb4_0900_ai_ci",
+    "NO",
+    "",
+    "material",
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "etiquetas",
+    "set('oferta','nuevo','eco')",
+    "utf8mb4_0900_ai_ci",
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "foto",
+    "mediumblob",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "medida",
+    "float",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "ratio",
+    "double",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "codigo",
+    "bigint",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "pequeno",
+    "mediumint",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "ceros",
+    "int(6) unsigned zerofill",
+    null,
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 32,
+  "texto": "INSERT INTO producto (referencia, nombre, precio, peso_g, valoracion, entrega, hora, anio, etiquetas, medida, ratio, codigo, pequeno, ceros)\n  VALUES ('ZAP-0001', 'Zapatilla trail', 89.9, 320, 5, '2026-11-02', '09:30', 2026, 'nuevo,oferta', 3.14159265, 2.5, 9007199254740993, -8000000, 42)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 34,
+  "texto": "SELECT id, referencia, precio, peso_g, valoracion, activo, entrega, hora, anio, categoria, etiquetas, medida, ratio, codigo, pequeno, ceros FROM producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id",
+   "referencia",
+   "precio",
+   "peso_g",
+   "valoracion",
+   "activo",
+   "entrega",
+   "hora",
+   "anio",
+   "categoria",
+   "etiquetas",
+   "medida",
+   "ratio",
+   "codigo",
+   "pequeno",
+   "ceros"
+  ],
+  "filas": [
+   [
+    "1",
+    "ZAP-0001",
+    "89.90",
+    "320",
+    "5",
+    "1",
+    "2026-11-02",
+    "09:30:00",
+    "2026",
+    "material",
+    "oferta,nuevo",
+    "3.14159",
+    "2.5",
+    "9007199254740993",
+    "-8000000",
+    "000042"
+   ]
+  ]
+ },
+ {
+  "linea": 35,
+  "texto": "INSERT INTO producto (referencia, nombre, precio) VALUES ('ZAP-0002', 'Calcetín', 4.999)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 36,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Note",
+    "1265",
+    "Data truncated for column 'precio' at row 1"
+   ]
+  ]
+ },
+ {
+  "linea": 37,
+  "texto": "SELECT precio FROM producto WHERE referencia = 'ZAP-0002'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "precio"
+  ],
+  "filas": [
+   [
+    "5.00"
+   ]
+  ]
+ },
+ {
+  "linea": 38,
+  "texto": "INSERT INTO producto (referencia, nombre, precio) VALUES ('ZAP-0003', 'Mochila', 1000000)",
+  "ok": false,
+  "codigo": 1264,
+  "mensaje": "Out of range value for column 'precio' at row 1"
+ },
+ {
+  "linea": 39,
+  "texto": "INSERT INTO producto (referencia, nombre, peso_g) VALUES ('ZAP-0003', 'Mochila', -1)",
+  "ok": false,
+  "codigo": 1264,
+  "mensaje": "Out of range value for column 'peso_g' at row 1"
+ },
+ {
+  "linea": 40,
+  "texto": "INSERT INTO producto (referencia, nombre, peso_g) VALUES ('ZAP-0003', 'Mochila', 70000)",
+  "ok": false,
+  "codigo": 1264,
+  "mensaje": "Out of range value for column 'peso_g' at row 1"
+ },
+ {
+  "linea": 41,
+  "texto": "INSERT INTO producto (referencia, nombre, valoracion) VALUES ('ZAP-0003', 'Mochila', 'cinco')",
+  "ok": false,
+  "codigo": 1366,
+  "mensaje": "Incorrect integer value: 'cinco' for column 'valoracion' at row 1"
+ },
+ {
+  "linea": 42,
+  "texto": "INSERT INTO producto (referencia, nombre, valoracion) VALUES ('ZAP-0003', 'Mochila', '5 estrellas')",
+  "ok": false,
+  "codigo": 1265,
+  "mensaje": "Data truncated for column 'valoracion' at row 1"
+ },
+ {
+  "linea": 43,
+  "texto": "INSERT INTO producto (referencia, nombre, valoracion) VALUES ('ZAP-0003', 'Mochila', '4')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 44,
+  "texto": "INSERT INTO producto (referencia, nombre, precio) VALUES ('ZAP-0004', 'Gorra', 'gratis')",
+  "ok": false,
+  "codigo": 1366,
+  "mensaje": "Incorrect decimal value: 'gratis' for column 'precio' at row 1"
+ },
+ {
+  "linea": 45,
+  "texto": "INSERT INTO producto (referencia, nombre) VALUES ('ZAP-0005-LARGA', 'Gorra')",
+  "ok": false,
+  "codigo": 1406,
+  "mensaje": "Data too long for column 'referencia' at row 1"
+ },
+ {
+  "linea": 46,
+  "texto": "INSERT INTO producto (referencia, nombre, entrega) VALUES ('ZAP-0005', 'Gorra', '2026-02-30')",
+  "ok": false,
+  "codigo": 1292,
+  "mensaje": "Incorrect date value: '2026-02-30' for column 'entrega' at row 1"
+ },
+ {
+  "linea": 47,
+  "texto": "INSERT INTO producto (referencia, nombre, entrega) VALUES ('ZAP-0005', 'Gorra', '30/11/2026')",
+  "ok": false,
+  "codigo": 1292,
+  "mensaje": "Incorrect date value: '30/11/2026' for column 'entrega' at row 1"
+ },
+ {
+  "linea": 48,
+  "texto": "INSERT INTO producto (referencia, nombre, entrega) VALUES ('ZAP-0005', 'Gorra', '2026/11/30')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 49,
+  "texto": "INSERT INTO producto (referencia, nombre, entrega) VALUES ('ZAP-0006', 'Gorra', 20261201)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 50,
+  "texto": "INSERT INTO producto (referencia, nombre, categoria) VALUES ('ZAP-0007', 'Gorra', 'joyeria')",
+  "ok": false,
+  "codigo": 1265,
+  "mensaje": "Data truncated for column 'categoria' at row 1"
+ },
+ {
+  "linea": 51,
+  "texto": "INSERT INTO producto (referencia, nombre, categoria) VALUES ('ZAP-0007', 'Gorra', 'ROPA')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 52,
+  "texto": "INSERT INTO producto (referencia, nombre, categoria) VALUES ('ZAP-0008', 'Gorra', 2)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 53,
+  "texto": "INSERT INTO producto (referencia, nombre, etiquetas) VALUES ('ZAP-0009', 'Gorra', 'eco,barato')",
+  "ok": false,
+  "codigo": 1265,
+  "mensaje": "Data truncated for column 'etiquetas' at row 1"
+ },
+ {
+  "linea": 54,
+  "texto": "INSERT INTO producto (referencia, nombre, anio) VALUES ('ZAP-0009', 'Gorra', 1800)",
+  "ok": false,
+  "codigo": 1264,
+  "mensaje": "Out of range value for column 'anio' at row 1"
+ },
+ {
+  "linea": 55,
+  "texto": "INSERT INTO producto (referencia, nombre, anio) VALUES ('ZAP-0009', 'Gorra', 26)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 56,
+  "texto": "INSERT INTO producto (referencia, nombre, hora) VALUES ('ZAP-0010', 'Gorra', '25:61:00')",
+  "ok": false,
+  "codigo": 1292,
+  "mensaje": "Incorrect time value: '25:61:00' for column 'hora' at row 1"
+ },
+ {
+  "linea": 57,
+  "texto": "INSERT INTO producto (referencia, nombre, activo) VALUES ('ZAP-0011', 'Gorra', 7)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 58,
+  "texto": "INSERT INTO producto (referencia, nombre) VALUES ('zap-0011 ', 'Gorra')",
+  "ok": false,
+  "codigo": 1062,
+  "mensaje": "Duplicate entry 'zap-0011' for key 'producto.referencia'"
+ },
+ {
+  "linea": 59,
+  "texto": "SELECT referencia, nombre, categoria, entrega, anio, activo FROM producto ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "referencia",
+   "nombre",
+   "categoria",
+   "entrega",
+   "anio",
+   "activo"
+  ],
+  "filas": [
+   [
+    "ZAP-0001",
+    "Zapatilla trail",
+    "material",
+    "2026-11-02",
+    "2026",
+    "1"
+   ],
+   [
+    "ZAP-0002",
+    "Calcetín",
+    "material",
+    null,
+    null,
+    "1"
+   ],
+   [
+    "ZAP-0003",
+    "Mochila",
+    "material",
+    null,
+    null,
+    "1"
+   ],
+   [
+    "ZAP-0005",
+    "Gorra",
+    "material",
+    "2026-11-30",
+    null,
+    "1"
+   ],
+   [
+    "ZAP-0006",
+    "Gorra",
+    "material",
+    "2026-12-01",
+    null,
+    "1"
+   ],
+   [
+    "ZAP-0007",
+    "Gorra",
+    "ropa",
+    null,
+    null,
+    "1"
+   ],
+   [
+    "ZAP-0008",
+    "Gorra",
+    "calzado",
+    null,
+    null,
+    "1"
+   ],
+   [
+    "ZAP-0009",
+    "Gorra",
+    "material",
+    null,
+    "2026",
+    "1"
+   ],
+   [
+    "ZAP-0011",
+    "Gorra",
+    "material",
+    null,
+    null,
+    "7"
+   ]
+  ]
+ },
+ {
+  "linea": 60,
+  "texto": "SELECT CONCAT('[', referencia, ']') FROM producto WHERE nombre = 'gorra' ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "CONCAT('[', referencia, ']')"
+  ],
+  "filas": [
+   [
+    "[ZAP-0005]"
+   ],
+   [
+    "[ZAP-0006]"
+   ],
+   [
+    "[ZAP-0007]"
+   ],
+   [
+    "[ZAP-0008]"
+   ],
+   [
+    "[ZAP-0009]"
+   ],
+   [
+    "[ZAP-0011]"
+   ]
+  ]
+ },
+ {
+  "linea": 61,
+  "texto": "CREATE TABLE textos (c CHAR(3), v VARCHAR(3), t TINYTEXT, b VARBINARY(4))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 62,
+  "texto": "INSERT INTO textos VALUES ('ab ', 'ab ', 'x', 'abcd')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 63,
+  "texto": "INSERT INTO textos (v) VALUES ('abc   ')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 64,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Note",
+    "1265",
+    "Data truncated for column 'v' at row 1"
+   ]
+  ]
+ },
+ {
+  "linea": 65,
+  "texto": "INSERT INTO textos (v) VALUES ('abcd ')",
+  "ok": false,
+  "codigo": 1406,
+  "mensaje": "Data too long for column 'v' at row 1"
+ },
+ {
+  "linea": 66,
+  "texto": "INSERT INTO textos (b) VALUES ('abcde')",
+  "ok": false,
+  "codigo": 1406,
+  "mensaje": "Data too long for column 'b' at row 1"
+ },
+ {
+  "linea": 67,
+  "texto": "SELECT CONCAT('[', c, ']'), CONCAT('[', v, ']'), LENGTH(c), LENGTH(v) FROM textos",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "CONCAT('[', c, ']')",
+   "CONCAT('[', v, ']')",
+   "LENGTH(c)",
+   "LENGTH(v)"
+  ],
+  "filas": [
+   [
+    "[ab]",
+    "[ab ]",
+    "2",
+    "3"
+   ],
+   [
+    null,
+    "[abc]",
+    null,
+    "3"
+   ]
+  ]
+ },
+ {
+  "linea": 68,
+  "texto": "CREATE TABLE numeros (d DECIMAL(5,2), d0 DECIMAL, f FLOAT(7,3), u DECIMAL(4,1) UNSIGNED)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 2
+ },
+ {
+  "linea": 69,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Warning",
+    "1681",
+    "Specifying number of digits for floating point data types is deprecated and will be removed in a future release."
+   ],
+   [
+    "Warning",
+    "1681",
+    "UNSIGNED for decimal and floating point data types is deprecated and support for it will be removed in a future release."
+   ]
+  ]
+ },
+ {
+  "linea": 70,
+  "texto": "SHOW CREATE TABLE numeros",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "numeros",
+    "CREATE TABLE `numeros` (\n  `d` decimal(5,2) DEFAULT NULL,\n  `d0` decimal(10,0) DEFAULT NULL,\n  `f` float(7,3) DEFAULT NULL,\n  `u` decimal(4,1) unsigned DEFAULT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 71,
+  "texto": "INSERT INTO numeros VALUES (123.456, 12345.6, 1.23456, 0)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 2
+ },
+ {
+  "linea": 72,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Note",
+    "1265",
+    "Data truncated for column 'd' at row 1"
+   ],
+   [
+    "Note",
+    "1265",
+    "Data truncated for column 'd0' at row 1"
+   ]
+  ]
+ },
+ {
+  "linea": 73,
+  "texto": "INSERT INTO numeros VALUES (-999.995, 0, 0, 0)",
+  "ok": false,
+  "codigo": 1264,
+  "mensaje": "Out of range value for column 'd' at row 1"
+ },
+ {
+  "linea": 74,
+  "texto": "INSERT INTO numeros VALUES (999.994, 0, 0, -1)",
+  "ok": false,
+  "codigo": 1264,
+  "mensaje": "Out of range value for column 'u' at row 1"
+ },
+ {
+  "linea": 75,
+  "texto": "SELECT * FROM numeros",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "d",
+   "d0",
+   "f",
+   "u"
+  ],
+  "filas": [
+   [
+    "123.46",
+    "12346",
+    "1.235",
+    "0.0"
+   ]
+  ]
+ },
+ {
+  "linea": 76,
+  "texto": "CREATE TABLE errores1 (a VARCHAR)",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1"
+ },
+ {
+  "linea": 77,
+  "texto": "CREATE TABLE errores2 (a CHAR(256))",
+  "ok": false,
+  "codigo": 1074,
+  "mensaje": "Column length too big for column 'a' (max = 255); use BLOB or TEXT instead"
+ },
+ {
+  "linea": 78,
+  "texto": "CREATE TABLE errores3 (a VARCHAR(20000))",
+  "ok": false,
+  "codigo": 1074,
+  "mensaje": "Column length too big for column 'a' (max = 16383); use BLOB or TEXT instead"
+ },
+ {
+  "linea": 79,
+  "texto": "CREATE TABLE errores4 (a DECIMAL(70,2))",
+  "ok": false,
+  "codigo": 1426,
+  "mensaje": "Too-big precision 70 specified for 'a'. Maximum is 65."
+ },
+ {
+  "linea": 80,
+  "texto": "CREATE TABLE errores5 (a DECIMAL(5,6))",
+  "ok": false,
+  "codigo": 1427,
+  "mensaje": "For float(M,D), double(M,D) or decimal(M,D), M must be >= D (column 'a')."
+ },
+ {
+  "linea": 81,
+  "texto": "CREATE TABLE errores6 (a INT DEFAULT 'abc')",
+  "ok": false,
+  "codigo": 1067,
+  "mensaje": "Invalid default value for 'a'"
+ },
+ {
+  "linea": 82,
+  "texto": "CREATE TABLE errores7 (a TINYINT DEFAULT 300)",
+  "ok": false,
+  "codigo": 1067,
+  "mensaje": "Invalid default value for 'a'"
+ },
+ {
+  "linea": 83,
+  "texto": "CREATE TABLE errores8 (a ENUM('x','y') DEFAULT 'z')",
+  "ok": false,
+  "codigo": 1067,
+  "mensaje": "Invalid default value for 'a'"
+ },
+ {
+  "linea": 84,
+  "texto": "CREATE TABLE errores9 (a INT NOT NULL DEFAULT NULL)",
+  "ok": false,
+  "codigo": 1067,
+  "mensaje": "Invalid default value for 'a'"
+ },
+ {
+  "linea": 85,
+  "texto": "CREATE TABLE errores10 (a DATE DEFAULT CURRENT_TIMESTAMP)",
+  "ok": false,
+  "codigo": 1067,
+  "mensaje": "Invalid default value for 'a'"
+ },
+ {
+  "linea": 86,
+  "texto": "CREATE TABLE errores11 (a ENUM('si','SI'))",
+  "ok": false,
+  "codigo": 1291,
+  "mensaje": "Column 'a' has duplicated value 'si' in ENUM"
+ },
+ {
+  "linea": 87,
+  "texto": "CREATE TABLE errores12 (a INT, A INT)",
+  "ok": false,
+  "codigo": 1060,
+  "mensaje": "Duplicate column name 'A'"
+ },
+ {
+  "linea": 88,
+  "texto": "CREATE TABLE errores13 (a TEXT DEFAULT '')",
+  "ok": false,
+  "codigo": 1101,
+  "mensaje": "BLOB, TEXT, GEOMETRY or JSON column 'a' can't have a default value"
+ },
+ {
+  "linea": 89,
+  "texto": "CREATE TABLE errores14 (a VARCHAR(10) AUTO_INCREMENT PRIMARY KEY)",
+  "ok": false,
+  "codigo": 1063,
+  "mensaje": "Incorrect column specifier for column 'a'"
+ },
+ {
+  "linea": 90,
+  "texto": "CREATE TABLE errores15 (a INT AUTO_INCREMENT PRIMARY KEY DEFAULT 1)",
+  "ok": false,
+  "codigo": 1067,
+  "mensaje": "Invalid default value for 'a'"
+ },
+ {
+  "linea": 91,
+  "texto": "CREATE TABLE errores16 (a INT ON UPDATE CURRENT_TIMESTAMP)",
+  "ok": false,
+  "codigo": 1294,
+  "mensaje": "Invalid ON UPDATE clause for 'a' column"
+ },
+ {
+  "linea": 92,
+  "texto": "CREATE TABLE errores17 ()",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1"
+ },
+ {
+  "linea": 93,
+  "texto": "CREATE TABLE defectos (n INT DEFAULT -5, d DECIMAL(6,2) DEFAULT 3, s VARCHAR(10) DEFAULT 'it''s', f DATE DEFAULT '2026-01-01', b BOOL DEFAULT FALSE, e ENUM('a','b') DEFAULT 'B')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 94,
+  "texto": "SHOW CREATE TABLE defectos",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "defectos",
+    "CREATE TABLE `defectos` (\n  `n` int DEFAULT '-5',\n  `d` decimal(6,2) DEFAULT '3.00',\n  `s` varchar(10) DEFAULT 'it''s',\n  `f` date DEFAULT '2026-01-01',\n  `b` tinyint(1) DEFAULT '0',\n  `e` enum('a','b') DEFAULT 'b'\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 95,
+  "texto": "DESCRIBE defectos",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "n",
+    "int",
+    "YES",
+    "",
+    "-5",
+    ""
+   ],
+   [
+    "d",
+    "decimal(6,2)",
+    "YES",
+    "",
+    "3.00",
+    ""
+   ],
+   [
+    "s",
+    "varchar(10)",
+    "YES",
+    "",
+    "it's",
+    ""
+   ],
+   [
+    "f",
+    "date",
+    "YES",
+    "",
+    "2026-01-01",
+    ""
+   ],
+   [
+    "b",
+    "tinyint(1)",
+    "YES",
+    "",
+    "0",
+    ""
+   ],
+   [
+    "e",
+    "enum('a','b')",
+    "YES",
+    "",
+    "b",
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 96,
+  "texto": "INSERT INTO defectos () VALUES ()",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 97,
+  "texto": "SELECT * FROM defectos",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "n",
+   "d",
+   "s",
+   "f",
+   "b",
+   "e"
+  ],
+  "filas": [
+   [
+    "-5",
+    "3.00",
+    "it's",
+    "2026-01-01",
+    "0",
+    "b"
+   ]
+  ]
+ }
+]

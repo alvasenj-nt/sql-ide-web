@@ -1,0 +1,362 @@
+[
+ {
+  "linea": 6,
+  "texto": "USE demo",
+  "ok": false,
+  "codigo": 1049,
+  "mensaje": "Unknown database 'demo'"
+ },
+ {
+  "linea": 7,
+  "texto": "DROP USER IF EXISTS 'ana'@'localhost', 'ana'@'%', 'luis'@'localhost'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 8,
+  "texto": "DROP ROLE IF EXISTS 'rol_lectura'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 10,
+  "texto": "CREATE TABLE socio (dni CHAR(9) PRIMARY KEY, nombre VARCHAR(50) NOT NULL, ciudad VARCHAR(30),\n  cuota DECIMAL(6,2) NOT NULL DEFAULT 20)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 12,
+  "texto": "INSERT INTO socio VALUES ('11111111A','Ana','Madrid',20), ('22222222B','Luis','Getafe',15),\n                         ('33333333C','Eva','Madrid',30)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 16,
+  "texto": "CREATE VIEW socios_madrid AS SELECT dni, nombre, cuota FROM socio WHERE ciudad = 'Madrid'",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 17,
+  "texto": "INSERT INTO socios_madrid VALUES ('44444444D', 'Raul', 25)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 18,
+  "texto": "SELECT * FROM socios_madrid WHERE dni = '44444444D'",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 19,
+  "texto": "SELECT * FROM socio WHERE dni = '44444444D'",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 22,
+  "texto": "CREATE OR REPLACE VIEW socios_madrid AS\n  SELECT dni, nombre, ciudad, cuota FROM socio WHERE ciudad = 'Madrid' WITH CHECK OPTION",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 25,
+  "texto": "INSERT INTO socios_madrid VALUES ('55555555E', 'Sara', 'Toledo', 25)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 27,
+  "texto": "UPDATE socios_madrid SET ciudad = 'Toledo' WHERE dni = '11111111A'",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 30,
+  "texto": "CREATE VIEW v1 AS SELECT * FROM socio WHERE cuota > 10",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 31,
+  "texto": "CREATE VIEW v2 AS SELECT * FROM v1 WHERE ciudad = 'Madrid' WITH LOCAL CHECK OPTION",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 33,
+  "texto": "INSERT INTO v2 (dni, nombre, ciudad, cuota) VALUES ('66666666F', 'Pablo', 'Madrid', 5)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 34,
+  "texto": "CREATE OR REPLACE VIEW v2 AS SELECT * FROM v1 WHERE ciudad = 'Madrid' WITH CASCADED CHECK OPTION",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 36,
+  "texto": "INSERT INTO v2 (dni, nombre, ciudad, cuota) VALUES ('77777777G', 'Lola', 'Madrid', 5)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 39,
+  "texto": "CREATE VIEW resumen AS SELECT ciudad, COUNT(*) AS total FROM socio GROUP BY ciudad",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 41,
+  "texto": "UPDATE resumen SET total = 0",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 42,
+  "texto": "CREATE VIEW solo_dni AS SELECT dni, ciudad FROM socio",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 44,
+  "texto": "INSERT INTO solo_dni VALUES ('99999999Z', 'Madrid')",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 47,
+  "texto": "CREATE VIEW todo AS SELECT * FROM socio",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 48,
+  "texto": "ALTER TABLE socio ADD COLUMN telefono CHAR(9)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 49,
+  "texto": "SHOW CREATE VIEW todo\\G\nSELECT TABLE_NAME, IS_UPDATABLE, CHECK_OPTION FROM information_schema.VIEWS WHERE TABLE_SCHEMA = 'demo'",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\\G\nSELECT TABLE_NAME, IS_UPDATABLE, CHECK_OPTION FROM information_schema.VIEWS W' at line 1"
+ },
+ {
+  "linea": 54,
+  "texto": "GRANT SELECT ON demo.* TO 'fantasma'@'localhost'",
+  "ok": false,
+  "codigo": 1410,
+  "mensaje": "You are not allowed to create a user with GRANT"
+ },
+ {
+  "linea": 55,
+  "texto": "CREATE USER 'ana'@'localhost' IDENTIFIED BY 'Ana_2026!'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 56,
+  "texto": "CREATE USER 'ana'@'%' IDENTIFIED BY 'Otra_2026!'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 57,
+  "texto": "SELECT user, host FROM mysql.user WHERE user = 'ana'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "user",
+   "host"
+  ],
+  "filas": [
+   [
+    "ana",
+    "%"
+   ],
+   [
+    "ana",
+    "localhost"
+   ]
+  ]
+ },
+ {
+  "linea": 58,
+  "texto": "GRANT SELECT (dni, nombre), UPDATE (cuota) ON demo.socio TO 'ana'@'localhost'",
+  "ok": false,
+  "codigo": 1049,
+  "mensaje": "Unknown database 'demo'"
+ },
+ {
+  "linea": 59,
+  "texto": "CREATE VIEW cuotas_madrid AS SELECT dni, nombre, cuota FROM socio WHERE ciudad = 'Madrid'",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 60,
+  "texto": "GRANT SELECT ON demo.cuotas_madrid TO 'ana'@'localhost'",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'demo.cuotas_madrid' doesn't exist"
+ },
+ {
+  "linea": 61,
+  "texto": "SHOW GRANTS FOR 'ana'@'localhost'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for ana@localhost"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `ana`@`localhost`"
+   ]
+  ]
+ },
+ {
+  "linea": 62,
+  "texto": "REVOKE UPDATE (cuota) ON demo.socio FROM 'ana'@'localhost'",
+  "ok": false,
+  "codigo": 1147,
+  "mensaje": "There is no such grant defined for user 'ana' on host 'localhost' on table 'socio'"
+ },
+ {
+  "linea": 63,
+  "texto": "SHOW GRANTS FOR 'ana'@'localhost'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for ana@localhost"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `ana`@`localhost`"
+   ]
+  ]
+ },
+ {
+  "linea": 66,
+  "texto": "CREATE ROLE 'rol_lectura'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 67,
+  "texto": "GRANT SELECT ON demo.* TO 'rol_lectura'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 68,
+  "texto": "CREATE USER 'luis'@'localhost' IDENTIFIED BY 'Luis_2026!'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 69,
+  "texto": "GRANT 'rol_lectura' TO 'luis'@'localhost'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 70,
+  "texto": "SHOW GRANTS FOR 'luis'@'localhost'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for luis@localhost"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `luis`@`localhost`"
+   ],
+   [
+    "GRANT `rol_lectura`@`%` TO `luis`@`localhost`"
+   ]
+  ]
+ },
+ {
+  "linea": 71,
+  "texto": "SHOW GRANTS FOR 'luis'@'localhost' USING 'rol_lectura'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for luis@localhost"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `luis`@`localhost`"
+   ],
+   [
+    "GRANT SELECT ON `demo`.* TO `luis`@`localhost`"
+   ],
+   [
+    "GRANT `rol_lectura`@`%` TO `luis`@`localhost`"
+   ]
+  ]
+ },
+ {
+  "linea": 72,
+  "texto": "SELECT @@activate_all_roles_on_login",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "@@activate_all_roles_on_login"
+  ],
+  "filas": [
+   [
+    "0"
+   ]
+  ]
+ }
+]

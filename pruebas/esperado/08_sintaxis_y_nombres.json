@@ -1,0 +1,1244 @@
+[
+ {
+  "linea": 2,
+  "texto": "CREATE TABLE sin_bd (a INT)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 3,
+  "texto": "SELECT * FROM sin_bd",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 4,
+  "texto": "SELECT DATABASE()",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "DATABASE()"
+  ],
+  "filas": [
+   [
+    null
+   ]
+  ]
+ },
+ {
+  "linea": 5,
+  "texto": "CREATE DATABASE prueba",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 6,
+  "texto": "CREATE DATABASE prueba",
+  "ok": false,
+  "codigo": 1007,
+  "mensaje": "Can't create database 'prueba'; database exists"
+ },
+ {
+  "linea": 7,
+  "texto": "CREATE DATABASE IF NOT EXISTS prueba",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 8,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Note",
+    "1007",
+    "Can't create database 'prueba'; database exists"
+   ]
+  ]
+ },
+ {
+  "linea": 9,
+  "texto": "DROP DATABASE nada",
+  "ok": false,
+  "codigo": 1008,
+  "mensaje": "Can't drop database 'nada'; database doesn't exist"
+ },
+ {
+  "linea": 10,
+  "texto": "DROP DATABASE IF EXISTS nada",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 11,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Note",
+    "1008",
+    "Can't drop database 'nada'; database doesn't exist"
+   ]
+  ]
+ },
+ {
+  "linea": 12,
+  "texto": "USE prueba",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 13,
+  "texto": "CREATE TABLE order (id INT)",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'order (id INT)' at line 1"
+ },
+ {
+  "linea": 14,
+  "texto": "CREATE TABLE `order` (id INT)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 15,
+  "texto": "CREATE TABLE pedido (id INT, rank INT)",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'rank INT)' at line 1"
+ },
+ {
+  "linea": 16,
+  "texto": "CREATE TABLE pedido (id INT, `rank` INT, key INT)",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'INT)' at line 1"
+ },
+ {
+  "linea": 17,
+  "texto": "CREATE TABLE pedido (id INT, fecha DATE, date DATE, time TIME, text TEXT, year YEAR, name VARCHAR(5), comment VARCHAR(5), status INT)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 18,
+  "texto": "CREATE TABLE coma (a INT, b INT,)",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ')' at line 1"
+ },
+ {
+  "linea": 19,
+  "texto": "CREATE TABLE sin_tipo (a, b INT)",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ', b INT)' at line 1"
+ },
+ {
+  "linea": 20,
+  "texto": "CREATE TABLE mal_cierre (a INT",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1"
+ },
+ {
+  "linea": 21,
+  "texto": "CREATE TABLE Pedido (x INT)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 22,
+  "texto": "SHOW TABLES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Tables_in_prueba"
+  ],
+  "filas": [
+   [
+    "Pedido"
+   ],
+   [
+    "order"
+   ],
+   [
+    "pedido"
+   ]
+  ]
+ },
+ {
+  "linea": 23,
+  "texto": "SHOW TABLES LIKE 'p%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Tables_in_prueba (p%)"
+  ],
+  "filas": [
+   [
+    "pedido"
+   ]
+  ]
+ },
+ {
+  "linea": 24,
+  "texto": "SHOW FULL TABLES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Tables_in_prueba",
+   "Table_type"
+  ],
+  "filas": [
+   [
+    "Pedido",
+    "BASE TABLE"
+   ],
+   [
+    "order",
+    "BASE TABLE"
+   ],
+   [
+    "pedido",
+    "BASE TABLE"
+   ]
+  ]
+ },
+ {
+  "linea": 25,
+  "texto": "SELECT * FROM PEDIDO",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'prueba.PEDIDO' doesn't exist"
+ },
+ {
+  "linea": 26,
+  "texto": "INSERT INTO pedido (ID, FECHA) VALUES (1, '2026-01-01')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 27,
+  "texto": "SELECT Id, FeChA FROM pedido",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Id",
+   "FeChA"
+  ],
+  "filas": [
+   [
+    "1",
+    "2026-01-01"
+   ]
+  ]
+ },
+ {
+  "linea": 28,
+  "texto": "CREATE TABLE motor_raro (a INT) ENGINE = Patata",
+  "ok": false,
+  "codigo": 1286,
+  "mensaje": "Unknown storage engine 'Patata'"
+ },
+ {
+  "linea": 29,
+  "texto": "CREATE TABLE motor_myisam (a INT) ENGINE = myisam",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 30,
+  "texto": "SHOW CREATE TABLE motor_myisam",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "motor_myisam",
+    "CREATE TABLE `motor_myisam` (\n  `a` int DEFAULT NULL\n) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 31,
+  "texto": "CREATE TABLE juegos (a VARCHAR(10) CHARACTER SET utf8, b VARCHAR(10) CHARACTER SET latin1, c VARCHAR(10) COLLATE utf8mb4_bin, d VARCHAR(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci) DEFAULT CHARSET = latin1",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 32,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Warning",
+    "3719",
+    "'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous."
+   ]
+  ]
+ },
+ {
+  "linea": 33,
+  "texto": "SHOW CREATE TABLE juegos",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "juegos",
+    "CREATE TABLE `juegos` (\n  `a` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,\n  `b` varchar(10) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,\n  `c` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,\n  `d` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_spanish_ci DEFAULT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+   ]
+  ]
+ },
+ {
+  "linea": 34,
+  "texto": "SHOW FULL COLUMNS FROM juegos",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Collation",
+   "Null",
+   "Key",
+   "Default",
+   "Extra",
+   "Privileges",
+   "Comment"
+  ],
+  "filas": [
+   [
+    "a",
+    "varchar(10)",
+    "utf8mb3_general_ci",
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "b",
+    "varchar(10)",
+    "latin1_swedish_ci",
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "c",
+    "varchar(10)",
+    "utf8mb4_bin",
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ],
+   [
+    "d",
+    "varchar(10)",
+    "utf8mb4_spanish_ci",
+    "YES",
+    "",
+    null,
+    "",
+    "select,insert,update,references",
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 35,
+  "texto": "CREATE TABLE juego_malo (a VARCHAR(10) CHARACTER SET klingon)",
+  "ok": false,
+  "codigo": 1115,
+  "mensaje": "Unknown character set: 'klingon'"
+ },
+ {
+  "linea": 36,
+  "texto": "CREATE TABLE colacion_mala (a VARCHAR(10) COLLATE utf8mb4_klingon_ci)",
+  "ok": false,
+  "codigo": 1273,
+  "mensaje": "Unknown collation: 'utf8mb4_klingon_ci'"
+ },
+ {
+  "linea": 37,
+  "texto": "CREATE TABLE mezcla (a VARCHAR(10) CHARACTER SET latin1 COLLATE utf8mb4_bin)",
+  "ok": false,
+  "codigo": 1253,
+  "mensaje": "COLLATION 'utf8mb4_bin' is not valid for CHARACTER SET 'latin1'"
+ },
+ {
+  "linea": 38,
+  "texto": "INSERT INTO juegos (b) VALUES ('ñandú')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 39,
+  "texto": "INSERT INTO juegos (a) VALUES ('ok')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 40,
+  "texto": "SELECT a, b FROM juegos",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "a",
+   "b"
+  ],
+  "filas": [
+   [
+    null,
+    "ñandú"
+   ],
+   [
+    "ok",
+    null
+   ]
+  ]
+ },
+ {
+  "linea": 41,
+  "texto": "INSERT INTO juegos (c) VALUES ('Hola'), ('hola')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 42,
+  "texto": "SELECT COUNT(*) FROM juegos WHERE c = 'hola'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)"
+  ],
+  "filas": [
+   [
+    "1"
+   ]
+  ]
+ },
+ {
+  "linea": 43,
+  "texto": "SELECT COUNT(*) FROM juegos WHERE c LIKE 'H%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)"
+  ],
+  "filas": [
+   [
+    "1"
+   ]
+  ]
+ },
+ {
+  "linea": 44,
+  "texto": "CREATE DATABASE latina CHARACTER SET latin1",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 45,
+  "texto": "SHOW CREATE DATABASE latina",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Database",
+   "Create Database"
+  ],
+  "filas": [
+   [
+    "latina",
+    "CREATE DATABASE `latina` /*!40100 DEFAULT CHARACTER SET latin1 */ /*!80016 DEFAULT ENCRYPTION='N' */"
+   ]
+  ]
+ },
+ {
+  "linea": 46,
+  "texto": "CREATE TABLE latina.t (a VARCHAR(5))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 47,
+  "texto": "SHOW CREATE TABLE latina.t",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "t",
+    "CREATE TABLE `t` (\n  `a` varchar(5) DEFAULT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+   ]
+  ]
+ },
+ {
+  "linea": 48,
+  "texto": "CREATE DATABASE `con espacios`",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 49,
+  "texto": "SHOW DATABASES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Database"
+  ],
+  "filas": [
+   [
+    "con espacios"
+   ],
+   [
+    "information_schema"
+   ],
+   [
+    "latina"
+   ],
+   [
+    "mysql"
+   ],
+   [
+    "performance_schema"
+   ],
+   [
+    "prueba"
+   ],
+   [
+    "sys"
+   ]
+  ]
+ },
+ {
+  "linea": 50,
+  "texto": "SHOW DATABASES LIKE 'lat%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Database (lat%)"
+  ],
+  "filas": [
+   [
+    "latina"
+   ]
+  ]
+ },
+ {
+  "linea": 51,
+  "texto": "DROP DATABASE `con espacios`",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 52,
+  "texto": "SELECT * FROM latina.noexiste",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'latina.noexiste' doesn't exist"
+ },
+ {
+  "linea": 53,
+  "texto": "SELECT * FROM noexiste.t",
+  "ok": false,
+  "codigo": 1049,
+  "mensaje": "Unknown database 'noexiste'"
+ },
+ {
+  "linea": 54,
+  "texto": "CREATE TABLE noexiste.t (a INT)",
+  "ok": false,
+  "codigo": 1049,
+  "mensaje": "Unknown database 'noexiste'"
+ },
+ {
+  "linea": 55,
+  "texto": "SHOW CREATE TABLE noexiste",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'prueba.noexiste' doesn't exist"
+ },
+ {
+  "linea": 56,
+  "texto": "DESCRIBE noexiste",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'prueba.noexiste' doesn't exist"
+ },
+ {
+  "linea": 57,
+  "texto": "SELECT 1 FROM",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1"
+ },
+ {
+  "linea": 58,
+  "texto": "SELECT",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '' at line 1"
+ },
+ {
+  "linea": 59,
+  "texto": "INSERT pedido VALUES (2, '2026-02-02')",
+  "ok": false,
+  "codigo": 1136,
+  "mensaje": "Column count doesn't match value count at row 1"
+ },
+ {
+  "linea": 60,
+  "texto": "INSERT INTO pedido VALUES (3, '2026-03-03')",
+  "ok": false,
+  "codigo": 1136,
+  "mensaje": "Column count doesn't match value count at row 1"
+ },
+ {
+  "linea": 61,
+  "texto": "SELECT id FROM pedido ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id"
+  ],
+  "filas": [
+   [
+    "1"
+   ]
+  ]
+ },
+ {
+  "linea": 62,
+  "texto": "SHOW COLUMNS FROM pedido FROM prueba",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "id",
+    "int",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "fecha",
+    "date",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "date",
+    "date",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "time",
+    "time",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "text",
+    "text",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "year",
+    "year",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "name",
+    "varchar(5)",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "comment",
+    "varchar(5)",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "status",
+    "int",
+    "YES",
+    "",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 63,
+  "texto": "DESC pedido",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "id",
+    "int",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "fecha",
+    "date",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "date",
+    "date",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "time",
+    "time",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "text",
+    "text",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "year",
+    "year",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "name",
+    "varchar(5)",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "comment",
+    "varchar(5)",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "status",
+    "int",
+    "YES",
+    "",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 64,
+  "texto": "DESCRIBE pedido fecha",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "fecha",
+    "date",
+    "YES",
+    "",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 65,
+  "texto": "SHOW ENGINES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Engine",
+   "Support",
+   "Comment",
+   "Transactions",
+   "XA",
+   "Savepoints"
+  ],
+  "filas": [
+   [
+    "ndbcluster",
+    "NO",
+    "Clustered, fault-tolerant tables",
+    null,
+    null,
+    null
+   ],
+   [
+    "MEMORY",
+    "YES",
+    "Hash based, stored in memory, useful for temporary tables",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "InnoDB",
+    "DEFAULT",
+    "Supports transactions, row-level locking, and foreign keys",
+    "YES",
+    "YES",
+    "YES"
+   ],
+   [
+    "PERFORMANCE_SCHEMA",
+    "YES",
+    "Performance Schema",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "MyISAM",
+    "YES",
+    "MyISAM storage engine",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "FEDERATED",
+    "NO",
+    "Federated MySQL storage engine",
+    null,
+    null,
+    null
+   ],
+   [
+    "ndbinfo",
+    "NO",
+    "MySQL Cluster system information storage engine",
+    null,
+    null,
+    null
+   ],
+   [
+    "MRG_MYISAM",
+    "YES",
+    "Collection of identical MyISAM tables",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "BLACKHOLE",
+    "YES",
+    "/dev/null storage engine (anything you write to it disappears)",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "CSV",
+    "YES",
+    "CSV storage engine",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "ARCHIVE",
+    "YES",
+    "Archive storage engine",
+    "NO",
+    "NO",
+    "NO"
+   ]
+  ]
+ },
+ {
+  "linea": 66,
+  "texto": "SELECT * FROM information_schema.SCHEMATA ORDER BY SCHEMA_NAME",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "CATALOG_NAME",
+   "SCHEMA_NAME",
+   "DEFAULT_CHARACTER_SET_NAME",
+   "DEFAULT_COLLATION_NAME",
+   "SQL_PATH",
+   "DEFAULT_ENCRYPTION"
+  ],
+  "filas": [
+   [
+    "def",
+    "information_schema",
+    "utf8mb3",
+    "utf8mb3_general_ci",
+    null,
+    "NO"
+   ],
+   [
+    "def",
+    "latina",
+    "latin1",
+    "latin1_swedish_ci",
+    null,
+    "NO"
+   ],
+   [
+    "def",
+    "mysql",
+    "utf8mb4",
+    "utf8mb4_0900_ai_ci",
+    null,
+    "NO"
+   ],
+   [
+    "def",
+    "performance_schema",
+    "utf8mb4",
+    "utf8mb4_0900_ai_ci",
+    null,
+    "NO"
+   ],
+   [
+    "def",
+    "prueba",
+    "utf8mb4",
+    "utf8mb4_0900_ai_ci",
+    null,
+    "NO"
+   ],
+   [
+    "def",
+    "sys",
+    "utf8mb4",
+    "utf8mb4_0900_ai_ci",
+    null,
+    "NO"
+   ]
+  ]
+ },
+ {
+  "linea": 67,
+  "texto": "SELECT TABLE_NAME, ENGINE, TABLE_TYPE FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'prueba' ORDER BY TABLE_NAME",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "TABLE_NAME",
+   "ENGINE",
+   "TABLE_TYPE"
+  ],
+  "filas": [
+   [
+    "Pedido",
+    "InnoDB",
+    "BASE TABLE"
+   ],
+   [
+    "juegos",
+    "InnoDB",
+    "BASE TABLE"
+   ],
+   [
+    "motor_myisam",
+    "MyISAM",
+    "BASE TABLE"
+   ],
+   [
+    "order",
+    "InnoDB",
+    "BASE TABLE"
+   ],
+   [
+    "pedido",
+    "InnoDB",
+    "BASE TABLE"
+   ]
+  ]
+ },
+ {
+  "linea": 68,
+  "texto": "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'prueba'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)"
+  ],
+  "filas": [
+   [
+    "5"
+   ]
+  ]
+ },
+ {
+  "linea": 69,
+  "texto": "SELECT @@foreign_key_checks, @@sql_mode, @@lower_case_table_names, @@character_set_server, @@collation_server",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "@@foreign_key_checks",
+   "@@sql_mode",
+   "@@lower_case_table_names",
+   "@@character_set_server",
+   "@@collation_server"
+  ],
+  "filas": [
+   [
+    "1",
+    "ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION",
+    "0",
+    "utf8mb4",
+    "utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 70,
+  "texto": "SELECT @@no_existe",
+  "ok": false,
+  "codigo": 1193,
+  "mensaje": "Unknown system variable 'no_existe'"
+ },
+ {
+  "linea": 71,
+  "texto": "SET @mi_variable = 5",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 72,
+  "texto": "SELECT @mi_variable * 2, @otra",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "@mi_variable * 2",
+   "@otra"
+  ],
+  "filas": [
+   [
+    "10",
+    null
+   ]
+  ]
+ },
+ {
+  "linea": 73,
+  "texto": "DROP TABLE pedido, Pedido",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 74,
+  "texto": "SHOW TABLES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Tables_in_prueba"
+  ],
+  "filas": [
+   [
+    "juegos"
+   ],
+   [
+    "motor_myisam"
+   ],
+   [
+    "order"
+   ]
+  ]
+ },
+ {
+  "linea": 75,
+  "texto": "DROP DATABASE prueba",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 76,
+  "texto": "DROP DATABASE latina",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 77,
+  "texto": "SHOW DATABASES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Database"
+  ],
+  "filas": [
+   [
+    "information_schema"
+   ],
+   [
+    "mysql"
+   ],
+   [
+    "performance_schema"
+   ],
+   [
+    "sys"
+   ]
+  ]
+ }
+]

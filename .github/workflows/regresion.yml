@@ -1,0 +1,29 @@
+# En cada push: el emulador se compara con lo que respondió MySQL 8 real a
+# todo el corpus (pruebas/esperado/) y se prueban en Chrome sin interfaz todas
+# las prácticas publicadas. Un cambio del motor que rompa la fidelidad o una
+# práctica ya usada se detecta antes de llegar al alumnado.
+name: Regresión
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  regresion:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Instalar dependencias de prueba
+        run: npm install --no-save --no-package-lock sql.js@1.15.2 puppeteer-core@25.16.0
+      - name: Comparar el emulador con MySQL real
+        run: node pruebas/diferencial.js
+      - name: Probar las prácticas en Chrome sin interfaz
+        env:
+          CHROME: /usr/bin/google-chrome
+        run: node pruebas/regresion.js

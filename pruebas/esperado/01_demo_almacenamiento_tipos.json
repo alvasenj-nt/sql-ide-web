@@ -1,0 +1,646 @@
+[
+ {
+  "linea": 7,
+  "texto": "DROP DATABASE IF EXISTS demo",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 8,
+  "texto": "CREATE DATABASE demo CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 9,
+  "texto": "USE demo",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 12,
+  "texto": "SHOW ENGINES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Engine",
+   "Support",
+   "Comment",
+   "Transactions",
+   "XA",
+   "Savepoints"
+  ],
+  "filas": [
+   [
+    "ndbcluster",
+    "NO",
+    "Clustered, fault-tolerant tables",
+    null,
+    null,
+    null
+   ],
+   [
+    "MEMORY",
+    "YES",
+    "Hash based, stored in memory, useful for temporary tables",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "InnoDB",
+    "DEFAULT",
+    "Supports transactions, row-level locking, and foreign keys",
+    "YES",
+    "YES",
+    "YES"
+   ],
+   [
+    "PERFORMANCE_SCHEMA",
+    "YES",
+    "Performance Schema",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "MyISAM",
+    "YES",
+    "MyISAM storage engine",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "FEDERATED",
+    "NO",
+    "Federated MySQL storage engine",
+    null,
+    null,
+    null
+   ],
+   [
+    "ndbinfo",
+    "NO",
+    "MySQL Cluster system information storage engine",
+    null,
+    null,
+    null
+   ],
+   [
+    "MRG_MYISAM",
+    "YES",
+    "Collection of identical MyISAM tables",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "BLACKHOLE",
+    "YES",
+    "/dev/null storage engine (anything you write to it disappears)",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "CSV",
+    "YES",
+    "CSV storage engine",
+    "NO",
+    "NO",
+    "NO"
+   ],
+   [
+    "ARCHIVE",
+    "YES",
+    "Archive storage engine",
+    "NO",
+    "NO",
+    "NO"
+   ]
+  ]
+ },
+ {
+  "linea": 13,
+  "texto": "CREATE TABLE t_innodb (id INT PRIMARY KEY) ENGINE=InnoDB",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 14,
+  "texto": "CREATE TABLE t_myisam (id INT PRIMARY KEY) ENGINE=MyISAM",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 17,
+  "texto": "CREATE TABLE hija_myisam (id INT PRIMARY KEY, padre INT,\n  FOREIGN KEY (padre) REFERENCES t_innodb (id)) ENGINE=MyISAM",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 19,
+  "texto": "SHOW CREATE TABLE hija_myisam\\G\n-- ERROR 1824: Failed to open the referenced table 't_myisam'\nCREATE TABLE hija_de_myisam (id INT PRIMARY KEY, padre INT,\n  FOREIGN KEY (padre) REFERENCES t_myisam (id)) ENGINE=InnoDB",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\\G\n-- ERROR 1824: Failed to open the referenced table 't_myisam'\nCREATE TABLE hi' at line 1"
+ },
+ {
+  "linea": 25,
+  "texto": "CREATE TABLE c3 (txt VARCHAR(20) CHARACTER SET utf8)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 26,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Warning",
+    "3719",
+    "'utf8' is currently an alias for the character set UTF8MB3, but will be an alias for UTF8MB4 in a future release. Please consider using UTF8MB4 in order to be unambiguous."
+   ]
+  ]
+ },
+ {
+  "linea": 28,
+  "texto": "INSERT INTO c3 VALUES (CONCAT('hola ', _utf8mb4 0xF09F9880))",
+  "ok": false,
+  "codigo": 1366,
+  "mensaje": "Incorrect string value: '\\xF0\\x9F\\x98\\x80' for column 'txt' at row 1"
+ },
+ {
+  "linea": 29,
+  "texto": "CREATE TABLE c4 (txt VARCHAR(20))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 30,
+  "texto": "INSERT INTO c4 VALUES (CONCAT('hola ', _utf8mb4 0xF09F9880))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 31,
+  "texto": "SELECT LENGTH(txt) AS bytes, CHAR_LENGTH(txt) AS caracteres FROM c4",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "bytes",
+   "caracteres"
+  ],
+  "filas": [
+   [
+    "9",
+    "6"
+   ]
+  ]
+ },
+ {
+  "linea": 32,
+  "texto": "SELECT 'José' = 'jose' AS ai_ci, 'José' = 'jose' COLLATE utf8mb4_0900_as_cs AS as_cs",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "ai_ci",
+   "as_cs"
+  ],
+  "filas": [
+   [
+    "1",
+    "0"
+   ]
+  ]
+ },
+ {
+  "linea": 35,
+  "texto": "SELECT @@lower_case_table_names",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "@@lower_case_table_names"
+  ],
+  "filas": [
+   [
+    "0"
+   ]
+  ]
+ },
+ {
+  "linea": 36,
+  "texto": "CREATE TABLE Socio (id INT PRIMARY KEY)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 37,
+  "texto": "CREATE TABLE socio_tmp (id INT PRIMARY KEY)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 38,
+  "texto": "SHOW TABLES LIKE '%ocio%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Tables_in_demo (%ocio%)"
+  ],
+  "filas": [
+   [
+    "Socio"
+   ],
+   [
+    "socio_tmp"
+   ]
+  ]
+ },
+ {
+  "linea": 39,
+  "texto": "DROP TABLE Socio, socio_tmp",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 42,
+  "texto": "CREATE TABLE tipos (v VARCHAR(5), t TINYINT, b BOOLEAN, ts TIMESTAMP NULL, dt DATETIME,\n  e ENUM('a','b'), c CHAR(5), n INT(11))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 44,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Warning",
+    "1681",
+    "Integer display width is deprecated and will be removed in a future release."
+   ]
+  ]
+ },
+ {
+  "linea": 46,
+  "texto": "INSERT INTO tipos (v) VALUES ('abcdefg')",
+  "ok": false,
+  "codigo": 1406,
+  "mensaje": "Data too long for column 'v' at row 1"
+ },
+ {
+  "linea": 48,
+  "texto": "INSERT INTO tipos (t) VALUES (300)",
+  "ok": false,
+  "codigo": 1264,
+  "mensaje": "Out of range value for column 't' at row 1"
+ },
+ {
+  "linea": 49,
+  "texto": "INSERT INTO tipos (b) VALUES (5)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 51,
+  "texto": "INSERT INTO tipos (ts) VALUES ('2040-01-01 00:00:00')",
+  "ok": false,
+  "codigo": 1292,
+  "mensaje": "Incorrect datetime value: '2040-01-01 00:00:00' for column 'ts' at row 1"
+ },
+ {
+  "linea": 52,
+  "texto": "INSERT INTO tipos (dt) VALUES ('2040-01-01 00:00:00')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 54,
+  "texto": "INSERT INTO tipos (e) VALUES ('c')",
+  "ok": false,
+  "codigo": 1265,
+  "mensaje": "Data truncated for column 'e' at row 1"
+ },
+ {
+  "linea": 55,
+  "texto": "INSERT INTO tipos (c) VALUES ('ab   ')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 56,
+  "texto": "SELECT b, CONCAT('[', c, ']') AS c_entre_corchetes FROM tipos WHERE b IS NOT NULL OR c IS NOT NULL",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "b",
+   "c_entre_corchetes"
+  ],
+  "filas": [
+   [
+    "5",
+    null
+   ],
+   [
+    null,
+    "[ab]"
+   ]
+  ]
+ },
+ {
+  "linea": 57,
+  "texto": "DESCRIBE tipos",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "v",
+    "varchar(5)",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "t",
+    "tinyint",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "b",
+    "tinyint(1)",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "ts",
+    "timestamp",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "dt",
+    "datetime",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "e",
+    "enum('a','b')",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "c",
+    "char(5)",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "n",
+    "int",
+    "YES",
+    "",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 59,
+  "texto": "CREATE TABLE dinero (f FLOAT, d DECIMAL(10,2))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 60,
+  "texto": "INSERT INTO dinero VALUES (0.1,0.1),(0.1,0.1),(0.1,0.1),(0.1,0.1),(0.1,0.1),\n                          (0.1,0.1),(0.1,0.1),(0.1,0.1),(0.1,0.1),(0.1,0.1)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 10,
+  "info": "Records: 10  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 62,
+  "texto": "SELECT SUM(f), SUM(d) FROM dinero",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "SUM(f)",
+   "SUM(d)"
+  ],
+  "filas": [
+   [
+    "1.0000000149011612",
+    "1.00"
+   ]
+  ]
+ },
+ {
+  "linea": 64,
+  "texto": "CREATE TABLE zonas (ts TIMESTAMP, dt DATETIME)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 65,
+  "texto": "SET time_zone = '+00:00'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 66,
+  "texto": "INSERT INTO zonas VALUES ('2026-10-28 10:00:00', '2026-10-28 10:00:00')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 67,
+  "texto": "SET time_zone = '+01:00'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 68,
+  "texto": "SELECT ts, dt FROM zonas",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "ts",
+   "dt"
+  ],
+  "filas": [
+   [
+    "2026-10-28 11:00:00",
+    "2026-10-28 10:00:00"
+   ]
+  ]
+ },
+ {
+  "linea": 69,
+  "texto": "SET time_zone = SYSTEM",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 72,
+  "texto": "CREATE TABLE txt_defecto (t TEXT DEFAULT 'x')",
+  "ok": false,
+  "codigo": 1101,
+  "mensaje": "BLOB, TEXT, GEOMETRY or JSON column 't' can't have a default value"
+ },
+ {
+  "linea": 75,
+  "texto": "SELECT TABLE_NAME, ENGINE, TABLE_COLLATION FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'demo'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "TABLE_NAME",
+   "ENGINE",
+   "TABLE_COLLATION"
+  ],
+  "filas": [
+   [
+    "c3",
+    "InnoDB",
+    "utf8mb4_0900_ai_ci"
+   ],
+   [
+    "c4",
+    "InnoDB",
+    "utf8mb4_0900_ai_ci"
+   ],
+   [
+    "dinero",
+    "InnoDB",
+    "utf8mb4_0900_ai_ci"
+   ],
+   [
+    "hija_myisam",
+    "MyISAM",
+    "utf8mb4_0900_ai_ci"
+   ],
+   [
+    "t_innodb",
+    "InnoDB",
+    "utf8mb4_0900_ai_ci"
+   ],
+   [
+    "t_myisam",
+    "MyISAM",
+    "utf8mb4_0900_ai_ci"
+   ],
+   [
+    "tipos",
+    "InnoDB",
+    "utf8mb4_0900_ai_ci"
+   ],
+   [
+    "zonas",
+    "InnoDB",
+    "utf8mb4_0900_ai_ci"
+   ]
+  ]
+ }
+]

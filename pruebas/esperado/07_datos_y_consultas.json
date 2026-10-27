@@ -1,0 +1,1026 @@
+[
+ {
+  "linea": 2,
+  "texto": "CREATE DATABASE club",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 3,
+  "texto": "USE club",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 4,
+  "texto": "CREATE TABLE socio (\n  dni CHAR(9) PRIMARY KEY,\n  nombre VARCHAR(50) NOT NULL,\n  ciudad VARCHAR(30),\n  cuota DECIMAL(6,2) NOT NULL DEFAULT 20,\n  alta DATE NOT NULL,\n  puntos INT DEFAULT 0\n)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 12,
+  "texto": "INSERT INTO socio VALUES ('11111111A', 'Ana', 'Madrid', 20, '2025-01-10', 15)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 13,
+  "texto": "INSERT INTO socio (dni, nombre, ciudad, alta) VALUES ('22222222B', 'Luis', 'Getafe', '2025-03-01'), ('33333333C', 'Eva', 'madrid', '2026-02-14')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 14,
+  "texto": "INSERT INTO socio SET dni = '44444444D', nombre = 'Raúl', alta = '2026-05-05', puntos = NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 15,
+  "texto": "INSERT INTO socio (dni, nombre, ciudad, cuota, alta) VALUES ('55555555E', 'Sara', 'Toledo', DEFAULT, '2026-06-01')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 16,
+  "texto": "INSERT INTO socio (dni, nombre) VALUES ('66666666F', 'Sin alta')",
+  "ok": false,
+  "codigo": 1364,
+  "mensaje": "Field 'alta' doesn't have a default value"
+ },
+ {
+  "linea": 17,
+  "texto": "INSERT INTO socio (dni, nombre, alta) VALUES ('66666666F', NULL, '2026-01-01')",
+  "ok": false,
+  "codigo": 1048,
+  "mensaje": "Column 'nombre' cannot be null"
+ },
+ {
+  "linea": 18,
+  "texto": "INSERT INTO socio (dni, nombre, alta) VALUES ('66666666F', 'Dos', '2026-01-01', 3)",
+  "ok": false,
+  "codigo": 1136,
+  "mensaje": "Column count doesn't match value count at row 1"
+ },
+ {
+  "linea": 19,
+  "texto": "INSERT INTO socio (dni, nombre, alta, nombre) VALUES ('66666666F', 'Dos', '2026-01-01', 'x')",
+  "ok": false,
+  "codigo": 1110,
+  "mensaje": "Column 'nombre' specified twice"
+ },
+ {
+  "linea": 20,
+  "texto": "INSERT INTO socio (dni, apellido) VALUES ('66666666F', 'x')",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'apellido' in 'field list'"
+ },
+ {
+  "linea": 21,
+  "texto": "INSERT INTO socio VALUES ('77777777G', 'Lola', 'Madrid', 31.5, '2026-07-07', 2), ('77777777G', 'Lola', 'Madrid', 31.5, '2026-07-07', 2)",
+  "ok": false,
+  "codigo": 1062,
+  "mensaje": "Duplicate entry '77777777G' for key 'socio.PRIMARY'"
+ },
+ {
+  "linea": 22,
+  "texto": "INSERT INTO noexiste VALUES (1)",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'club.noexiste' doesn't exist"
+ },
+ {
+  "linea": 23,
+  "texto": "SELECT * FROM socio ORDER BY dni",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "dni",
+   "nombre",
+   "ciudad",
+   "cuota",
+   "alta",
+   "puntos"
+  ],
+  "filas": [
+   [
+    "11111111A",
+    "Ana",
+    "Madrid",
+    "20.00",
+    "2025-01-10",
+    "15"
+   ],
+   [
+    "22222222B",
+    "Luis",
+    "Getafe",
+    "20.00",
+    "2025-03-01",
+    "0"
+   ],
+   [
+    "33333333C",
+    "Eva",
+    "madrid",
+    "20.00",
+    "2026-02-14",
+    "0"
+   ],
+   [
+    "44444444D",
+    "Raúl",
+    null,
+    "20.00",
+    "2026-05-05",
+    null
+   ],
+   [
+    "55555555E",
+    "Sara",
+    "Toledo",
+    "20.00",
+    "2026-06-01",
+    "0"
+   ]
+  ]
+ },
+ {
+  "linea": 24,
+  "texto": "SELECT nombre, cuota FROM socio WHERE ciudad = 'MADRID' ORDER BY nombre",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre",
+   "cuota"
+  ],
+  "filas": [
+   [
+    "Ana",
+    "20.00"
+   ],
+   [
+    "Eva",
+    "20.00"
+   ]
+  ]
+ },
+ {
+  "linea": 25,
+  "texto": "SELECT nombre FROM socio WHERE ciudad IS NULL",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Raúl"
+   ]
+  ]
+ },
+ {
+  "linea": 26,
+  "texto": "SELECT nombre FROM socio WHERE ciudad IN ('getafe', 'toledo') ORDER BY nombre DESC",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Sara"
+   ],
+   [
+    "Luis"
+   ]
+  ]
+ },
+ {
+  "linea": 27,
+  "texto": "SELECT nombre FROM socio WHERE nombre LIKE 'r%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Raúl"
+   ]
+  ]
+ },
+ {
+  "linea": 28,
+  "texto": "SELECT nombre FROM socio WHERE nombre = 'raul'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Raúl"
+   ]
+  ]
+ },
+ {
+  "linea": 29,
+  "texto": "SELECT nombre FROM socio WHERE alta BETWEEN '2026-01-01' AND '2026-12-31' ORDER BY alta LIMIT 2",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Eva"
+   ],
+   [
+    "Raúl"
+   ]
+  ]
+ },
+ {
+  "linea": 30,
+  "texto": "SELECT nombre FROM socio ORDER BY alta DESC LIMIT 1, 2",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Raúl"
+   ],
+   [
+    "Eva"
+   ]
+  ]
+ },
+ {
+  "linea": 31,
+  "texto": "SELECT DISTINCT ciudad FROM socio ORDER BY ciudad",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "ciudad"
+  ],
+  "filas": [
+   [
+    null
+   ],
+   [
+    "Getafe"
+   ],
+   [
+    "Madrid"
+   ],
+   [
+    "Toledo"
+   ]
+  ]
+ },
+ {
+  "linea": 32,
+  "texto": "SELECT nombre AS socio, cuota * 12 AS anual, cuota / 3, cuota + 0.5, puntos * 2, puntos / 4, 10 DIV 3, 10 % 3 FROM socio WHERE dni = '11111111A'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "socio",
+   "anual",
+   "cuota / 3",
+   "cuota + 0.5",
+   "puntos * 2",
+   "puntos / 4",
+   "10 DIV 3",
+   "10 % 3"
+  ],
+  "filas": [
+   [
+    "Ana",
+    "240.00",
+    "6.666667",
+    "20.50",
+    "30",
+    "3.7500",
+    "3",
+    "1"
+   ]
+  ]
+ },
+ {
+  "linea": 33,
+  "texto": "SELECT 1 + 1, 7 / 2, 2.50 * 3, 1.5 + 1, 10 / 4, -3 / 2, 5 DIV 2, 0.1 + 0.2",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "1 + 1",
+   "7 / 2",
+   "2.50 * 3",
+   "1.5 + 1",
+   "10 / 4",
+   "-3 / 2",
+   "5 DIV 2",
+   "0.1 + 0.2"
+  ],
+  "filas": [
+   [
+    "2",
+    "3.5000",
+    "7.50",
+    "2.5",
+    "2.5000",
+    "-1.5000",
+    "2",
+    "0.3"
+   ]
+  ]
+ },
+ {
+  "linea": 34,
+  "texto": "SELECT COUNT(*), COUNT(ciudad), SUM(cuota), AVG(cuota), MIN(alta), MAX(cuota), AVG(puntos), SUM(puntos) FROM socio",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)",
+   "COUNT(ciudad)",
+   "SUM(cuota)",
+   "AVG(cuota)",
+   "MIN(alta)",
+   "MAX(cuota)",
+   "AVG(puntos)",
+   "SUM(puntos)"
+  ],
+  "filas": [
+   [
+    "5",
+    "4",
+    "100.00",
+    "20.000000",
+    "2025-01-10",
+    "20.00",
+    "3.7500",
+    "15"
+   ]
+  ]
+ },
+ {
+  "linea": 35,
+  "texto": "SELECT ciudad, COUNT(*) AS n, SUM(cuota) FROM socio GROUP BY ciudad HAVING COUNT(*) >= 1 ORDER BY n DESC, ciudad",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "ciudad",
+   "n",
+   "SUM(cuota)"
+  ],
+  "filas": [
+   [
+    "Madrid",
+    "2",
+    "40.00"
+   ],
+   [
+    null,
+    "1",
+    "20.00"
+   ],
+   [
+    "Getafe",
+    "1",
+    "20.00"
+   ],
+   [
+    "Toledo",
+    "1",
+    "20.00"
+   ]
+  ]
+ },
+ {
+  "linea": 36,
+  "texto": "SELECT UPPER(nombre), LOWER(ciudad), LENGTH(nombre), CHAR_LENGTH(nombre), CONCAT(nombre, ' (', ciudad, ')'), SUBSTRING(nombre, 2, 2), LEFT(nombre, 1), RIGHT(dni, 1) FROM socio WHERE dni = '44444444D'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "UPPER(nombre)",
+   "LOWER(ciudad)",
+   "LENGTH(nombre)",
+   "CHAR_LENGTH(nombre)",
+   "CONCAT(nombre, ' (', ciudad, ')')",
+   "SUBSTRING(nombre, 2, 2)",
+   "LEFT(nombre, 1)",
+   "RIGHT(dni, 1)"
+  ],
+  "filas": [
+   [
+    "RAÚL",
+    null,
+    "5",
+    "4",
+    null,
+    "aú",
+    "R",
+    "D"
+   ]
+  ]
+ },
+ {
+  "linea": 37,
+  "texto": "SELECT CONCAT(nombre, ' - ', IFNULL(ciudad, 'sin ciudad')), COALESCE(ciudad, 'n/d'), IF(cuota > 20, 'alta', 'normal') FROM socio ORDER BY dni",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "CONCAT(nombre, ' - ', IFNULL(ciudad, 'sin ciudad'))",
+   "COALESCE(ciudad, 'n/d')",
+   "IF(cuota > 20, 'alta', 'normal')"
+  ],
+  "filas": [
+   [
+    "Ana - Madrid",
+    "Madrid",
+    "normal"
+   ],
+   [
+    "Luis - Getafe",
+    "Getafe",
+    "normal"
+   ],
+   [
+    "Eva - madrid",
+    "madrid",
+    "normal"
+   ],
+   [
+    "Raúl - sin ciudad",
+    "n/d",
+    "normal"
+   ],
+   [
+    "Sara - Toledo",
+    "Toledo",
+    "normal"
+   ]
+  ]
+ },
+ {
+  "linea": 38,
+  "texto": "SELECT YEAR(alta), MONTH(alta), DAY(alta), DATEDIFF('2026-12-31', alta), DATE_FORMAT(alta, '%d/%m/%Y') FROM socio WHERE dni = '33333333C'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "YEAR(alta)",
+   "MONTH(alta)",
+   "DAY(alta)",
+   "DATEDIFF('2026-12-31', alta)",
+   "DATE_FORMAT(alta, '%d/%m/%Y')"
+  ],
+  "filas": [
+   [
+    "2026",
+    "2",
+    "14",
+    "320",
+    "14/02/2026"
+   ]
+  ]
+ },
+ {
+  "linea": 39,
+  "texto": "SELECT ROUND(2.5), ROUND(-2.5), ROUND(1.2345, 2), TRUNCATE(1.789, 1), ABS(-4), CEIL(1.2), FLOOR(-1.2), MOD(10, 4), GREATEST(1, 5, 3), LEAST('b', 'a')",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "ROUND(2.5)",
+   "ROUND(-2.5)",
+   "ROUND(1.2345, 2)",
+   "TRUNCATE(1.789, 1)",
+   "ABS(-4)",
+   "CEIL(1.2)",
+   "FLOOR(-1.2)",
+   "MOD(10, 4)",
+   "GREATEST(1, 5, 3)",
+   "LEAST('b', 'a')"
+  ],
+  "filas": [
+   [
+    "3",
+    "-3",
+    "1.23",
+    "1.7",
+    "4",
+    "2",
+    "-2",
+    "2",
+    "5",
+    "a"
+   ]
+  ]
+ },
+ {
+  "linea": 40,
+  "texto": "SELECT 'abc' = 'ABC', 'a' < 'B', NULL = NULL, NULL <=> NULL, 1 = 1.0, 'ñ' = 'n', 'José' LIKE 'jose'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "'abc' = 'ABC'",
+   "'a' < 'B'",
+   "NULL = NULL",
+   "NULL <=> NULL",
+   "1 = 1.0",
+   "'ñ' = 'n'",
+   "'José' LIKE 'jose'"
+  ],
+  "filas": [
+   [
+    "1",
+    "1",
+    null,
+    "1",
+    "1",
+    "1",
+    "1"
+   ]
+  ]
+ },
+ {
+  "linea": 41,
+  "texto": "SELECT nombre FROM socio WHERE puntos IS NOT NULL AND (cuota > 20 OR ciudad = 'Getafe') ORDER BY nombre",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Luis"
+   ]
+  ]
+ },
+ {
+  "linea": 42,
+  "texto": "SELECT nombre FROM socio WHERE NOT (ciudad = 'Madrid') ORDER BY nombre",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Luis"
+   ],
+   [
+    "Sara"
+   ]
+  ]
+ },
+ {
+  "linea": 43,
+  "texto": "SELECT nombre, CASE WHEN puntos IS NULL THEN 'sin datos' WHEN puntos > 10 THEN 'muchos' ELSE 'pocos' END AS nivel FROM socio ORDER BY dni",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre",
+   "nivel"
+  ],
+  "filas": [
+   [
+    "Ana",
+    "muchos"
+   ],
+   [
+    "Luis",
+    "pocos"
+   ],
+   [
+    "Eva",
+    "pocos"
+   ],
+   [
+    "Raúl",
+    "sin datos"
+   ],
+   [
+    "Sara",
+    "pocos"
+   ]
+  ]
+ },
+ {
+  "linea": 44,
+  "texto": "SELECT s.nombre FROM socio AS s WHERE s.cuota = (SELECT MAX(cuota) FROM socio)",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Ana"
+   ],
+   [
+    "Luis"
+   ],
+   [
+    "Eva"
+   ],
+   [
+    "Raúl"
+   ],
+   [
+    "Sara"
+   ]
+  ]
+ },
+ {
+  "linea": 45,
+  "texto": "SELECT nombre FROM socio WHERE dni IN (SELECT dni FROM socio WHERE ciudad = 'Madrid') ORDER BY nombre",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Ana"
+   ],
+   [
+    "Eva"
+   ]
+  ]
+ },
+ {
+  "linea": 46,
+  "texto": "SELECT nombre FROM socio ORDER BY 1 LIMIT 3",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Ana"
+   ],
+   [
+    "Eva"
+   ],
+   [
+    "Luis"
+   ]
+  ]
+ },
+ {
+  "linea": 47,
+  "texto": "SELECT socio.nombre FROM socio WHERE socio.dni = '11111111A'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Ana"
+   ]
+  ]
+ },
+ {
+  "linea": 48,
+  "texto": "SELECT club.socio.nombre FROM club.socio WHERE dni = '11111111A'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "nombre"
+  ],
+  "filas": [
+   [
+    "Ana"
+   ]
+  ]
+ },
+ {
+  "linea": 49,
+  "texto": "SELECT nombre FROM socio WHERE apellido = 'x'",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'apellido' in 'where clause'"
+ },
+ {
+  "linea": 50,
+  "texto": "SELECT x.nombre FROM socio AS s",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'x.nombre' in 'field list'"
+ },
+ {
+  "linea": 51,
+  "texto": "SELECT nombre, COUNT(*) FROM socio",
+  "ok": false,
+  "codigo": 1140,
+  "mensaje": "In aggregated query without GROUP BY, expression #1 of SELECT list contains nonaggregated column 'club.socio.nombre'; this is incompatible with sql_mode=only_full_group_by"
+ },
+ {
+  "linea": 52,
+  "texto": "SELECT * FROM socio WHERE COUNT(*) > 1",
+  "ok": false,
+  "codigo": 1111,
+  "mensaje": "Invalid use of group function"
+ },
+ {
+  "linea": 53,
+  "texto": "UPDATE socio SET cuota = cuota * 1.1 WHERE ciudad = 'Madrid'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Rows matched: 2  Changed: 2  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 54,
+  "texto": "SELECT dni, cuota FROM socio ORDER BY dni",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "dni",
+   "cuota"
+  ],
+  "filas": [
+   [
+    "11111111A",
+    "22.00"
+   ],
+   [
+    "22222222B",
+    "20.00"
+   ],
+   [
+    "33333333C",
+    "22.00"
+   ],
+   [
+    "44444444D",
+    "20.00"
+   ],
+   [
+    "55555555E",
+    "20.00"
+   ]
+  ]
+ },
+ {
+  "linea": 55,
+  "texto": "UPDATE socio SET cuota = 22 WHERE dni = '11111111A'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Rows matched: 1  Changed: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 56,
+  "texto": "UPDATE socio SET ciudad = 'Madrid' WHERE ciudad = 'Madrid'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Rows matched: 2  Changed: 1  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 57,
+  "texto": "UPDATE socio SET puntos = puntos + 1",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 4,
+  "info": "Rows matched: 5  Changed: 4  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 58,
+  "texto": "UPDATE socio SET nombre = NULL WHERE dni = '11111111A'",
+  "ok": false,
+  "codigo": 1048,
+  "mensaje": "Column 'nombre' cannot be null"
+ },
+ {
+  "linea": 59,
+  "texto": "UPDATE socio SET cuota = 99999 WHERE dni = '11111111A'",
+  "ok": false,
+  "codigo": 1264,
+  "mensaje": "Out of range value for column 'cuota' at row 1"
+ },
+ {
+  "linea": 60,
+  "texto": "UPDATE socio SET dni = '22222222B' WHERE dni = '11111111A'",
+  "ok": false,
+  "codigo": 1062,
+  "mensaje": "Duplicate entry '22222222B' for key 'socio.PRIMARY'"
+ },
+ {
+  "linea": 61,
+  "texto": "UPDATE socio SET cuota = DEFAULT WHERE dni = '11111111A'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Rows matched: 1  Changed: 1  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 62,
+  "texto": "UPDATE socio SET puntos = 0 ORDER BY alta DESC LIMIT 2",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Rows matched: 2  Changed: 2  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 63,
+  "texto": "UPDATE socio SET apellido = 'x'",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'apellido' in 'field list'"
+ },
+ {
+  "linea": 64,
+  "texto": "SELECT dni, cuota, puntos FROM socio ORDER BY dni",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "dni",
+   "cuota",
+   "puntos"
+  ],
+  "filas": [
+   [
+    "11111111A",
+    "20.00",
+    "16"
+   ],
+   [
+    "22222222B",
+    "20.00",
+    "1"
+   ],
+   [
+    "33333333C",
+    "22.00",
+    "1"
+   ],
+   [
+    "44444444D",
+    "20.00",
+    "0"
+   ],
+   [
+    "55555555E",
+    "20.00",
+    "0"
+   ]
+  ]
+ },
+ {
+  "linea": 65,
+  "texto": "DELETE FROM socio WHERE ciudad = 'Toledo'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 66,
+  "texto": "DELETE FROM socio ORDER BY alta LIMIT 1",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 67,
+  "texto": "DELETE FROM socio WHERE dni = 'nadie'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 68,
+  "texto": "SELECT dni FROM socio ORDER BY dni",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "dni"
+  ],
+  "filas": [
+   [
+    "22222222B"
+   ],
+   [
+    "33333333C"
+   ],
+   [
+    "44444444D"
+   ]
+  ]
+ },
+ {
+  "linea": 69,
+  "texto": "SELECT COUNT(*) FROM socio WHERE cuota > 20",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)"
+  ],
+  "filas": [
+   [
+    "1"
+   ]
+  ]
+ },
+ {
+  "linea": 70,
+  "texto": "DELETE FROM socio",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 71,
+  "texto": "SELECT COUNT(*) FROM socio",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)"
+  ],
+  "filas": [
+   [
+    "0"
+   ]
+  ]
+ },
+ {
+  "linea": 72,
+  "texto": "SELECT 'hola' AS saludo, 3 AS numero, NULL AS nada",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "saludo",
+   "numero",
+   "nada"
+  ],
+  "filas": [
+   [
+    "hola",
+    "3",
+    null
+   ]
+  ]
+ },
+ {
+  "linea": 73,
+  "texto": "SELECT DATABASE()",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "DATABASE()"
+  ],
+  "filas": [
+   [
+    "club"
+   ]
+  ]
+ },
+ {
+  "linea": 74,
+  "texto": "USE noexiste",
+  "ok": false,
+  "codigo": 1049,
+  "mensaje": "Unknown database 'noexiste'"
+ }
+]

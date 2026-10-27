@@ -1,0 +1,928 @@
+[
+ {
+  "linea": 2,
+  "texto": "CREATE DATABASE cines",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 3,
+  "texto": "USE cines",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 4,
+  "texto": "CREATE TABLE cine (distrito VARCHAR(30) PRIMARY KEY, direccion VARCHAR(100) NOT NULL)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 5,
+  "texto": "CREATE TABLE sala (\n  distrito_cine VARCHAR(30),\n  numero TINYINT UNSIGNED,\n  aforo SMALLINT UNSIGNED NOT NULL,\n  PRIMARY KEY (distrito_cine, numero),\n  FOREIGN KEY (distrito_cine) REFERENCES cine (distrito) ON DELETE CASCADE ON UPDATE CASCADE\n)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 12,
+  "texto": "CREATE TABLE pelicula (titulo VARCHAR(100) PRIMARY KEY, anio YEAR, categoria VARCHAR(10))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 13,
+  "texto": "CREATE TABLE sesion (\n  distrito_cine VARCHAR(30),\n  numero_sala TINYINT UNSIGNED,\n  hora_ini TIME,\n  titulo_pelicula VARCHAR(100),\n  vo BOOLEAN NOT NULL DEFAULT FALSE,\n  PRIMARY KEY (distrito_cine, numero_sala, hora_ini),\n  CONSTRAINT fk_sesion_sala FOREIGN KEY (distrito_cine, numero_sala) REFERENCES sala (distrito_cine, numero) ON UPDATE CASCADE,\n  CONSTRAINT fk_sesion_pelicula FOREIGN KEY (titulo_pelicula) REFERENCES pelicula (titulo) ON DELETE SET NULL ON UPDATE CASCADE\n)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 23,
+  "texto": "SHOW CREATE TABLE sala",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "sala",
+    "CREATE TABLE `sala` (\n  `distrito_cine` varchar(30) NOT NULL,\n  `numero` tinyint unsigned NOT NULL,\n  `aforo` smallint unsigned NOT NULL,\n  PRIMARY KEY (`distrito_cine`,`numero`),\n  CONSTRAINT `sala_ibfk_1` FOREIGN KEY (`distrito_cine`) REFERENCES `cine` (`distrito`) ON DELETE CASCADE ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 24,
+  "texto": "SHOW CREATE TABLE sesion",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "sesion",
+    "CREATE TABLE `sesion` (\n  `distrito_cine` varchar(30) NOT NULL,\n  `numero_sala` tinyint unsigned NOT NULL,\n  `hora_ini` time NOT NULL,\n  `titulo_pelicula` varchar(100) DEFAULT NULL,\n  `vo` tinyint(1) NOT NULL DEFAULT '0',\n  PRIMARY KEY (`distrito_cine`,`numero_sala`,`hora_ini`),\n  KEY `fk_sesion_pelicula` (`titulo_pelicula`),\n  CONSTRAINT `fk_sesion_pelicula` FOREIGN KEY (`titulo_pelicula`) REFERENCES `pelicula` (`titulo`) ON DELETE SET NULL ON UPDATE CASCADE,\n  CONSTRAINT `fk_sesion_sala` FOREIGN KEY (`distrito_cine`, `numero_sala`) REFERENCES `sala` (`distrito_cine`, `numero`) ON UPDATE CASCADE\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 25,
+  "texto": "SHOW INDEX FROM sesion",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Non_unique",
+   "Key_name",
+   "Seq_in_index",
+   "Column_name",
+   "Collation",
+   "Cardinality",
+   "Sub_part",
+   "Packed",
+   "Null",
+   "Index_type",
+   "Comment",
+   "Index_comment",
+   "Visible",
+   "Expression"
+  ],
+  "filas": [
+   [
+    "sesion",
+    "0",
+    "PRIMARY",
+    "1",
+    "distrito_cine",
+    "A",
+    "0",
+    null,
+    null,
+    "",
+    "BTREE",
+    "",
+    "",
+    "YES",
+    null
+   ],
+   [
+    "sesion",
+    "0",
+    "PRIMARY",
+    "2",
+    "numero_sala",
+    "A",
+    "0",
+    null,
+    null,
+    "",
+    "BTREE",
+    "",
+    "",
+    "YES",
+    null
+   ],
+   [
+    "sesion",
+    "0",
+    "PRIMARY",
+    "3",
+    "hora_ini",
+    "A",
+    "0",
+    null,
+    null,
+    "",
+    "BTREE",
+    "",
+    "",
+    "YES",
+    null
+   ],
+   [
+    "sesion",
+    "1",
+    "fk_sesion_pelicula",
+    "1",
+    "titulo_pelicula",
+    "A",
+    "0",
+    null,
+    null,
+    "YES",
+    "BTREE",
+    "",
+    "",
+    "YES",
+    null
+   ]
+  ]
+ },
+ {
+  "linea": 26,
+  "texto": "SELECT CONSTRAINT_NAME, UNIQUE_CONSTRAINT_NAME, UPDATE_RULE, DELETE_RULE, TABLE_NAME, REFERENCED_TABLE_NAME FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'cines' ORDER BY CONSTRAINT_NAME",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "CONSTRAINT_NAME",
+   "UNIQUE_CONSTRAINT_NAME",
+   "UPDATE_RULE",
+   "DELETE_RULE",
+   "TABLE_NAME",
+   "REFERENCED_TABLE_NAME"
+  ],
+  "filas": [
+   [
+    "fk_sesion_pelicula",
+    "PRIMARY",
+    "CASCADE",
+    "SET NULL",
+    "sesion",
+    "pelicula"
+   ],
+   [
+    "fk_sesion_sala",
+    "PRIMARY",
+    "CASCADE",
+    "NO ACTION",
+    "sesion",
+    "sala"
+   ],
+   [
+    "sala_ibfk_1",
+    "PRIMARY",
+    "CASCADE",
+    "CASCADE",
+    "sala",
+    "cine"
+   ]
+  ]
+ },
+ {
+  "linea": 27,
+  "texto": "SELECT CONSTRAINT_NAME, TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = 'cines' AND REFERENCED_TABLE_NAME IS NOT NULL ORDER BY CONSTRAINT_NAME, ORDINAL_POSITION",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "CONSTRAINT_NAME",
+   "TABLE_NAME",
+   "COLUMN_NAME",
+   "REFERENCED_TABLE_NAME",
+   "REFERENCED_COLUMN_NAME"
+  ],
+  "filas": [
+   [
+    "fk_sesion_pelicula",
+    "sesion",
+    "titulo_pelicula",
+    "pelicula",
+    "titulo"
+   ],
+   [
+    "fk_sesion_sala",
+    "sesion",
+    "distrito_cine",
+    "sala",
+    "distrito_cine"
+   ],
+   [
+    "fk_sesion_sala",
+    "sesion",
+    "numero_sala",
+    "sala",
+    "numero"
+   ],
+   [
+    "sala_ibfk_1",
+    "sala",
+    "distrito_cine",
+    "cine",
+    "distrito"
+   ]
+  ]
+ },
+ {
+  "linea": 28,
+  "texto": "INSERT INTO cine VALUES ('Centro', 'Gran Vía 1'), ('Retiro', 'Alcalá 200')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 29,
+  "texto": "INSERT INTO sala VALUES ('Centro', 1, 120), ('Centro', 2, 80), ('Retiro', 1, 200)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 30,
+  "texto": "INSERT INTO pelicula VALUES ('Vértigo', 1958, 'drama'), ('Cantando bajo la lluvia', 1952, 'musical')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 31,
+  "texto": "INSERT INTO sesion VALUES ('Centro', 1, '18:00', 'Vértigo', TRUE), ('Centro', 2, '20:00', 'Cantando bajo la lluvia', FALSE)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 32,
+  "texto": "INSERT INTO sesion VALUES ('Centro', 3, '18:00', 'Vértigo', TRUE)",
+  "ok": false,
+  "codigo": 1452,
+  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`cines`.`sesion`, CONSTRAINT `fk_sesion_sala` FOREIGN KEY (`distrito_cine`, `numero_sala`) REFERENCES `sala` (`distrito_cine`, `numero`) ON UPDATE CASCADE)"
+ },
+ {
+  "linea": 33,
+  "texto": "INSERT INTO sesion VALUES ('Centro', 1, '22:00', 'Psicosis', TRUE)",
+  "ok": false,
+  "codigo": 1452,
+  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`cines`.`sesion`, CONSTRAINT `fk_sesion_pelicula` FOREIGN KEY (`titulo_pelicula`) REFERENCES `pelicula` (`titulo`) ON DELETE SET NULL ON UPDATE CASCADE)"
+ },
+ {
+  "linea": 34,
+  "texto": "INSERT INTO sala VALUES ('Moncloa', 1, 100)",
+  "ok": false,
+  "codigo": 1452,
+  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`cines`.`sala`, CONSTRAINT `sala_ibfk_1` FOREIGN KEY (`distrito_cine`) REFERENCES `cine` (`distrito`) ON DELETE CASCADE ON UPDATE CASCADE)"
+ },
+ {
+  "linea": 35,
+  "texto": "INSERT INTO sesion (distrito_cine, numero_sala, hora_ini) VALUES ('Retiro', 1, '17:00')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 36,
+  "texto": "DELETE FROM sala WHERE distrito_cine = 'Centro' AND numero = 1",
+  "ok": false,
+  "codigo": 1451,
+  "mensaje": "Cannot delete or update a parent row: a foreign key constraint fails (`cines`.`sesion`, CONSTRAINT `fk_sesion_sala` FOREIGN KEY (`distrito_cine`, `numero_sala`) REFERENCES `sala` (`distrito_cine`, `numero`) ON UPDATE CASCADE)"
+ },
+ {
+  "linea": 37,
+  "texto": "DELETE FROM pelicula WHERE titulo = 'Vértigo'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 38,
+  "texto": "SELECT distrito_cine, numero_sala, hora_ini, titulo_pelicula FROM sesion ORDER BY hora_ini",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "distrito_cine",
+   "numero_sala",
+   "hora_ini",
+   "titulo_pelicula"
+  ],
+  "filas": [
+   [
+    "Retiro",
+    "1",
+    "17:00:00",
+    null
+   ],
+   [
+    "Centro",
+    "1",
+    "18:00:00",
+    null
+   ],
+   [
+    "Centro",
+    "2",
+    "20:00:00",
+    "Cantando bajo la lluvia"
+   ]
+  ]
+ },
+ {
+  "linea": 39,
+  "texto": "UPDATE pelicula SET titulo = 'Singin in the Rain' WHERE titulo = 'Cantando bajo la lluvia'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Rows matched: 1  Changed: 1  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 40,
+  "texto": "SELECT titulo_pelicula FROM sesion ORDER BY hora_ini",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "titulo_pelicula"
+  ],
+  "filas": [
+   [
+    null
+   ],
+   [
+    null
+   ],
+   [
+    "Singin in the Rain"
+   ]
+  ]
+ },
+ {
+  "linea": 41,
+  "texto": "UPDATE cine SET distrito = 'Sol' WHERE distrito = 'Centro'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Rows matched: 1  Changed: 1  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 42,
+  "texto": "SELECT * FROM sala ORDER BY distrito_cine, numero",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "distrito_cine",
+   "numero",
+   "aforo"
+  ],
+  "filas": [
+   [
+    "Retiro",
+    "1",
+    "200"
+   ],
+   [
+    "Sol",
+    "1",
+    "120"
+   ],
+   [
+    "Sol",
+    "2",
+    "80"
+   ]
+  ]
+ },
+ {
+  "linea": 43,
+  "texto": "SELECT distrito_cine, numero_sala FROM sesion ORDER BY hora_ini",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "distrito_cine",
+   "numero_sala"
+  ],
+  "filas": [
+   [
+    "Retiro",
+    "1"
+   ],
+   [
+    "Sol",
+    "1"
+   ],
+   [
+    "Sol",
+    "2"
+   ]
+  ]
+ },
+ {
+  "linea": 44,
+  "texto": "DELETE FROM cine WHERE distrito = 'Sol'",
+  "ok": false,
+  "codigo": 1451,
+  "mensaje": "Cannot delete or update a parent row: a foreign key constraint fails (`cines`.`sesion`, CONSTRAINT `fk_sesion_sala` FOREIGN KEY (`distrito_cine`, `numero_sala`) REFERENCES `sala` (`distrito_cine`, `numero`) ON UPDATE CASCADE)"
+ },
+ {
+  "linea": 45,
+  "texto": "DELETE FROM sesion",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 46,
+  "texto": "DELETE FROM cine WHERE distrito = 'Sol'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 47,
+  "texto": "SELECT COUNT(*) FROM sala",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)"
+  ],
+  "filas": [
+   [
+    "1"
+   ]
+  ]
+ },
+ {
+  "linea": 48,
+  "texto": "CREATE TABLE autor (id INT PRIMARY KEY, mentor INT, FOREIGN KEY (mentor) REFERENCES autor (id))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 49,
+  "texto": "INSERT INTO autor VALUES (1, NULL), (2, 1)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 50,
+  "texto": "INSERT INTO autor VALUES (3, 9)",
+  "ok": false,
+  "codigo": 1452,
+  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`cines`.`autor`, CONSTRAINT `autor_ibfk_1` FOREIGN KEY (`mentor`) REFERENCES `autor` (`id`))"
+ },
+ {
+  "linea": 51,
+  "texto": "DELETE FROM autor WHERE id = 1",
+  "ok": false,
+  "codigo": 1451,
+  "mensaje": "Cannot delete or update a parent row: a foreign key constraint fails (`cines`.`autor`, CONSTRAINT `autor_ibfk_1` FOREIGN KEY (`mentor`) REFERENCES `autor` (`id`))"
+ },
+ {
+  "linea": 52,
+  "texto": "SHOW CREATE TABLE autor",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "autor",
+    "CREATE TABLE `autor` (\n  `id` int NOT NULL,\n  `mentor` int DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `mentor` (`mentor`),\n  CONSTRAINT `autor_ibfk_1` FOREIGN KEY (`mentor`) REFERENCES `autor` (`id`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 53,
+  "texto": "CREATE TABLE f1 (a INT PRIMARY KEY)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 54,
+  "texto": "CREATE TABLE f2 (a INT, b INT, FOREIGN KEY (a) REFERENCES f1 (a), FOREIGN KEY (b) REFERENCES f1 (a), CONSTRAINT mio FOREIGN KEY (b) REFERENCES f1 (a))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 55,
+  "texto": "SHOW CREATE TABLE f2",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "f2",
+    "CREATE TABLE `f2` (\n  `a` int DEFAULT NULL,\n  `b` int DEFAULT NULL,\n  KEY `a` (`a`),\n  KEY `mio` (`b`),\n  CONSTRAINT `f2_ibfk_1` FOREIGN KEY (`a`) REFERENCES `f1` (`a`),\n  CONSTRAINT `f2_ibfk_2` FOREIGN KEY (`b`) REFERENCES `f1` (`a`),\n  CONSTRAINT `mio` FOREIGN KEY (`b`) REFERENCES `f1` (`a`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 56,
+  "texto": "CREATE TABLE f3 (a INT, CONSTRAINT mio FOREIGN KEY (a) REFERENCES f1 (a))",
+  "ok": false,
+  "codigo": 1826,
+  "mensaje": "Duplicate foreign key constraint name 'mio'"
+ },
+ {
+  "linea": 57,
+  "texto": "CREATE TABLE f4 (a INT, b INT, FOREIGN KEY (a, b) REFERENCES f1 (a))",
+  "ok": false,
+  "codigo": 1239,
+  "mensaje": "Incorrect foreign key definition for 'foreign key without name': Key reference and table reference don't match"
+ },
+ {
+  "linea": 58,
+  "texto": "CREATE TABLE f5 (a INT, FOREIGN KEY (a) REFERENCES f1 (z))",
+  "ok": false,
+  "codigo": 3734,
+  "mensaje": "Failed to add the foreign key constraint. Missing column 'z' for constraint 'f5_ibfk_1' in the referenced table 'f1'"
+ },
+ {
+  "linea": 59,
+  "texto": "CREATE TABLE f6 (a INT UNSIGNED, FOREIGN KEY (a) REFERENCES f1 (a))",
+  "ok": false,
+  "codigo": 3780,
+  "mensaje": "Referencing column 'a' and referenced column 'a' in foreign key constraint 'f6_ibfk_1' are incompatible."
+ },
+ {
+  "linea": 60,
+  "texto": "CREATE TABLE f7 (a INT REFERENCES f1 (a))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 61,
+  "texto": "SHOW CREATE TABLE f7",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "f7",
+    "CREATE TABLE `f7` (\n  `a` int DEFAULT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 62,
+  "texto": "INSERT INTO f7 VALUES (99)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 63,
+  "texto": "CREATE TABLE cadenas (c CHAR(9) PRIMARY KEY)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 64,
+  "texto": "CREATE TABLE ref_cadena (v VARCHAR(20), FOREIGN KEY (v) REFERENCES cadenas (c))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 65,
+  "texto": "CREATE TABLE ref_latin (v VARCHAR(9) CHARACTER SET latin1, FOREIGN KEY (v) REFERENCES cadenas (c))",
+  "ok": false,
+  "codigo": 3780,
+  "mensaje": "Referencing column 'v' and referenced column 'c' in foreign key constraint 'ref_latin_ibfk_1' are incompatible."
+ },
+ {
+  "linea": 66,
+  "texto": "CREATE TABLE ref_unico (x INT UNIQUE, y INT)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 67,
+  "texto": "CREATE TABLE apunta_unico (x INT, FOREIGN KEY (x) REFERENCES ref_unico (x))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 68,
+  "texto": "INSERT INTO ref_unico VALUES (1, 1)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 69,
+  "texto": "INSERT INTO apunta_unico VALUES (1)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 70,
+  "texto": "INSERT INTO apunta_unico VALUES (2)",
+  "ok": false,
+  "codigo": 1452,
+  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`cines`.`apunta_unico`, CONSTRAINT `apunta_unico_ibfk_1` FOREIGN KEY (`x`) REFERENCES `ref_unico` (`x`))"
+ },
+ {
+  "linea": 71,
+  "texto": "DROP TABLE f1",
+  "ok": false,
+  "codigo": 3730,
+  "mensaje": "Cannot drop table 'f1' referenced by a foreign key constraint 'f2_ibfk_1' on table 'f2'."
+ },
+ {
+  "linea": 72,
+  "texto": "DROP TABLE f2, f1",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 73,
+  "texto": "DROP TABLE noexiste",
+  "ok": false,
+  "codigo": 1051,
+  "mensaje": "Unknown table 'cines.noexiste'"
+ },
+ {
+  "linea": 74,
+  "texto": "DROP TABLE IF EXISTS noexiste, f7",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 75,
+  "texto": "SHOW WARNINGS",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Level",
+   "Code",
+   "Message"
+  ],
+  "filas": [
+   [
+    "Note",
+    "1051",
+    "Unknown table 'cines.noexiste'"
+   ]
+  ]
+ },
+ {
+  "linea": 76,
+  "texto": "CREATE DATABASE otra",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 77,
+  "texto": "CREATE TABLE otra.hija (id INT, cine VARCHAR(30), FOREIGN KEY (cine) REFERENCES cines.cine (distrito))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 78,
+  "texto": "SHOW CREATE TABLE otra.hija",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "hija",
+    "CREATE TABLE `hija` (\n  `id` int DEFAULT NULL,\n  `cine` varchar(30) DEFAULT NULL,\n  KEY `cine` (`cine`),\n  CONSTRAINT `hija_ibfk_1` FOREIGN KEY (`cine`) REFERENCES `cines`.`cine` (`distrito`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 79,
+  "texto": "SET FOREIGN_KEY_CHECKS = 0",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 80,
+  "texto": "CREATE TABLE huerfana (id INT, padre INT, FOREIGN KEY (padre) REFERENCES no_existe_aun (id))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 81,
+  "texto": "INSERT INTO autor VALUES (5, 77)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 82,
+  "texto": "DROP TABLE cine",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 83,
+  "texto": "SET FOREIGN_KEY_CHECKS = 1",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 84,
+  "texto": "SELECT * FROM autor ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id",
+   "mentor"
+  ],
+  "filas": [
+   [
+    "1",
+    null
+   ],
+   [
+    "2",
+    "1"
+   ],
+   [
+    "5",
+    "77"
+   ]
+  ]
+ },
+ {
+  "linea": 85,
+  "texto": "SHOW TABLES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Tables_in_cines"
+  ],
+  "filas": [
+   [
+    "apunta_unico"
+   ],
+   [
+    "autor"
+   ],
+   [
+    "cadenas"
+   ],
+   [
+    "huerfana"
+   ],
+   [
+    "pelicula"
+   ],
+   [
+    "ref_cadena"
+   ],
+   [
+    "ref_unico"
+   ],
+   [
+    "sala"
+   ],
+   [
+    "sesion"
+   ]
+  ]
+ },
+ {
+  "linea": 86,
+  "texto": "DROP DATABASE otra",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 87,
+  "texto": "DROP DATABASE cines",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 9,
+  "info": "",
+  "avisos": 0
+ }
+]

@@ -1,0 +1,401 @@
+[
+ {
+  "linea": 6,
+  "texto": "USE demo",
+  "ok": false,
+  "codigo": 1049,
+  "mensaje": "Unknown database 'demo'"
+ },
+ {
+  "linea": 9,
+  "texto": "CREATE TABLE pk1 (dni CHAR(9), nombre VARCHAR(50), PRIMARY KEY (dni))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 10,
+  "texto": "DESCRIBE pk1",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 12,
+  "texto": "CREATE TABLE ai (id INT AUTO_INCREMENT, nombre VARCHAR(20))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 15,
+  "texto": "CREATE TABLE u (email VARCHAR(50) UNIQUE)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 16,
+  "texto": "INSERT INTO u VALUES (NULL), (NULL)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 17,
+  "texto": "SELECT COUNT(*) FROM u",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 20,
+  "texto": "CREATE TABLE ck (precio DECIMAL(8,2) CHECK (precio > 0), ini DATE, fin DATE,\n  CONSTRAINT chk_fechas CHECK (fin >= ini))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 23,
+  "texto": "INSERT INTO ck VALUES (-1, NULL, NULL)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 25,
+  "texto": "INSERT INTO ck VALUES (5, '2026-10-10', '2026-10-01')",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 27,
+  "texto": "INSERT INTO ck VALUES (5, '2026-10-10', NULL)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 29,
+  "texto": "CREATE TABLE ck2 (f DATE CHECK (f <= CURDATE()))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 31,
+  "texto": "CREATE TABLE ck3 (id INT AUTO_INCREMENT PRIMARY KEY CHECK (id > 0))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 32,
+  "texto": "SHOW CREATE TABLE ck\\G\n\n-- Claves ajenas: requisitos (presentación A, 28)\n-- ERROR 1824: Failed to open the referenced table 'no_existe'\nCREATE TABLE hija_antes (id INT PRIMARY KEY, cod INT, FOREIGN KEY (cod) REFERENCES no_existe (cod))",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\\G\n\n-- Claves ajenas: requisitos (presentación A, 28)\n-- ERROR 1824: Failed to ' at line 1"
+ },
+ {
+  "linea": 37,
+  "texto": "CREATE TABLE padre (cod INT PRIMARY KEY, nombre VARCHAR(20) NOT NULL)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 39,
+  "texto": "CREATE TABLE hija_tipo (id INT PRIMARY KEY, cod BIGINT, FOREIGN KEY (cod) REFERENCES padre (cod))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 41,
+  "texto": "CREATE TABLE hija_sinindice (id INT PRIMARY KEY, nom VARCHAR(20), FOREIGN KEY (nom) REFERENCES padre (nombre))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 43,
+  "texto": "CREATE TABLE hija_setnull (id INT PRIMARY KEY, cod INT NOT NULL,\n  FOREIGN KEY (cod) REFERENCES padre (cod) ON DELETE SET NULL)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 47,
+  "texto": "CREATE TABLE hija (id INT PRIMARY KEY, cod INT,\n  CONSTRAINT fk_hija_padre FOREIGN KEY (cod) REFERENCES padre (cod))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 49,
+  "texto": "CREATE TABLE hija_cascada (id INT PRIMARY KEY, cod INT NOT NULL,\n  FOREIGN KEY (cod) REFERENCES padre (cod) ON DELETE CASCADE ON UPDATE CASCADE)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 51,
+  "texto": "INSERT INTO padre VALUES (1, 'uno'), (2, 'dos')",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 52,
+  "texto": "INSERT INTO hija VALUES (10, 1)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 54,
+  "texto": "INSERT INTO hija VALUES (11, 99)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 55,
+  "texto": "INSERT INTO hija_cascada VALUES (20, 2)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 57,
+  "texto": "DELETE FROM padre WHERE cod = 1",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 58,
+  "texto": "UPDATE padre SET cod = 22 WHERE cod = 2",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 59,
+  "texto": "SELECT * FROM hija_cascada",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 60,
+  "texto": "DELETE FROM padre WHERE cod = 22",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 61,
+  "texto": "SELECT COUNT(*) FROM hija_cascada",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 63,
+  "texto": "DROP TABLE padre",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 65,
+  "texto": "TRUNCATE TABLE padre",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 66,
+  "texto": "SHOW INDEX FROM hija",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 69,
+  "texto": "INSERT INTO t_innodb VALUES (1), (2)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 70,
+  "texto": "CREATE TABLE sd (id INT PRIMARY KEY, cod INT DEFAULT 1,\n  FOREIGN KEY (cod) REFERENCES t_innodb (id) ON DELETE SET DEFAULT)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 72,
+  "texto": "INSERT INTO sd VALUES (1, 2)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 74,
+  "texto": "DELETE FROM t_innodb WHERE id = 2",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 77,
+  "texto": "CREATE TABLE departamento (cod INT PRIMARY KEY, jefe CHAR(9))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 78,
+  "texto": "CREATE TABLE empleado (dni CHAR(9) PRIMARY KEY, cod_dep INT NOT NULL,\n  CONSTRAINT fk_emp_dep FOREIGN KEY (cod_dep) REFERENCES departamento (cod))",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 80,
+  "texto": "ALTER TABLE departamento ADD CONSTRAINT fk_dep_jefe FOREIGN KEY (jefe) REFERENCES empleado (dni)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 83,
+  "texto": "CREATE TABLE copia_hija LIKE hija",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 84,
+  "texto": "SHOW CREATE TABLE copia_hija\\G\n\n-- ALTER TABLE y sus trampas (presentación A, 35-36)\nCREATE TABLE emp (id INT PRIMARY KEY, nombre VARCHAR(20) NOT NULL DEFAULT 'x', sueldo DECIMAL(8,2))",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '\\G\n\n-- ALTER TABLE y sus trampas (presentación A, 35-36)\nCREATE TABLE emp (id I' at line 1"
+ },
+ {
+  "linea": 88,
+  "texto": "ALTER TABLE emp MODIFY nombre VARCHAR(40)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 89,
+  "texto": "DESCRIBE emp",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 90,
+  "texto": "ALTER TABLE emp ADD COLUMN email VARCHAR(60) AFTER nombre, ADD CONSTRAINT uq_emp_email UNIQUE (email)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 91,
+  "texto": "ALTER TABLE emp RENAME COLUMN sueldo TO salario",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 92,
+  "texto": "ALTER TABLE hija DROP FOREIGN KEY fk_hija_padre",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 93,
+  "texto": "SHOW INDEX FROM hija",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 94,
+  "texto": "CREATE TABLE ck5 (p INT)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 95,
+  "texto": "INSERT INTO ck5 VALUES (-3)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 97,
+  "texto": "ALTER TABLE ck5 ADD CONSTRAINT chk_p CHECK (p > 0)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 100,
+  "texto": "CREATE TABLE pedido (id INT AUTO_INCREMENT PRIMARY KEY,\n  creado DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  estado ENUM('pendiente','enviado') NOT NULL DEFAULT 'pendiente')",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 103,
+  "texto": "INSERT INTO pedido () VALUES (), ()",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 104,
+  "texto": "TRUNCATE TABLE pedido",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 105,
+  "texto": "INSERT INTO pedido () VALUES ()",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 106,
+  "texto": "SELECT id, estado FROM pedido",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 109,
+  "texto": "CREATE INDEX idx_emp_nombre ON emp (nombre)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 110,
+  "texto": "SHOW INDEX FROM emp",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ }
+]

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Laboratorio MySQL BD</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
+  <link rel="stylesheet" href="css/workbench.css?v=1">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/closebrackets.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/comment/comment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/sql-hint.min.js"></script>
+  <script src="lib/sql-wasm-browser.js"></script>
+  <script src="js/motor/lexico.js?v=1"></script>
+  <script src="js/motor/sintaxis.js?v=1"></script>
+  <script src="js/motor/tipos.js?v=1"></script>
+  <script src="js/motor/catalogo.js?v=1"></script>
+  <script src="js/motor/traductor.js?v=1"></script>
+  <script src="js/motor/funciones.js?v=1"></script>
+  <script src="js/motor/servidor.js?v=1"></script>
+</head>
+<body>
+  <header class="barra-titulo">
+    <span class="logo" aria-hidden="true"></span>
+    <span class="marca">Laboratorio MySQL</span>
+    <span class="pestana-conexion"><span class="icono-casa" aria-hidden="true"></span><span id="nombre-conexion">Servidor del laboratorio</span></span>
+    <span class="subtitulo"></span>
+  </header>
+
+  <nav class="barra-herramientas" aria-label="Acciones">
+    <button id="btn-ejecutar" class="boton-icono" disabled title="Ejecutar el script completo desde un servidor limpio (Ctrl+Mayús+Intro)">
+      <span class="icono rayo" aria-hidden="true"></span><span class="texto-boton">Ejecutar</span>
+    </button>
+    <button id="btn-sentencia" class="boton-icono" disabled title="Ejecutar la sentencia del cursor o la selección sobre el estado actual (Ctrl+Intro)">
+      <span class="icono rayo-cursor" aria-hidden="true"></span><span class="texto-boton">Sentencia</span>
+    </button>
+    <button id="btn-continuar" class="boton-icono interruptor" aria-pressed="false" title="Continuar la ejecución del script aunque falle una sentencia">
+      <span class="icono continuar" aria-hidden="true"></span>
+    </button>
+    <span class="separador"></span>
+    <button id="btn-comprobar" class="boton" disabled>Comprobar</button>
+    <button id="btn-copiar-codigo" class="boton" disabled>Copiar código</button>
+    <span class="separador solo-profesor"></span>
+    <button id="btn-diagnostico" class="boton solo-profesor" disabled>Diagnóstico automático</button>
+    <span class="relleno"></span>
+    <button id="btn-plantilla" class="boton" title="Volver al código inicial del script abierto">Restaurar plantilla</button>
+    <button id="btn-reiniciar" class="boton" title="Vaciar el servidor y volver al estado inicial de la práctica">Reiniciar servidor</button>
+    <button id="btn-pantalla-completa" class="boton" hidden title="Ampliar el laboratorio a toda la pantalla">Pantalla completa</button>
+  </nav>
+
+  <main class="espacio">
+    <aside class="navegador">
+      <div class="panel-titulo">Navigator</div>
+      <div class="seccion-titulo">
+        <span>SCHEMAS</span>
+        <button id="btn-refrescar" class="mini" title="Actualizar"><span class="icono refrescar" aria-hidden="true"></span></button>
+      </div>
+      <input id="filtro" class="filtro" type="search" placeholder="Filter objects" autocomplete="off" spellcheck="false">
+      <ul id="arbol-esquemas" class="arbol" role="tree"></ul>
+      <div class="pestanas-navegador">
+        <span class="pestana-nav inactiva" title="No disponible en el laboratorio">Administration</span>
+        <span class="pestana-nav activa">Schemas</span>
+      </div>
+      <div class="panel-titulo">Information</div>
+      <div id="info-objeto" class="info-objeto">No object selected</div>
+    </aside>
+
+    <section class="centro">
+      <div class="zona-editor">
+        <div id="pestanas-editor" class="pestanas-editor" role="tablist"></div>
+        <div class="barra-editor">
+          <span id="ruta-archivo"></span>
+          <span class="relleno"></span>
+          <span id="bd-actual" title="Base de datos por defecto (USE)"></span>
+        </div>
+        <div id="contenedor-editor"></div>
+      </div>
+      <div class="separador-horizontal" id="separador" title="Arrastra para cambiar el tamaño"></div>
+      <div class="zona-resultados">
+        <div class="pestanas-resultados" role="tablist">
+          <div id="pestanas-resultado" class="lista-pestanas"></div>
+        </div>
+        <div id="rejilla" class="rejilla"><p class="nota-panel">Las consultas que devuelven filas aparecen aquí (Result Grid).</p></div>
+        <div class="pestanas-salida" role="tablist">
+          <button class="pestana-salida activa" data-panel="salida">Output</button>
+          <button class="pestana-salida" data-panel="comprobaciones">Comprobaciones <span id="contador-comprobaciones"></span></button>
+          <button class="pestana-salida solo-profesor" data-panel="diagnostico">Diagnóstico</button>
+          <span class="relleno"></span>
+          <span class="etiqueta-salida">Action Output</span>
+        </div>
+        <div class="contenido-salida activo" id="panel-salida">
+          <table class="tabla-salida">
+            <thead><tr><th class="col-estado"></th><th class="col-num">#</th><th class="col-hora">Time</th><th>Action</th><th>Message</th><th class="col-dur">Duration</th></tr></thead>
+            <tbody id="lista-salida"></tbody>
+          </table>
+        </div>
+        <div class="contenido-salida" id="panel-comprobaciones">
+          <p id="nota-comprobaciones" class="nota-panel">Abre el script de un ejercicio y pulsa Comprobar.</p>
+          <ul id="lista-comprobaciones" class="lista-comprobaciones"></ul>
+        </div>
+        <div class="contenido-salida solo-profesor" id="panel-diagnostico">
+          <div class="diag-cabecera"><button id="btn-copiar-informe" class="boton">Copiar informe</button></div>
+          <table class="tabla-diag">
+            <thead><tr><th>Prueba</th><th>Resultado</th><th>Valoración</th></tr></thead>
+            <tbody id="lista-diag"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="barra-estado">
+    <span id="estado">Cargando el servidor...</span>
+    <span id="cronometro"></span>
+  </footer>
+
+  <script src="js/app.js?v=1"></script>
+</body>
+</html>
