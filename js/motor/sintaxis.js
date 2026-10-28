@@ -157,7 +157,10 @@
         case 'SHOW': s = this.mostrar(); break;
         case 'DESCRIBE': case 'DESC': case 'EXPLAIN': s = this.describir(); break;
         case 'SET': s = this.asignar(); break;
-        case 'ALTER': case 'TRUNCATE': case 'RENAME': case 'GRANT': case 'REVOKE': case 'START': case 'BEGIN':
+        case 'ALTER': s = this.alterar(); break;
+        case 'TRUNCATE': s = this.vaciar(); break;
+        case 'RENAME': s = this.renombrarTablas(); break;
+        case 'GRANT': case 'REVOKE': case 'START': case 'BEGIN':
         case 'COMMIT': case 'ROLLBACK': case 'SAVEPOINT': case 'RELEASE': case 'CALL': case 'LOCK': case 'UNLOCK':
         case 'LOAD': case 'ANALYZE': case 'OPTIMIZE': case 'FLUSH': case 'KILL': case 'REPLACE': case 'HANDLER':
         case 'DO': case 'PREPARE': case 'EXECUTE': case 'DEALLOCATE': case 'CHECKSUM': case 'REPAIR': case 'CHECK':
@@ -181,7 +184,8 @@
       if (this.es('TEMPORARY')) throw new NoDisponible('CREATE TEMPORARY TABLE');
       if (this.acepta('TABLE')) return this.crearTabla();
       const resto = this.actual.valor.toUpperCase();
-      if (['UNIQUE', 'FULLTEXT', 'SPATIAL', 'INDEX'].includes(resto)) throw new NoDisponible('CREATE INDEX');
+      if (['FULLTEXT', 'SPATIAL'].includes(resto)) throw new NoDisponible('índices ' + resto);
+      if (resto === 'UNIQUE' || resto === 'INDEX') return this.crearIndice();
       if (['VIEW', 'OR', 'ALGORITHM', 'DEFINER', 'SQL'].includes(resto)) throw new NoDisponible('CREATE VIEW');
       if (['USER', 'ROLE', 'PROCEDURE', 'FUNCTION', 'TRIGGER', 'EVENT', 'TABLESPACE', 'SERVER', 'SPATIAL',
         'LOGFILE', 'RESOURCE', 'UNDO', 'AGGREGATE'].includes(resto)) throw new NoDisponible('CREATE ' + resto);
@@ -608,6 +612,177 @@
       return o;
     }
 
+    // CREATE [UNIQUE] INDEX nombre ON tabla (columnas): un ALTER TABLE ... ADD INDEX
+    crearIndice() {
+      const unico = this.acepta('UNIQUE');
+      this.espera('INDEX');
+      const nombreIndice = this.identificador();
+      if (this.acepta('USING')) this.nombreLibre();
+      this.espera('ON');
+      const tabla = this.nombreTabla();
+      const columnas = this.partesClave();
+      this.opcionesIndice();
+      this.opcionesAlgoritmo();
+      return { tipo: 'alterarTabla', tabla, deIndice: true,
+        ops: [{ op: 'anadirRestriccion', r: { tipo: unico ? 'unico' : 'indice', simbolo: null, nombreIndice, columnas } }] };
+    }
+
+    opcionesAlgoritmo() {
+      for (;;) {
+        if (this.acepta('ALGORITHM') || this.acepta('LOCK')) { this.aceptaOp('='); this.nombreLibre(); continue; }
+        break;
+      }
+    }
+
+    vaciar() {
+      this.espera('TRUNCATE');
+      this.acepta('TABLE');
+      return { tipo: 'vaciarTabla', tabla: this.nombreTabla() };
+    }
+
+    renombrarTablas() {
+      this.espera('RENAME');
+      if (!this.acepta('TABLE') && !this.acepta('TABLES')) {
+        if (this.es('USER')) throw new NoDisponible('RENAME USER');
+        throw this.error();
+      }
+      const pares = [];
+      do {
+        const de = this.nombreTabla();
+        this.espera('TO');
+        pares.push({ de, a: this.nombreTabla() });
+      } while (this.aceptaOp(','));
+      return { tipo: 'renombrarTablas', pares };
+    }
+
+    // Posición de una columna en ADD, MODIFY y CHANGE
+    posicionColumna() {
+      if (this.acepta('FIRST')) return { primera: true };
+      if (this.acepta('AFTER')) return { despues: this.identificador() };
+      return null;
+    }
+
+    alterar() {
+      this.espera('ALTER');
+      if (this.acepta('DATABASE') || this.acepta('SCHEMA')) throw new NoDisponible('ALTER DATABASE');
+      if (!this.acepta('TABLE')) {
+        const resto = this.actual.tipo === 'id' ? this.actual.valor.toUpperCase() : '';
+        if (['VIEW', 'ALGORITHM', 'DEFINER', 'SQL', 'USER', 'PROCEDURE', 'FUNCTION', 'EVENT', 'TABLESPACE', 'SERVER',
+          'LOGFILE', 'INSTANCE', 'UNDO', 'RESOURCE', 'ONLINE', 'OFFLINE', 'IGNORE'].includes(resto)) throw new NoDisponible('ALTER ' + resto);
+        throw this.error();
+      }
+      const tabla = this.nombreTabla();
+      const ops = [];
+      if (this.actual.tipo === 'fin') return { tipo: 'alterarTabla', tabla, ops };
+      do ops.push(...this.operacionAlterar()); while (this.aceptaOp(','));
+      if (this.es('PARTITION')) throw new NoDisponible('PARTITION BY');
+      return { tipo: 'alterarTabla', tabla, ops };
+    }
+
+    operacionAlterar() {
+      if (this.acepta('ADD')) {
+        if (this.esRestriccion()) return [{ op: 'anadirRestriccion', r: this.restriccion() }];
+        this.acepta('COLUMN');
+        if (this.aceptaOp('(')) {
+          const lista = [];
+          do {
+            if (this.esRestriccion()) lista.push({ op: 'anadirRestriccion', r: this.restriccion() });
+            else lista.push({ op: 'anadirColumna', col: this.columna(), pos: null });
+          } while (this.aceptaOp(','));
+          this.esperaOp(')');
+          return lista;
+        }
+        const col = this.columna();
+        return [{ op: 'anadirColumna', col, pos: this.posicionColumna() }];
+      }
+      if (this.acepta('DROP')) {
+        if (this.acepta('PRIMARY', 'KEY')) return [{ op: 'borrarPrimaria' }];
+        if (this.acepta('INDEX') || this.acepta('KEY')) return [{ op: 'borrarIndice', nombre: this.identificador() }];
+        if (this.acepta('FOREIGN', 'KEY')) return [{ op: 'borrarFk', nombre: this.identificador() }];
+        if (this.acepta('CHECK')) return [{ op: 'borrarCheck', nombre: this.identificador() }];
+        if (this.acepta('CONSTRAINT')) return [{ op: 'borrarRestriccion', nombre: this.identificador() }];
+        this.acepta('COLUMN');
+        const nombre = this.identificador();
+        if (!this.acepta('RESTRICT')) this.acepta('CASCADE');
+        return [{ op: 'borrarColumna', nombre }];
+      }
+      if (this.acepta('MODIFY')) {
+        this.acepta('COLUMN');
+        const col = this.columna();
+        return [{ op: 'modificarColumna', viejo: col.nombre, col, pos: this.posicionColumna() }];
+      }
+      if (this.acepta('CHANGE')) {
+        this.acepta('COLUMN');
+        const viejo = this.identificador();
+        const col = this.columna();
+        return [{ op: 'modificarColumna', viejo, col, pos: this.posicionColumna(), cambio: true }];
+      }
+      if (this.acepta('ALTER')) {
+        if (this.acepta('CHECK') || this.acepta('CONSTRAINT')) {
+          const nombre = this.identificador();
+          if (this.acepta('NOT', 'ENFORCED')) return [{ op: 'alterarCheck', nombre, aplicada: false }];
+          this.espera('ENFORCED');
+          return [{ op: 'alterarCheck', nombre, aplicada: true }];
+        }
+        if (this.es('INDEX')) throw new NoDisponible('ALTER INDEX');
+        this.acepta('COLUMN');
+        const nombre = this.identificador();
+        if (this.acepta('SET', 'DEFAULT')) return [{ op: 'defecto', nombre, defecto: this.valorDefecto() }];
+        if (this.acepta('DROP', 'DEFAULT')) return [{ op: 'defecto', nombre, defecto: null }];
+        if (this.acepta('SET', 'VISIBLE') || this.acepta('SET', 'INVISIBLE')) throw new NoDisponible('columnas invisibles');
+        throw this.error();
+      }
+      if (this.acepta('RENAME')) {
+        if (this.acepta('COLUMN')) {
+          const viejo = this.identificador();
+          this.espera('TO');
+          return [{ op: 'renombrarColumna', viejo, nuevo: this.identificador() }];
+        }
+        if (this.acepta('INDEX') || this.acepta('KEY')) {
+          const viejo = this.identificador();
+          this.espera('TO');
+          return [{ op: 'renombrarIndice', viejo, nuevo: this.identificador() }];
+        }
+        if (!this.acepta('TO')) this.acepta('AS');
+        return [{ op: 'renombrarTabla', destino: this.nombreTabla() }];
+      }
+      if (this.acepta('ALGORITHM') || this.acepta('LOCK')) {
+        this.aceptaOp('=');
+        this.nombreLibre();
+        return [];
+      }
+      if (this.acepta('CONVERT', 'TO')) throw new NoDisponible('CONVERT TO CHARACTER SET');
+      if (['ORDER', 'FORCE', 'DISCARD', 'IMPORT', 'ENABLE', 'DISABLE', 'WITH', 'WITHOUT'].some((k) => this.es(k))) {
+        throw new NoDisponible('ALTER TABLE ... ' + this.actual.valor.toUpperCase());
+      }
+      return [{ op: 'opciones', o: this.opcionesAlterar() }];
+    }
+
+    // Opciones de tabla dentro de ALTER TABLE: una por operación (las
+    // separa la coma de la lista de operaciones)
+    opcionesAlterar() {
+      const o = {};
+      if (this.acepta('ENGINE') || this.acepta('TYPE')) { this.aceptaOp('='); o.motor = this.nombreLibre(); return o; }
+      const conDefecto = this.acepta('DEFAULT');
+      if (this.acepta('CHARACTER', 'SET') || this.acepta('CHARSET')) {
+        this.aceptaOp('=');
+        o.charset = this.nombreLibre();
+        if (this.acepta('COLLATE')) { this.aceptaOp('='); o.collation = this.nombreLibre(); }
+        return o;
+      }
+      if (this.acepta('COLLATE')) { this.aceptaOp('='); o.collation = this.nombreLibre(); return o; }
+      if (conDefecto) throw this.error();
+      if (this.acepta('AUTO_INCREMENT')) { this.aceptaOp('='); o.autoInc = this.entero(); return o; }
+      if (this.acepta('COMMENT')) { this.aceptaOp('='); o.comentario = this.cadena(); return o; }
+      if (this.acepta('ROW_FORMAT') || this.acepta('KEY_BLOCK_SIZE') || this.acepta('STATS_PERSISTENT')
+        || this.acepta('STATS_AUTO_RECALC') || this.acepta('PACK_KEYS') || this.acepta('CHECKSUM')) {
+        this.aceptaOp('=');
+        this.avanza();
+        return o;
+      }
+      throw this.error();
+    }
+
     borrar() {
       this.espera('DROP');
       if (this.acepta('DATABASE') || this.acepta('SCHEMA')) {
@@ -622,8 +797,15 @@
         if (!this.acepta('RESTRICT')) this.acepta('CASCADE');
         return { tipo: 'borrarTabla', tablas, siExiste };
       }
+      if (this.acepta('INDEX')) {
+        const nombre = this.identificador();
+        this.espera('ON');
+        const tabla = this.nombreTabla();
+        this.opcionesAlgoritmo();
+        return { tipo: 'alterarTabla', tabla, ops: [{ op: 'borrarIndice', nombre }], deIndice: true };
+      }
       const resto = this.actual.tipo === 'id' ? this.actual.valor.toUpperCase() : '';
-      if (['INDEX', 'VIEW', 'USER', 'ROLE', 'PROCEDURE', 'FUNCTION', 'TRIGGER', 'EVENT', 'TABLESPACE', 'SERVER',
+      if (['VIEW', 'USER', 'ROLE', 'PROCEDURE', 'FUNCTION', 'TRIGGER', 'EVENT', 'TABLESPACE', 'SERVER',
         'SPATIAL', 'LOGFILE', 'RESOURCE', 'UNDO', 'ONLINE', 'OFFLINE'].includes(resto)) throw new NoDisponible('DROP ' + resto);
       throw this.error();
     }

@@ -1,0 +1,978 @@
+[
+ {
+  "linea": 2,
+  "texto": "CREATE DATABASE tienda",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 3,
+  "texto": "USE tienda",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 4,
+  "texto": "CREATE TABLE categoria (id SMALLINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, nombre VARCHAR(30) NOT NULL, padre SMALLINT UNSIGNED,\n  FOREIGN KEY (padre) REFERENCES categoria (id) ON DELETE SET NULL)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 6,
+  "texto": "CREATE TABLE producto (\n  ref CHAR(6) PRIMARY KEY,\n  nombre VARCHAR(40) NOT NULL,\n  precio DECIMAL(7,2) NOT NULL,\n  stock INT NOT NULL DEFAULT 0,\n  codigo VARCHAR(10),\n  id_categoria SMALLINT UNSIGNED,\n  CONSTRAINT chk_precio CHECK (precio >= 0),\n  CONSTRAINT chk_stock_precio CHECK (stock >= 0 AND precio < 10000),\n  CONSTRAINT fk_producto_categoria FOREIGN KEY (id_categoria) REFERENCES categoria (id)\n)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 17,
+  "texto": "INSERT INTO categoria (nombre, padre) VALUES ('Deporte', NULL), ('Running', 1), ('Montaña', 1)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 18,
+  "texto": "INSERT INTO producto VALUES ('A00001', 'Zapatilla', 89.95, 10, '123', 2), ('A00002', 'Mochila', 45.50, 0, 'X12', 3), ('A00003', 'Gorra', 12.00, 4, NULL, NULL)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 20,
+  "texto": "ALTER TABLE producto DROP COLUMN stock",
+  "ok": false,
+  "codigo": 3959,
+  "mensaje": "Check constraint 'chk_stock_precio' uses column 'stock', hence column cannot be dropped or renamed."
+ },
+ {
+  "linea": 21,
+  "texto": "ALTER TABLE producto RENAME COLUMN precio TO pvp",
+  "ok": false,
+  "codigo": 3959,
+  "mensaje": "Check constraint 'chk_precio' uses column 'precio', hence column cannot be dropped or renamed."
+ },
+ {
+  "linea": 22,
+  "texto": "SHOW CREATE TABLE producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "producto",
+    "CREATE TABLE `producto` (\n  `ref` char(6) NOT NULL,\n  `nombre` varchar(40) NOT NULL,\n  `precio` decimal(7,2) NOT NULL,\n  `stock` int NOT NULL DEFAULT '0',\n  `codigo` varchar(10) DEFAULT NULL,\n  `id_categoria` smallint unsigned DEFAULT NULL,\n  PRIMARY KEY (`ref`),\n  KEY `fk_producto_categoria` (`id_categoria`),\n  CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id`),\n  CONSTRAINT `chk_precio` CHECK ((`precio` >= 0)),\n  CONSTRAINT `chk_stock_precio` CHECK (((`stock` >= 0) and (`precio` < 10000)))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 23,
+  "texto": "ALTER TABLE producto DROP CHECK chk_stock_precio",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 24,
+  "texto": "ALTER TABLE producto DROP COLUMN stock",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 25,
+  "texto": "ALTER TABLE producto DROP COLUMN pvp",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'pvp'; check that column/key exists"
+ },
+ {
+  "linea": 26,
+  "texto": "SHOW CREATE TABLE producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "producto",
+    "CREATE TABLE `producto` (\n  `ref` char(6) NOT NULL,\n  `nombre` varchar(40) NOT NULL,\n  `precio` decimal(7,2) NOT NULL,\n  `codigo` varchar(10) DEFAULT NULL,\n  `id_categoria` smallint unsigned DEFAULT NULL,\n  PRIMARY KEY (`ref`),\n  KEY `fk_producto_categoria` (`id_categoria`),\n  CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id`),\n  CONSTRAINT `chk_precio` CHECK ((`precio` >= 0))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 27,
+  "texto": "ALTER TABLE producto DROP CONSTRAINT no_existe",
+  "ok": false,
+  "codigo": 3940,
+  "mensaje": "Constraint 'no_existe' does not exist."
+ },
+ {
+  "linea": 29,
+  "texto": "ALTER TABLE producto MODIFY codigo INT",
+  "ok": false,
+  "codigo": 1366,
+  "mensaje": "Incorrect integer value: 'X12' for column 'codigo' at row 2"
+ },
+ {
+  "linea": 30,
+  "texto": "UPDATE producto SET codigo = '999' WHERE ref = 'A00002'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Rows matched: 1  Changed: 1  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 31,
+  "texto": "ALTER TABLE producto MODIFY codigo INT",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 32,
+  "texto": "SELECT ref, codigo FROM producto ORDER BY ref",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "ref",
+   "codigo"
+  ],
+  "filas": [
+   [
+    "A00001",
+    "123"
+   ],
+   [
+    "A00002",
+    "999"
+   ],
+   [
+    "A00003",
+    null
+   ]
+  ]
+ },
+ {
+  "linea": 33,
+  "texto": "ALTER TABLE producto MODIFY codigo VARCHAR(10)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 34,
+  "texto": "ALTER TABLE producto MODIFY pvp DECIMAL(5,1) NOT NULL",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'pvp' in 'producto'"
+ },
+ {
+  "linea": 35,
+  "texto": "SELECT ref, pvp FROM producto ORDER BY ref",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'pvp' in 'field list'"
+ },
+ {
+  "linea": 36,
+  "texto": "ALTER TABLE producto MODIFY pvp DECIMAL(3,1) NOT NULL",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'pvp' in 'producto'"
+ },
+ {
+  "linea": 37,
+  "texto": "ALTER TABLE producto MODIFY pvp INT NOT NULL",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'pvp' in 'producto'"
+ },
+ {
+  "linea": 38,
+  "texto": "SELECT ref, pvp FROM producto ORDER BY ref",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'pvp' in 'field list'"
+ },
+ {
+  "linea": 39,
+  "texto": "ALTER TABLE producto MODIFY nombre CHAR(40) NOT NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 40,
+  "texto": "ALTER TABLE producto MODIFY nombre VARCHAR(60) NOT NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 41,
+  "texto": "ALTER TABLE producto MODIFY nombre VARCHAR(70) NOT NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 43,
+  "texto": "ALTER TABLE producto ALTER codigo DROP DEFAULT",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 44,
+  "texto": "INSERT INTO producto (ref, nombre, pvp) VALUES ('A00004', 'Calcetines', 6)",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'pvp' in 'field list'"
+ },
+ {
+  "linea": 45,
+  "texto": "INSERT INTO producto (ref, nombre, pvp, codigo) VALUES ('A00004', 'Calcetines', 6, NULL)",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'pvp' in 'field list'"
+ },
+ {
+  "linea": 46,
+  "texto": "DESCRIBE producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "ref",
+    "char(6)",
+    "NO",
+    "PRI",
+    null,
+    ""
+   ],
+   [
+    "nombre",
+    "varchar(70)",
+    "NO",
+    "",
+    null,
+    ""
+   ],
+   [
+    "precio",
+    "decimal(7,2)",
+    "NO",
+    "",
+    null,
+    ""
+   ],
+   [
+    "codigo",
+    "varchar(10)",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "id_categoria",
+    "smallint unsigned",
+    "YES",
+    "MUL",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 48,
+  "texto": "ALTER TABLE producto ADD COLUMN ean CHAR(13) UNIQUE",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 49,
+  "texto": "ALTER TABLE producto ADD COLUMN lote INT NOT NULL DEFAULT 1 UNIQUE",
+  "ok": false,
+  "codigo": 1062,
+  "mensaje": "Duplicate entry '1' for key 'producto.lote'"
+ },
+ {
+  "linea": 50,
+  "texto": "ALTER TABLE producto ADD COLUMN orden INT AUTO_INCREMENT",
+  "ok": false,
+  "codigo": 1075,
+  "mensaje": "Incorrect table definition; there can be only one auto column and it must be defined as a key"
+ },
+ {
+  "linea": 51,
+  "texto": "ALTER TABLE producto ADD COLUMN num INT AUTO_INCREMENT UNIQUE",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 52,
+  "texto": "SELECT ref, num FROM producto ORDER BY ref",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "ref",
+   "num"
+  ],
+  "filas": [
+   [
+    "A00001",
+    "1"
+   ],
+   [
+    "A00002",
+    "2"
+   ],
+   [
+    "A00003",
+    "3"
+   ]
+  ]
+ },
+ {
+  "linea": 53,
+  "texto": "ALTER TABLE producto ADD COLUMN alta DATETIME NOT NULL",
+  "ok": false,
+  "codigo": 1292,
+  "mensaje": "Incorrect datetime value: '0000-00-00 00:00:00' for column 'alta' at row 1"
+ },
+ {
+  "linea": 54,
+  "texto": "ALTER TABLE producto ADD COLUMN hora TIME NOT NULL, ADD COLUMN activo BOOLEAN NOT NULL, ADD COLUMN talla ENUM('S', 'M', 'L') NOT NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 55,
+  "texto": "SELECT ref, hora, activo, talla FROM producto ORDER BY ref",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "ref",
+   "hora",
+   "activo",
+   "talla"
+  ],
+  "filas": [
+   [
+    "A00001",
+    "00:00:00",
+    "0",
+    "S"
+   ],
+   [
+    "A00002",
+    "00:00:00",
+    "0",
+    "S"
+   ],
+   [
+    "A00003",
+    "00:00:00",
+    "0",
+    "S"
+   ]
+  ]
+ },
+ {
+  "linea": 56,
+  "texto": "ALTER TABLE producto ADD UNIQUE (activo)",
+  "ok": false,
+  "codigo": 1062,
+  "mensaje": "Duplicate entry '0' for key 'producto.activo'"
+ },
+ {
+  "linea": 57,
+  "texto": "ALTER TABLE producto ADD CHECK (talla <> 'S')",
+  "ok": false,
+  "codigo": 3819,
+  "mensaje": "Check constraint 'producto_chk_1' is violated."
+ },
+ {
+  "linea": 58,
+  "texto": "ALTER TABLE producto MODIFY ref CHAR(6) NULL",
+  "ok": false,
+  "codigo": 1171,
+  "mensaje": "All parts of a PRIMARY KEY must be NOT NULL; if you need NULL in a key, use UNIQUE instead"
+ },
+ {
+  "linea": 59,
+  "texto": "ALTER TABLE producto MODIFY ref CHAR(8)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 60,
+  "texto": "SHOW CREATE TABLE producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "producto",
+    "CREATE TABLE `producto` (\n  `ref` char(8) NOT NULL,\n  `nombre` varchar(70) NOT NULL,\n  `precio` decimal(7,2) NOT NULL,\n  `codigo` varchar(10),\n  `id_categoria` smallint unsigned DEFAULT NULL,\n  `ean` char(13) DEFAULT NULL,\n  `num` int NOT NULL AUTO_INCREMENT,\n  `hora` time NOT NULL,\n  `activo` tinyint(1) NOT NULL,\n  `talla` enum('S','M','L') NOT NULL,\n  PRIMARY KEY (`ref`),\n  UNIQUE KEY `num` (`num`),\n  UNIQUE KEY `ean` (`ean`),\n  KEY `fk_producto_categoria` (`id_categoria`),\n  CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id`),\n  CONSTRAINT `chk_precio` CHECK ((`precio` >= 0))\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 62,
+  "texto": "ALTER TABLE producto DROP INDEX fk_producto_categoria",
+  "ok": false,
+  "codigo": 1553,
+  "mensaje": "Cannot drop index 'fk_producto_categoria': needed in a foreign key constraint"
+ },
+ {
+  "linea": 63,
+  "texto": "CREATE INDEX idx_cat_nombre ON producto (id_categoria, nombre)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 64,
+  "texto": "ALTER TABLE producto DROP INDEX fk_producto_categoria",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'fk_producto_categoria'; check that column/key exists"
+ },
+ {
+  "linea": 65,
+  "texto": "SHOW CREATE TABLE producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "producto",
+    "CREATE TABLE `producto` (\n  `ref` char(8) NOT NULL,\n  `nombre` varchar(70) NOT NULL,\n  `precio` decimal(7,2) NOT NULL,\n  `codigo` varchar(10),\n  `id_categoria` smallint unsigned DEFAULT NULL,\n  `ean` char(13) DEFAULT NULL,\n  `num` int NOT NULL AUTO_INCREMENT,\n  `hora` time NOT NULL,\n  `activo` tinyint(1) NOT NULL,\n  `talla` enum('S','M','L') NOT NULL,\n  PRIMARY KEY (`ref`),\n  UNIQUE KEY `num` (`num`),\n  UNIQUE KEY `ean` (`ean`),\n  KEY `idx_cat_nombre` (`id_categoria`,`nombre`),\n  CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id`),\n  CONSTRAINT `chk_precio` CHECK ((`precio` >= 0))\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 66,
+  "texto": "ALTER TABLE producto DROP INDEX idx_cat_nombre",
+  "ok": false,
+  "codigo": 1553,
+  "mensaje": "Cannot drop index 'idx_cat_nombre': needed in a foreign key constraint"
+ },
+ {
+  "linea": 67,
+  "texto": "ALTER TABLE producto MODIFY id_categoria INT",
+  "ok": false,
+  "codigo": 3780,
+  "mensaje": "Referencing column 'id_categoria' and referenced column 'id' in foreign key constraint 'fk_producto_categoria' are incompatible."
+ },
+ {
+  "linea": 68,
+  "texto": "ALTER TABLE producto MODIFY id_categoria SMALLINT UNSIGNED NOT NULL",
+  "ok": false,
+  "codigo": 1138,
+  "mensaje": "Invalid use of NULL value"
+ },
+ {
+  "linea": 69,
+  "texto": "UPDATE producto SET id_categoria = 1 WHERE id_categoria IS NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Rows matched: 1  Changed: 1  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 70,
+  "texto": "ALTER TABLE producto MODIFY id_categoria SMALLINT UNSIGNED NOT NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 71,
+  "texto": "ALTER TABLE categoria MODIFY padre SMALLINT UNSIGNED NOT NULL",
+  "ok": false,
+  "codigo": 1830,
+  "mensaje": "Column 'padre' cannot be NOT NULL: needed in a foreign key constraint 'categoria_ibfk_1' SET NULL"
+ },
+ {
+  "linea": 73,
+  "texto": "ALTER TABLE categoria RENAME COLUMN id TO id_cat",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 74,
+  "texto": "SHOW CREATE TABLE categoria",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "categoria",
+    "CREATE TABLE `categoria` (\n  `id_cat` smallint unsigned NOT NULL AUTO_INCREMENT,\n  `nombre` varchar(30) NOT NULL,\n  `padre` smallint unsigned DEFAULT NULL,\n  PRIMARY KEY (`id_cat`),\n  KEY `padre` (`padre`),\n  CONSTRAINT `categoria_ibfk_1` FOREIGN KEY (`padre`) REFERENCES `categoria` (`id_cat`) ON DELETE SET NULL\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 75,
+  "texto": "RENAME TABLE categoria TO seccion",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 76,
+  "texto": "SHOW CREATE TABLE seccion",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "seccion",
+    "CREATE TABLE `seccion` (\n  `id_cat` smallint unsigned NOT NULL AUTO_INCREMENT,\n  `nombre` varchar(30) NOT NULL,\n  `padre` smallint unsigned DEFAULT NULL,\n  PRIMARY KEY (`id_cat`),\n  KEY `padre` (`padre`),\n  CONSTRAINT `seccion_ibfk_1` FOREIGN KEY (`padre`) REFERENCES `seccion` (`id_cat`) ON DELETE SET NULL\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 77,
+  "texto": "SHOW CREATE TABLE producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "producto",
+    "CREATE TABLE `producto` (\n  `ref` char(8) NOT NULL,\n  `nombre` varchar(70) NOT NULL,\n  `precio` decimal(7,2) NOT NULL,\n  `codigo` varchar(10),\n  `id_categoria` smallint unsigned NOT NULL,\n  `ean` char(13) DEFAULT NULL,\n  `num` int NOT NULL AUTO_INCREMENT,\n  `hora` time NOT NULL,\n  `activo` tinyint(1) NOT NULL,\n  `talla` enum('S','M','L') NOT NULL,\n  PRIMARY KEY (`ref`),\n  UNIQUE KEY `num` (`num`),\n  UNIQUE KEY `ean` (`ean`),\n  KEY `idx_cat_nombre` (`id_categoria`,`nombre`),\n  CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `seccion` (`id_cat`),\n  CONSTRAINT `chk_precio` CHECK ((`precio` >= 0))\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 78,
+  "texto": "DELETE FROM seccion WHERE id_cat = 2",
+  "ok": false,
+  "codigo": 1451,
+  "mensaje": "Cannot delete or update a parent row: a foreign key constraint fails (`tienda`.`producto`, CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `seccion` (`id_cat`))"
+ },
+ {
+  "linea": 79,
+  "texto": "SELECT * FROM producto ORDER BY ref",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "ref",
+   "nombre",
+   "precio",
+   "codigo",
+   "id_categoria",
+   "ean",
+   "num",
+   "hora",
+   "activo",
+   "talla"
+  ],
+  "filas": [
+   [
+    "A00001",
+    "Zapatilla",
+    "89.95",
+    "123",
+    "2",
+    null,
+    "1",
+    "00:00:00",
+    "0",
+    "S"
+   ],
+   [
+    "A00002",
+    "Mochila",
+    "45.50",
+    "999",
+    "3",
+    null,
+    "2",
+    "00:00:00",
+    "0",
+    "S"
+   ],
+   [
+    "A00003",
+    "Gorra",
+    "12.00",
+    null,
+    "1",
+    null,
+    "3",
+    "00:00:00",
+    "0",
+    "S"
+   ]
+  ]
+ },
+ {
+  "linea": 80,
+  "texto": "INSERT INTO seccion (nombre, padre) VALUES ('Trail', 3)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 81,
+  "texto": "DELETE FROM seccion WHERE id_cat = 3",
+  "ok": false,
+  "codigo": 1451,
+  "mensaje": "Cannot delete or update a parent row: a foreign key constraint fails (`tienda`.`producto`, CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `seccion` (`id_cat`))"
+ },
+ {
+  "linea": 82,
+  "texto": "SELECT id_cat, nombre, padre FROM seccion ORDER BY id_cat",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id_cat",
+   "nombre",
+   "padre"
+  ],
+  "filas": [
+   [
+    "1",
+    "Deporte",
+    null
+   ],
+   [
+    "2",
+    "Running",
+    "1"
+   ],
+   [
+    "3",
+    "Montaña",
+    "1"
+   ],
+   [
+    "4",
+    "Trail",
+    "3"
+   ]
+  ]
+ },
+ {
+  "linea": 84,
+  "texto": "ALTER TABLE producto DROP COLUMN ean, ADD COLUMN ean VARCHAR(13) AFTER ref",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 85,
+  "texto": "ALTER TABLE producto ADD COLUMN a INT, ADD COLUMN b INT AFTER a, DROP COLUMN a",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'a'; check that column/key exists"
+ },
+ {
+  "linea": 86,
+  "texto": "ALTER TABLE producto ADD COLUMN c INT AFTER no_existe",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'no_existe' in 'producto'"
+ },
+ {
+  "linea": 87,
+  "texto": "ALTER TABLE producto ADD PRIMARY KEY (nombre)",
+  "ok": false,
+  "codigo": 1068,
+  "mensaje": "Multiple primary key defined"
+ },
+ {
+  "linea": 88,
+  "texto": "ALTER TABLE producto DROP PRIMARY KEY, ADD PRIMARY KEY (ref, nombre)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 89,
+  "texto": "SHOW CREATE TABLE producto",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "producto",
+    "CREATE TABLE `producto` (\n  `ref` char(8) NOT NULL,\n  `ean` varchar(13) DEFAULT NULL,\n  `nombre` varchar(70) NOT NULL,\n  `precio` decimal(7,2) NOT NULL,\n  `codigo` varchar(10),\n  `id_categoria` smallint unsigned NOT NULL,\n  `num` int NOT NULL AUTO_INCREMENT,\n  `hora` time NOT NULL,\n  `activo` tinyint(1) NOT NULL,\n  `talla` enum('S','M','L') NOT NULL,\n  PRIMARY KEY (`ref`,`nombre`),\n  UNIQUE KEY `num` (`num`),\n  UNIQUE KEY `ean` (`ean`),\n  KEY `idx_cat_nombre` (`id_categoria`,`nombre`),\n  CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`id_categoria`) REFERENCES `seccion` (`id_cat`),\n  CONSTRAINT `chk_precio` CHECK ((`precio` >= 0))\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 90,
+  "texto": "SELECT TABLE_NAME, CONSTRAINT_NAME, CONSTRAINT_TYPE FROM information_schema.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = 'tienda' ORDER BY TABLE_NAME, CONSTRAINT_NAME",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "TABLE_NAME",
+   "CONSTRAINT_NAME",
+   "CONSTRAINT_TYPE"
+  ],
+  "filas": [
+   [
+    "producto",
+    "chk_precio",
+    "CHECK"
+   ],
+   [
+    "producto",
+    "ean",
+    "UNIQUE"
+   ],
+   [
+    "producto",
+    "fk_producto_categoria",
+    "FOREIGN KEY"
+   ],
+   [
+    "producto",
+    "num",
+    "UNIQUE"
+   ],
+   [
+    "producto",
+    "PRIMARY",
+    "PRIMARY KEY"
+   ],
+   [
+    "seccion",
+    "PRIMARY",
+    "PRIMARY KEY"
+   ],
+   [
+    "seccion",
+    "seccion_ibfk_1",
+    "FOREIGN KEY"
+   ]
+  ]
+ },
+ {
+  "linea": 91,
+  "texto": "SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, COLUMN_TYPE FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'tienda' ORDER BY TABLE_NAME, ORDINAL_POSITION",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "TABLE_NAME",
+   "COLUMN_NAME",
+   "ORDINAL_POSITION",
+   "COLUMN_DEFAULT",
+   "IS_NULLABLE",
+   "COLUMN_TYPE"
+  ],
+  "filas": [
+   [
+    "producto",
+    "ref",
+    "1",
+    null,
+    "NO",
+    "char(8)"
+   ],
+   [
+    "producto",
+    "ean",
+    "2",
+    null,
+    "YES",
+    "varchar(13)"
+   ],
+   [
+    "producto",
+    "nombre",
+    "3",
+    null,
+    "NO",
+    "varchar(70)"
+   ],
+   [
+    "producto",
+    "precio",
+    "4",
+    null,
+    "NO",
+    "decimal(7,2)"
+   ],
+   [
+    "producto",
+    "codigo",
+    "5",
+    null,
+    "YES",
+    "varchar(10)"
+   ],
+   [
+    "producto",
+    "id_categoria",
+    "6",
+    null,
+    "NO",
+    "smallint unsigned"
+   ],
+   [
+    "producto",
+    "num",
+    "7",
+    null,
+    "NO",
+    "int"
+   ],
+   [
+    "producto",
+    "hora",
+    "8",
+    null,
+    "NO",
+    "time"
+   ],
+   [
+    "producto",
+    "activo",
+    "9",
+    null,
+    "NO",
+    "tinyint(1)"
+   ],
+   [
+    "producto",
+    "talla",
+    "10",
+    null,
+    "NO",
+    "enum('S','M','L')"
+   ],
+   [
+    "seccion",
+    "id_cat",
+    "1",
+    null,
+    "NO",
+    "smallint unsigned"
+   ],
+   [
+    "seccion",
+    "nombre",
+    "2",
+    null,
+    "NO",
+    "varchar(30)"
+   ],
+   [
+    "seccion",
+    "padre",
+    "3",
+    null,
+    "YES",
+    "smallint unsigned"
+   ]
+  ]
+ },
+ {
+  "linea": 92,
+  "texto": "DROP DATABASE tienda",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "",
+  "avisos": 0
+ }
+]

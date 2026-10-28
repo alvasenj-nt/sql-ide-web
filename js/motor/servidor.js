@@ -161,6 +161,9 @@
         case 'seleccionar': case 'conjunto': return this.consultar(ast);
         case 'mostrar': return this.mostrar(ast);
         case 'asignar': return this.asignar(ast);
+        case 'alterarTabla': return this.alterarTabla(ast, avisos);
+        case 'vaciarTabla': return this.vaciarTabla(ast, avisos);
+        case 'renombrarTablas': return this.renombrarTablas(ast, avisos);
         case 'nada': return { tipo: 'cambio', afectadas: 0 };
         default: throw new NoDisponible(ast.tipo);
       }
@@ -434,7 +437,7 @@
         if (c.nombre.length > 64) throw new ErrorSQL(1059, '42000', "Identifier name '" + c.nombre + "' is too long");
         nombres.add(c.nombre.toLowerCase());
         const tipo = T.normalizarTipo(c.tipo, c.nombre, tabla, avisos);
-        const col = { nombre: c.nombre, tipo, nulo: c.nulo !== false, autoInc: c.autoInc, comentario: c.comentario,
+        const col = { nombre: c.nombre, tipo, nulo: c.nulo !== false && !c.autoInc, autoInc: c.autoInc, comentario: c.comentario,
           alActualizarAhora: c.alActualizarAhora, nuloExplicito: c.nulo === true };
         if (c.primaria) {
           if (pendientes.pk) throw new ErrorSQL(1068, '42000', 'Multiple primary key defined');
@@ -546,102 +549,113 @@
       }
 
       // Claves ajenas: requisitos de MySQL y su índice en la tabla hija
-      const nombresFk = this.cat.nombresFk(bd);
-      let contadorFk = 0;
-      pendientes.fks.forEach((f) => {
-        const cols = f.columnas.map((c) => {
-          const col = C.columna(tabla, c);
-          if (!col) throw new ErrorSQL(1072, '42000', "Key column '" + c + "' doesn't exist in table");
-          return col;
-        });
-        let nombreFk = f.simbolo;
-        let generado = false;
-        if (!nombreFk) {
-          do contadorFk++; while (nombresFk.has((nombre + '_ibfk_' + contadorFk).toLowerCase()));
-          nombreFk = nombre + '_ibfk_' + contadorFk;
-          generado = true;
-        }
-        if (nombreFk.length > 64) throw new ErrorSQL(1059, '42000', "Identifier name '" + nombreFk + "' is too long");
-        if (nombresFk.has(nombreFk.toLowerCase())) throw new ErrorSQL(1826, 'HY000', "Duplicate foreign key constraint name '" + nombreFk + "'");
-        nombresFk.add(nombreFk.toLowerCase());
-        if (f.columnas.length !== f.columnasRef.length) {
-          throw new ErrorSQL(1239, '42000', "Incorrect foreign key definition for '" + (f.simbolo || 'foreign key without name') + "': Key reference and table reference don't match");
-        }
-        // Índice de la tabla hija: el existente que empiece por esas columnas o uno nuevo
-        const cubre = (i) => f.columnas.every((c, k) => i.columnas[k] && i.columnas[k].nombre.toLowerCase() === c.toLowerCase());
-        const existente = tabla.indices.find((i) => cubre(i) && !i.generadoFk);
-        const indiceFk = tabla.indices.find((i) => cubre(i) && i.generadoFk && i.columnas.length === f.columnas.length);
-        if (!existente) {
-          if (indiceFk) {
-            // MySQL conserva el índice de la última clave ajena con esas columnas
-            nombresIndice.delete(indiceFk.nombre.toLowerCase());
-            indiceFk.nombre = f.nombreIndice ? reservarNombre(f.nombreIndice) : f.simbolo ? reservarNombre(f.simbolo) : reservarNombre(nombreLibre(cols[0].nombre));
-          } else {
-            const nombreIdx = f.nombreIndice ? reservarNombre(f.nombreIndice) : f.simbolo ? reservarNombre(f.simbolo) : reservarNombre(nombreLibre(cols[0].nombre));
-            tabla.indices.push({ nombre: nombreIdx, unico: false, primaria: false, generadoFk: true,
-              columnas: cols.map((c) => ({ nombre: c.nombre, prefijo: null, desc: false })) });
-          }
-        }
-        if (motor !== 'InnoDB') return; // MyISAM descarta la clave ajena sin avisar
-        const refBd = f.tablaRef.bd || bd;
-        const propia = refBd === bd && f.tablaRef.nombre === nombre;
-        const padre = propia ? tabla : this.cat.tabla(refBd, f.tablaRef.nombre);
-        const fk = { nombre: nombreFk, generado, columnas: cols.map((c) => c.nombre), refBd, refTabla: f.tablaRef.nombre,
-          refColumnas: f.columnasRef.slice(), alBorrar: f.alBorrar, alActualizar: f.alActualizar };
-        if (!padre) {
-          if (this.fkChecks) throw new ErrorSQL(1824, 'HY000', "Failed to open the referenced table '" + f.tablaRef.nombre + "'");
-          tabla.fks.push(fk);
-          return;
-        }
-        if (padre.motor !== 'InnoDB') throw new ErrorSQL(1824, 'HY000', "Failed to open the referenced table '" + f.tablaRef.nombre + "'");
-        const colsPadre = f.columnasRef.map((c) => {
-          const col = C.columna(padre, c);
-          if (!col) throw new ErrorSQL(3734, 'HY000', "Failed to add the foreign key constraint. Missing column '" + c + "' for constraint '" + nombreFk + "' in the referenced table '" + f.tablaRef.nombre + "'");
-          return col;
-        });
-        fk.refColumnas = colsPadre.map((c) => c.nombre);
-        cols.forEach((c, k) => {
-          if (!tiposCompatibles(c.tipo, colsPadre[k].tipo)) {
-            throw new ErrorSQL(3780, 'HY000', "Referencing column '" + c.nombre + "' and referenced column '" + colsPadre[k].nombre
-              + "' in foreign key constraint '" + nombreFk + "' are incompatible.");
-          }
-        });
-        const indicePadre = padre.indices.find((i) => fk.refColumnas.every((c, k) => i.columnas[k] && i.columnas[k].nombre.toLowerCase() === c.toLowerCase()));
-        if (!indicePadre) {
-          throw new ErrorSQL(1822, 'HY000', "Failed to add the foreign key constraint. Missing index for constraint '" + nombreFk
-            + "' in the referenced table '" + f.tablaRef.nombre + "'");
-        }
-        if (!(indicePadre.unico && indicePadre.columnas.length === fk.refColumnas.length)) {
-          throw new NoDisponible('claves ajenas que apuntan a columnas sin clave primaria ni índice único');
-        }
-        ['alBorrar', 'alActualizar'].forEach((a) => {
-          if (fk[a] === 'SET NULL') {
-            const noNula = cols.find((c) => !c.nulo);
-            if (noNula) throw new ErrorSQL(1830, 'HY000', "Column '" + noNula.nombre + "' cannot be NOT NULL: needed in a foreign key constraint '" + nombreFk + "' SET NULL");
-          }
-        });
-        tabla.fks.push(fk);
-      });
+      const ctx = { nombresFk: this.cat.nombresFk(bd), contadorFk: 0, nombresIndice, reservarNombre, nombreLibre,
+        nombresCheck: this.cat.nombresCheck(bd), contadorChk: 0 };
+      pendientes.fks.forEach((f) => this.definirFk(tabla, f, ctx));
 
       // Restricciones CHECK con su nombre de MySQL
-      const nombresCheck = this.cat.nombresCheck(bd);
-      let contadorChk = 0;
-      pendientes.checks.forEach((k) => {
-        let nombreChk = k.simbolo;
-        let generado = false;
-        if (!nombreChk) {
-          do contadorChk++; while (nombresCheck.has((nombre + '_chk_' + contadorChk).toLowerCase()));
-          nombreChk = nombre + '_chk_' + contadorChk;
-          generado = true;
-        }
-        if (nombresCheck.has(nombreChk.toLowerCase())) throw new ErrorSQL(3822, 'HY000', "Duplicate check constraint name '" + nombreChk + "'.");
-        nombresCheck.add(nombreChk.toLowerCase());
-        const traducida = TR.traducir(k.expr, { srv: this, enCheck: { tabla, nombre: nombreChk }, clausula: 'check' });
-        tabla.checks.push({ nombre: nombreChk, generado, expr: k.expr, texto: C.textoExpresion(k.expr), sql: traducida.sql, aplicada: k.aplicada });
-      });
+      pendientes.checks.forEach((k) => this.definirCheck(tabla, k, ctx));
       tabla.columnas.forEach((c) => delete c.nuloExplicito);
-      tabla.indices.forEach((i) => delete i.generadoFk);
       return tabla;
+    }
+
+    // Añade a la tabla una clave ajena con las comprobaciones de MySQL y,
+    // si hace falta, el índice de la tabla hija. ctx lleva los nombres ya
+    // usados de claves ajenas e índices y el contador de nombres generados.
+    definirFk(tabla, f, ctx) {
+      const { bd, nombre, motor } = tabla;
+      const { nombresFk, nombresIndice, reservarNombre, nombreLibre } = ctx;
+      const cols = f.columnas.map((c) => {
+        const col = C.columna(tabla, c);
+        if (!col) throw new ErrorSQL(1072, '42000', "Key column '" + c + "' doesn't exist in table");
+        return col;
+      });
+      let nombreFk = f.simbolo;
+      let generado = false;
+      if (!nombreFk) {
+        do ctx.contadorFk++; while (nombresFk.has((nombre + '_ibfk_' + ctx.contadorFk).toLowerCase()));
+        nombreFk = nombre + '_ibfk_' + ctx.contadorFk;
+        generado = true;
+      }
+      if (nombreFk.length > 64) throw new ErrorSQL(1059, '42000', "Identifier name '" + nombreFk + "' is too long");
+      if (nombresFk.has(nombreFk.toLowerCase())) throw new ErrorSQL(1826, 'HY000', "Duplicate foreign key constraint name '" + nombreFk + "'");
+      nombresFk.add(nombreFk.toLowerCase());
+      if (f.columnas.length !== f.columnasRef.length) {
+        throw new ErrorSQL(1239, '42000', "Incorrect foreign key definition for '" + (f.simbolo || 'foreign key without name') + "': Key reference and table reference don't match");
+      }
+      // Índice de la tabla hija: el existente que empiece por esas columnas o uno nuevo
+      const cubre = (i) => f.columnas.every((c, k) => i.columnas[k] && i.columnas[k].nombre.toLowerCase() === c.toLowerCase());
+      const existente = tabla.indices.find((i) => cubre(i) && !i.generadoFk);
+      const indiceFk = tabla.indices.find((i) => cubre(i) && i.generadoFk && i.columnas.length === f.columnas.length);
+      if (!existente) {
+        if (indiceFk) {
+          // MySQL conserva el índice de la última clave ajena con esas columnas
+          nombresIndice.delete(indiceFk.nombre.toLowerCase());
+          indiceFk.nombre = f.nombreIndice ? reservarNombre(f.nombreIndice) : f.simbolo ? reservarNombre(f.simbolo) : reservarNombre(nombreLibre(cols[0].nombre));
+        } else {
+          const nombreIdx = f.nombreIndice ? reservarNombre(f.nombreIndice) : f.simbolo ? reservarNombre(f.simbolo) : reservarNombre(nombreLibre(cols[0].nombre));
+          tabla.indices.push({ nombre: nombreIdx, unico: false, primaria: false, generadoFk: true,
+            columnas: cols.map((c) => ({ nombre: c.nombre, prefijo: null, desc: false })) });
+        }
+      }
+      if (motor !== 'InnoDB') return null; // MyISAM descarta la clave ajena sin avisar
+      const refBd = f.tablaRef.bd || bd;
+      const propia = refBd === bd && f.tablaRef.nombre === nombre;
+      const padre = propia ? tabla : this.cat.tabla(refBd, f.tablaRef.nombre);
+      const fk = { nombre: nombreFk, generado, columnas: cols.map((c) => c.nombre), refBd, refTabla: f.tablaRef.nombre,
+        refColumnas: f.columnasRef.slice(), alBorrar: f.alBorrar, alActualizar: f.alActualizar };
+      if (!padre) {
+        if (this.fkChecks) throw new ErrorSQL(1824, 'HY000', "Failed to open the referenced table '" + f.tablaRef.nombre + "'");
+        tabla.fks.push(fk);
+        return fk;
+      }
+      if (padre.motor !== 'InnoDB') throw new ErrorSQL(1824, 'HY000', "Failed to open the referenced table '" + f.tablaRef.nombre + "'");
+      const colsPadre = f.columnasRef.map((c) => {
+        const col = C.columna(padre, c);
+        if (!col) throw new ErrorSQL(3734, 'HY000', "Failed to add the foreign key constraint. Missing column '" + c + "' for constraint '" + nombreFk + "' in the referenced table '" + f.tablaRef.nombre + "'");
+        return col;
+      });
+      fk.refColumnas = colsPadre.map((c) => c.nombre);
+      cols.forEach((c, k) => {
+        if (!tiposCompatibles(c.tipo, colsPadre[k].tipo)) {
+          throw new ErrorSQL(3780, 'HY000', "Referencing column '" + c.nombre + "' and referenced column '" + colsPadre[k].nombre
+            + "' in foreign key constraint '" + nombreFk + "' are incompatible.");
+        }
+      });
+      const indicePadre = padre.indices.find((i) => fk.refColumnas.every((c, k) => i.columnas[k] && i.columnas[k].nombre.toLowerCase() === c.toLowerCase()));
+      if (!indicePadre) {
+        throw new ErrorSQL(1822, 'HY000', "Failed to add the foreign key constraint. Missing index for constraint '" + nombreFk
+          + "' in the referenced table '" + f.tablaRef.nombre + "'");
+      }
+      if (!(indicePadre.unico && indicePadre.columnas.length === fk.refColumnas.length)) {
+        throw new NoDisponible('claves ajenas que apuntan a columnas sin clave primaria ni índice único');
+      }
+      ['alBorrar', 'alActualizar'].forEach((a) => {
+        if (fk[a] === 'SET NULL') {
+          const noNula = cols.find((c) => !c.nulo);
+          if (noNula) throw new ErrorSQL(1830, 'HY000', "Column '" + noNula.nombre + "' cannot be NOT NULL: needed in a foreign key constraint '" + nombreFk + "' SET NULL");
+        }
+      });
+      tabla.fks.push(fk);
+      return fk;
+    }
+
+    // Añade a la tabla una restricción CHECK con su nombre de MySQL
+    definirCheck(tabla, k, ctx) {
+      const { nombresCheck } = ctx;
+      let nombreChk = k.simbolo;
+      let generado = false;
+      if (!nombreChk) {
+        do ctx.contadorChk++; while (nombresCheck.has((tabla.nombre + '_chk_' + ctx.contadorChk).toLowerCase()));
+        nombreChk = tabla.nombre + '_chk_' + ctx.contadorChk;
+        generado = true;
+      }
+      if (nombresCheck.has(nombreChk.toLowerCase())) throw new ErrorSQL(3822, 'HY000', "Duplicate check constraint name '" + nombreChk + "'.");
+      nombresCheck.add(nombreChk.toLowerCase());
+      const traducida = TR.traducir(k.expr, { srv: this, enCheck: { tabla, nombre: nombreChk }, clausula: 'check' });
+      const check = { nombre: nombreChk, generado, expr: k.expr, texto: C.textoExpresion(k.expr), sql: traducida.sql, aplicada: k.aplicada };
+      tabla.checks.push(check);
+      return check;
     }
 
     // Sentencias de SQLite que crean la tabla y sus índices
@@ -731,6 +745,8 @@
     valorDefecto(col, fila) {
       if (col.defecto === undefined) {
         if (col.autoInc) return { auto: true };
+        // Columna sin valor por defecto tras ALTER ... DROP DEFAULT
+        if (col.sinDefecto) throw new ErrorSQL(1364, 'HY000', "Field '" + col.nombre + "' doesn't have a default value");
         if (col.nulo) return { valor: null };
         // Un ENUM NOT NULL sin DEFAULT toma su primer valor, también en modo estricto
         if (col.tipo.base === 'enum') return { valor: col.tipo.valores[0] };
@@ -1234,6 +1250,7 @@
   }
 
   M.Servidor = Servidor;
+  M.tiposCompatibles = tiposCompatibles;
   M.evaluarPaso = evaluarPaso;
   M.VERSION = VERSION;
 

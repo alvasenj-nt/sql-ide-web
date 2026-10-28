@@ -1,0 +1,1744 @@
+[
+ {
+  "linea": 2,
+  "texto": "CREATE DATABASE cine",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 3,
+  "texto": "USE cine",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 4,
+  "texto": "CREATE TABLE sala (numero TINYINT UNSIGNED PRIMARY KEY, aforo SMALLINT UNSIGNED NOT NULL)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 5,
+  "texto": "CREATE TABLE pelicula (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  titulo VARCHAR(60) NOT NULL,\n  anio SMALLINT,\n  duracion SMALLINT UNSIGNED\n)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 11,
+  "texto": "CREATE TABLE sesion (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  id_pelicula INT NOT NULL,\n  numero_sala TINYINT UNSIGNED NOT NULL,\n  hora DATETIME NOT NULL,\n  CONSTRAINT fk_sesion_pelicula FOREIGN KEY (id_pelicula) REFERENCES pelicula (id),\n  FOREIGN KEY (numero_sala) REFERENCES sala (numero) ON DELETE CASCADE\n)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 19,
+  "texto": "INSERT INTO sala VALUES (1, 120), (2, 80)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 20,
+  "texto": "INSERT INTO pelicula (titulo, anio, duracion) VALUES ('Vértigo', 1958, 128), ('Psicosis', 1960, NULL), ('Los pájaros', 1963, 119)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 21,
+  "texto": "INSERT INTO sesion (id_pelicula, numero_sala, hora) VALUES (1, 1, '2026-11-02 18:00:00'), (2, 2, '2026-11-02 20:00:00')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 23,
+  "texto": "ALTER TABLE pelicula ADD COLUMN pais VARCHAR(30)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 24,
+  "texto": "ALTER TABLE pelicula ADD clasificacion CHAR(3) NOT NULL DEFAULT 'TP' AFTER titulo",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 25,
+  "texto": "ALTER TABLE pelicula ADD COLUMN codigo INT NOT NULL FIRST",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 26,
+  "texto": "ALTER TABLE pelicula ADD COLUMN estreno DATE NOT NULL",
+  "ok": false,
+  "codigo": 1292,
+  "mensaje": "Incorrect date value: '0000-00-00' for column 'estreno' at row 1"
+ },
+ {
+  "linea": 27,
+  "texto": "ALTER TABLE pelicula ADD COLUMN notas TEXT NOT NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 28,
+  "texto": "ALTER TABLE pelicula ADD COLUMN titulo VARCHAR(10)",
+  "ok": false,
+  "codigo": 1060,
+  "mensaje": "Duplicate column name 'titulo'"
+ },
+ {
+  "linea": 29,
+  "texto": "SELECT * FROM pelicula ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "codigo",
+   "id",
+   "titulo",
+   "clasificacion",
+   "anio",
+   "duracion",
+   "pais",
+   "notas"
+  ],
+  "filas": [
+   [
+    "0",
+    "1",
+    "Vértigo",
+    "TP",
+    "1958",
+    "128",
+    null,
+    ""
+   ],
+   [
+    "0",
+    "2",
+    "Psicosis",
+    "TP",
+    "1960",
+    null,
+    null,
+    ""
+   ],
+   [
+    "0",
+    "3",
+    "Los pájaros",
+    "TP",
+    "1963",
+    "119",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 30,
+  "texto": "SHOW CREATE TABLE pelicula",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "pelicula",
+    "CREATE TABLE `pelicula` (\n  `codigo` int NOT NULL,\n  `id` int NOT NULL AUTO_INCREMENT,\n  `titulo` varchar(60) NOT NULL,\n  `clasificacion` char(3) NOT NULL DEFAULT 'TP',\n  `anio` smallint DEFAULT NULL,\n  `duracion` smallint unsigned DEFAULT NULL,\n  `pais` varchar(30) DEFAULT NULL,\n  `notas` text NOT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 32,
+  "texto": "ALTER TABLE pelicula DROP COLUMN codigo, DROP notas",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 33,
+  "texto": "ALTER TABLE pelicula DROP COLUMN no_existe",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'no_existe'; check that column/key exists"
+ },
+ {
+  "linea": 34,
+  "texto": "ALTER TABLE sesion DROP COLUMN id_pelicula",
+  "ok": false,
+  "codigo": 1828,
+  "mensaje": "Cannot drop column 'id_pelicula': needed in a foreign key constraint 'fk_sesion_pelicula'"
+ },
+ {
+  "linea": 35,
+  "texto": "ALTER TABLE pelicula DROP COLUMN id",
+  "ok": false,
+  "codigo": 1829,
+  "mensaje": "Cannot drop column 'id': needed in a foreign key constraint 'fk_sesion_pelicula' of table 'sesion'"
+ },
+ {
+  "linea": 36,
+  "texto": "DESCRIBE pelicula",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "id",
+    "int",
+    "NO",
+    "PRI",
+    null,
+    "auto_increment"
+   ],
+   [
+    "titulo",
+    "varchar(60)",
+    "NO",
+    "",
+    null,
+    ""
+   ],
+   [
+    "clasificacion",
+    "char(3)",
+    "NO",
+    "",
+    "TP",
+    ""
+   ],
+   [
+    "anio",
+    "smallint",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "duracion",
+    "smallint unsigned",
+    "YES",
+    "",
+    null,
+    ""
+   ],
+   [
+    "pais",
+    "varchar(30)",
+    "YES",
+    "",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 38,
+  "texto": "ALTER TABLE pelicula MODIFY titulo VARCHAR(5)",
+  "ok": false,
+  "codigo": 1265,
+  "mensaje": "Data truncated for column 'titulo' at row 1"
+ },
+ {
+  "linea": 39,
+  "texto": "ALTER TABLE pelicula MODIFY titulo VARCHAR(80) NOT NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 40,
+  "texto": "ALTER TABLE pelicula MODIFY duracion SMALLINT UNSIGNED NOT NULL",
+  "ok": false,
+  "codigo": 1138,
+  "mensaje": "Invalid use of NULL value"
+ },
+ {
+  "linea": 41,
+  "texto": "ALTER TABLE pelicula MODIFY anio TINYINT",
+  "ok": false,
+  "codigo": 1264,
+  "mensaje": "Out of range value for column 'anio' at row 1"
+ },
+ {
+  "linea": 42,
+  "texto": "ALTER TABLE pelicula MODIFY anio YEAR",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 43,
+  "texto": "ALTER TABLE pelicula CHANGE pais pais_origen VARCHAR(40) DEFAULT 'España'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 44,
+  "texto": "ALTER TABLE pelicula CHANGE COLUMN pais_origen pais VARCHAR(40) DEFAULT 'España' AFTER anio",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 45,
+  "texto": "ALTER TABLE pelicula RENAME COLUMN pais TO nacionalidad",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 46,
+  "texto": "ALTER TABLE pelicula RENAME COLUMN no_existe TO otra",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'no_existe' in 'pelicula'"
+ },
+ {
+  "linea": 47,
+  "texto": "ALTER TABLE pelicula RENAME COLUMN anio TO titulo",
+  "ok": false,
+  "codigo": 1060,
+  "mensaje": "Duplicate column name 'titulo'"
+ },
+ {
+  "linea": 48,
+  "texto": "ALTER TABLE pelicula MODIFY clasificacion ENUM('TP', '7', '12', '16', '18') NOT NULL DEFAULT 'TP'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 49,
+  "texto": "ALTER TABLE pelicula MODIFY clasificacion CHAR(2)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 50,
+  "texto": "UPDATE pelicula SET duracion = 109 WHERE duracion IS NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Rows matched: 1  Changed: 1  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 51,
+  "texto": "ALTER TABLE pelicula MODIFY duracion SMALLINT UNSIGNED NOT NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 52,
+  "texto": "SELECT * FROM pelicula ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id",
+   "titulo",
+   "clasificacion",
+   "anio",
+   "nacionalidad",
+   "duracion"
+  ],
+  "filas": [
+   [
+    "1",
+    "Vértigo",
+    "TP",
+    "1958",
+    null,
+    "128"
+   ],
+   [
+    "2",
+    "Psicosis",
+    "TP",
+    "1960",
+    null,
+    "109"
+   ],
+   [
+    "3",
+    "Los pájaros",
+    "TP",
+    "1963",
+    null,
+    "119"
+   ]
+  ]
+ },
+ {
+  "linea": 53,
+  "texto": "SHOW CREATE TABLE pelicula",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "pelicula",
+    "CREATE TABLE `pelicula` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `titulo` varchar(80) NOT NULL,\n  `clasificacion` char(2) DEFAULT NULL,\n  `anio` year DEFAULT NULL,\n  `nacionalidad` varchar(40) DEFAULT 'España',\n  `duracion` smallint unsigned NOT NULL,\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 55,
+  "texto": "ALTER TABLE pelicula ALTER COLUMN nacionalidad SET DEFAULT 'Francia'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 56,
+  "texto": "ALTER TABLE pelicula ALTER nacionalidad DROP DEFAULT",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 57,
+  "texto": "ALTER TABLE pelicula ALTER COLUMN duracion SET DEFAULT 90",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 58,
+  "texto": "INSERT INTO pelicula (titulo, anio, estreno) VALUES ('Rebeca', 1940, '1940-04-12')",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'estreno' in 'field list'"
+ },
+ {
+  "linea": 59,
+  "texto": "SELECT id, titulo, nacionalidad, duracion FROM pelicula ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id",
+   "titulo",
+   "nacionalidad",
+   "duracion"
+  ],
+  "filas": [
+   [
+    "1",
+    "Vértigo",
+    null,
+    "128"
+   ],
+   [
+    "2",
+    "Psicosis",
+    null,
+    "109"
+   ],
+   [
+    "3",
+    "Los pájaros",
+    null,
+    "119"
+   ]
+  ]
+ },
+ {
+  "linea": 60,
+  "texto": "SHOW CREATE TABLE pelicula",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "pelicula",
+    "CREATE TABLE `pelicula` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `titulo` varchar(80) NOT NULL,\n  `clasificacion` char(2) DEFAULT NULL,\n  `anio` year DEFAULT NULL,\n  `nacionalidad` varchar(40),\n  `duracion` smallint unsigned NOT NULL DEFAULT '90',\n  PRIMARY KEY (`id`)\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 62,
+  "texto": "ALTER TABLE pelicula MODIFY id BIGINT AUTO_INCREMENT",
+  "ok": false,
+  "codigo": 3780,
+  "mensaje": "Referencing column 'id_pelicula' and referenced column 'id' in foreign key constraint 'fk_sesion_pelicula' are incompatible."
+ },
+ {
+  "linea": 63,
+  "texto": "ALTER TABLE pelicula MODIFY id INT UNSIGNED AUTO_INCREMENT",
+  "ok": false,
+  "codigo": 3780,
+  "mensaje": "Referencing column 'id_pelicula' and referenced column 'id' in foreign key constraint 'fk_sesion_pelicula' are incompatible."
+ },
+ {
+  "linea": 64,
+  "texto": "ALTER TABLE sesion MODIFY id_pelicula BIGINT NOT NULL",
+  "ok": false,
+  "codigo": 3780,
+  "mensaje": "Referencing column 'id_pelicula' and referenced column 'id' in foreign key constraint 'fk_sesion_pelicula' are incompatible."
+ },
+ {
+  "linea": 65,
+  "texto": "ALTER TABLE pelicula RENAME COLUMN id TO id_peli",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 66,
+  "texto": "SHOW CREATE TABLE sesion",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "sesion",
+    "CREATE TABLE `sesion` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `id_pelicula` int NOT NULL,\n  `numero_sala` tinyint unsigned NOT NULL,\n  `hora` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `fk_sesion_pelicula` (`id_pelicula`),\n  KEY `numero_sala` (`numero_sala`),\n  CONSTRAINT `fk_sesion_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id_peli`),\n  CONSTRAINT `sesion_ibfk_1` FOREIGN KEY (`numero_sala`) REFERENCES `sala` (`numero`) ON DELETE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 67,
+  "texto": "ALTER TABLE pelicula RENAME COLUMN id_peli TO id",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 68,
+  "texto": "ALTER TABLE sesion RENAME COLUMN numero_sala TO sala",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 69,
+  "texto": "SHOW CREATE TABLE sesion",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "sesion",
+    "CREATE TABLE `sesion` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `id_pelicula` int NOT NULL,\n  `sala` tinyint unsigned NOT NULL,\n  `hora` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `fk_sesion_pelicula` (`id_pelicula`),\n  KEY `numero_sala` (`sala`),\n  CONSTRAINT `fk_sesion_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id`),\n  CONSTRAINT `sesion_ibfk_1` FOREIGN KEY (`sala`) REFERENCES `sala` (`numero`) ON DELETE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 71,
+  "texto": "ALTER TABLE pelicula ADD CONSTRAINT uq_pelicula_titulo UNIQUE (titulo)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 72,
+  "texto": "INSERT INTO pelicula (titulo, anio, estreno) VALUES ('Vértigo', 1990, '1990-01-01')",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'estreno' in 'field list'"
+ },
+ {
+  "linea": 73,
+  "texto": "ALTER TABLE pelicula ADD UNIQUE (anio)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 74,
+  "texto": "INSERT INTO pelicula (titulo, anio, estreno) VALUES ('Encadenados', 1946, '1946-08-15'), ('Náufragos', 1946, '1944-01-11')",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'estreno' in 'field list'"
+ },
+ {
+  "linea": 75,
+  "texto": "ALTER TABLE pelicula ADD UNIQUE KEY uq_anio_titulo (anio, titulo)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 76,
+  "texto": "ALTER TABLE pelicula ADD UNIQUE KEY uq_anio_titulo (titulo)",
+  "ok": false,
+  "codigo": 1061,
+  "mensaje": "Duplicate key name 'uq_anio_titulo'"
+ },
+ {
+  "linea": 77,
+  "texto": "ALTER TABLE pelicula ADD CONSTRAINT chk_duracion CHECK (duracion > 60)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 78,
+  "texto": "ALTER TABLE pelicula ADD CONSTRAINT chk_duracion CHECK (duracion BETWEEN 60 AND 300)",
+  "ok": false,
+  "codigo": 3822,
+  "mensaje": "Duplicate check constraint name 'chk_duracion'."
+ },
+ {
+  "linea": 79,
+  "texto": "ALTER TABLE pelicula ADD CHECK (anio >= 1895)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 80,
+  "texto": "ALTER TABLE pelicula ADD CHECK (anio < 2100)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 81,
+  "texto": "ALTER TABLE pelicula ADD CONSTRAINT chk_anio_grande CHECK (anio > 1950)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 82,
+  "texto": "INSERT INTO pelicula (titulo, anio, duracion, estreno) VALUES ('Corto', 2000, 20, '2000-01-01')",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'estreno' in 'field list'"
+ },
+ {
+  "linea": 83,
+  "texto": "ALTER TABLE pelicula ALTER CHECK chk_duracion NOT ENFORCED",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 84,
+  "texto": "INSERT INTO pelicula (titulo, anio, duracion, estreno) VALUES ('Corto', 2000, 20, '2000-01-01')",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'estreno' in 'field list'"
+ },
+ {
+  "linea": 85,
+  "texto": "ALTER TABLE pelicula ALTER CHECK chk_duracion ENFORCED",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 3,
+  "info": "Records: 3  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 86,
+  "texto": "DELETE FROM pelicula WHERE titulo = 'Corto'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 87,
+  "texto": "ALTER TABLE pelicula ALTER CHECK chk_duracion ENFORCED",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 88,
+  "texto": "ALTER TABLE pelicula ALTER CHECK no_existe ENFORCED",
+  "ok": false,
+  "codigo": 3821,
+  "mensaje": "Check constraint 'no_existe' is not found in the table."
+ },
+ {
+  "linea": 89,
+  "texto": "SELECT CONSTRAINT_NAME, CHECK_CLAUSE FROM information_schema.CHECK_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'cine' ORDER BY CONSTRAINT_NAME",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "CONSTRAINT_NAME",
+   "CHECK_CLAUSE"
+  ],
+  "filas": [
+   [
+    "chk_anio_grande",
+    "(`anio` > 1950)"
+   ],
+   [
+    "chk_duracion",
+    "(`duracion` > 60)"
+   ],
+   [
+    "pelicula_chk_1",
+    "(`anio` >= 1895)"
+   ],
+   [
+    "pelicula_chk_2",
+    "(`anio` < 2100)"
+   ]
+  ]
+ },
+ {
+  "linea": 90,
+  "texto": "ALTER TABLE pelicula DROP CHECK pelicula_chk_1",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 91,
+  "texto": "ALTER TABLE pelicula DROP CONSTRAINT pelicula_chk_2",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 92,
+  "texto": "ALTER TABLE pelicula DROP CHECK no_existe",
+  "ok": false,
+  "codigo": 3821,
+  "mensaje": "Check constraint 'no_existe' is not found in the table."
+ },
+ {
+  "linea": 93,
+  "texto": "ALTER TABLE pelicula DROP CONSTRAINT uq_pelicula_titulo",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 94,
+  "texto": "ALTER TABLE pelicula DROP INDEX anio",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 95,
+  "texto": "ALTER TABLE pelicula DROP INDEX no_existe",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'no_existe'; check that column/key exists"
+ },
+ {
+  "linea": 96,
+  "texto": "ALTER TABLE pelicula DROP KEY uq_anio_titulo",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 97,
+  "texto": "SHOW CREATE TABLE pelicula",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "pelicula",
+    "CREATE TABLE `pelicula` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `titulo` varchar(80) NOT NULL,\n  `clasificacion` char(2) DEFAULT NULL,\n  `anio` year DEFAULT NULL,\n  `nacionalidad` varchar(40),\n  `duracion` smallint unsigned NOT NULL DEFAULT '90',\n  PRIMARY KEY (`id`),\n  CONSTRAINT `chk_anio_grande` CHECK ((`anio` > 1950)),\n  CONSTRAINT `chk_duracion` CHECK ((`duracion` > 60))\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 98,
+  "texto": "CREATE TABLE critica (id INT AUTO_INCREMENT PRIMARY KEY, id_pelicula INT, texto VARCHAR(200), autor VARCHAR(40))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 99,
+  "texto": "INSERT INTO critica (id_pelicula, texto) VALUES (1, 'Obra maestra'), (99, 'No existe')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 100,
+  "texto": "ALTER TABLE critica ADD CONSTRAINT fk_critica_pelicula FOREIGN KEY (id_pelicula) REFERENCES pelicula (id) /*ignorar*/",
+  "ok": false,
+  "codigo": 1452,
+  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`cine`.`#sql-1_c`, CONSTRAINT `fk_critica_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id`))"
+ },
+ {
+  "linea": 101,
+  "texto": "DELETE FROM critica WHERE id_pelicula = 99",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 102,
+  "texto": "ALTER TABLE critica ADD CONSTRAINT fk_critica_pelicula FOREIGN KEY (id_pelicula) REFERENCES pelicula (id) ON DELETE SET NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Records: 1  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 103,
+  "texto": "ALTER TABLE critica ADD FOREIGN KEY (id_pelicula) REFERENCES pelicula (id)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Records: 1  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 104,
+  "texto": "ALTER TABLE critica ADD FOREIGN KEY (autor) REFERENCES pelicula (titulo)",
+  "ok": false,
+  "codigo": 1822,
+  "mensaje": "Failed to add the foreign key constraint. Missing index for constraint 'critica_ibfk_2' in the referenced table 'pelicula'"
+ },
+ {
+  "linea": 105,
+  "texto": "ALTER TABLE critica ADD FOREIGN KEY (texto) REFERENCES no_existe (id)",
+  "ok": false,
+  "codigo": 1824,
+  "mensaje": "Failed to open the referenced table 'no_existe'"
+ },
+ {
+  "linea": 106,
+  "texto": "SHOW CREATE TABLE critica",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "critica",
+    "CREATE TABLE `critica` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `id_pelicula` int DEFAULT NULL,\n  `texto` varchar(200) DEFAULT NULL,\n  `autor` varchar(40) DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `id_pelicula` (`id_pelicula`),\n  CONSTRAINT `critica_ibfk_1` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id`),\n  CONSTRAINT `fk_critica_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id`) ON DELETE SET NULL\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 107,
+  "texto": "ALTER TABLE critica DROP FOREIGN KEY critica_ibfk_1",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 108,
+  "texto": "ALTER TABLE critica DROP FOREIGN KEY no_existe",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'no_existe'; check that column/key exists"
+ },
+ {
+  "linea": 109,
+  "texto": "ALTER TABLE critica DROP INDEX fk_critica_pelicula",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'fk_critica_pelicula'; check that column/key exists"
+ },
+ {
+  "linea": 110,
+  "texto": "ALTER TABLE critica DROP FOREIGN KEY fk_critica_pelicula",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 111,
+  "texto": "SHOW CREATE TABLE critica",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "critica",
+    "CREATE TABLE `critica` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `id_pelicula` int DEFAULT NULL,\n  `texto` varchar(200) DEFAULT NULL,\n  `autor` varchar(40) DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `id_pelicula` (`id_pelicula`)\n) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 112,
+  "texto": "ALTER TABLE critica DROP INDEX fk_critica_pelicula",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'fk_critica_pelicula'; check that column/key exists"
+ },
+ {
+  "linea": 113,
+  "texto": "ALTER TABLE critica ADD CONSTRAINT fk_critica_pelicula FOREIGN KEY (id_pelicula) REFERENCES pelicula (id) ON DELETE CASCADE",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Records: 1  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 115,
+  "texto": "ALTER TABLE critica DROP PRIMARY KEY",
+  "ok": false,
+  "codigo": 1075,
+  "mensaje": "Incorrect table definition; there can be only one auto column and it must be defined as a key"
+ },
+ {
+  "linea": 116,
+  "texto": "ALTER TABLE critica MODIFY id INT NOT NULL",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Records: 1  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 117,
+  "texto": "ALTER TABLE critica DROP PRIMARY KEY",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Records: 1  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 118,
+  "texto": "ALTER TABLE critica ADD PRIMARY KEY (autor)",
+  "ok": false,
+  "codigo": 1138,
+  "mensaje": "Invalid use of NULL value"
+ },
+ {
+  "linea": 119,
+  "texto": "ALTER TABLE critica ADD PRIMARY KEY (id)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 120,
+  "texto": "ALTER TABLE critica ADD PRIMARY KEY (id)",
+  "ok": false,
+  "codigo": 1068,
+  "mensaje": "Multiple primary key defined"
+ },
+ {
+  "linea": 121,
+  "texto": "ALTER TABLE sala DROP PRIMARY KEY",
+  "ok": false,
+  "codigo": 1553,
+  "mensaje": "Cannot drop index 'PRIMARY': needed in a foreign key constraint"
+ },
+ {
+  "linea": 122,
+  "texto": "ALTER TABLE critica MODIFY id INT NOT NULL AUTO_INCREMENT",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Records: 1  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 123,
+  "texto": "SHOW CREATE TABLE critica",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "critica",
+    "CREATE TABLE `critica` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `id_pelicula` int DEFAULT NULL,\n  `texto` varchar(200) DEFAULT NULL,\n  `autor` varchar(40) DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `fk_critica_pelicula` (`id_pelicula`),\n  CONSTRAINT `fk_critica_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id`) ON DELETE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 125,
+  "texto": "ALTER TABLE critica ADD COLUMN fecha DATE, ADD COLUMN puntuacion TINYINT UNSIGNED CHECK (puntuacion <= 10), ADD INDEX idx_fecha (fecha)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "Records: 1  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 126,
+  "texto": "ALTER TABLE critica ADD COLUMN x INT, DROP COLUMN no_existe",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'no_existe'; check that column/key exists"
+ },
+ {
+  "linea": 127,
+  "texto": "ALTER TABLE critica ENGINE = MyISAM",
+  "ok": false,
+  "codigo": 3776,
+  "mensaje": "Cannot change table's storage engine because the table participates in a foreign key constraint."
+ },
+ {
+  "linea": 128,
+  "texto": "ALTER TABLE critica COMMENT = 'Críticas de prensa', AUTO_INCREMENT = 100",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 129,
+  "texto": "INSERT INTO critica (id_pelicula, texto) VALUES (2, 'Inquietante')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 130,
+  "texto": "SELECT id, id_pelicula, texto FROM critica ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id",
+   "id_pelicula",
+   "texto"
+  ],
+  "filas": [
+   [
+    "1",
+    "1",
+    "Obra maestra"
+   ],
+   [
+    "100",
+    "2",
+    "Inquietante"
+   ]
+  ]
+ },
+ {
+  "linea": 131,
+  "texto": "ALTER TABLE critica RENAME INDEX idx_fecha TO idx_critica_fecha",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 132,
+  "texto": "ALTER TABLE critica RENAME KEY no_existe TO otro",
+  "ok": false,
+  "codigo": 1176,
+  "mensaje": "Key 'no_existe' doesn't exist in table 'critica'"
+ },
+ {
+  "linea": 133,
+  "texto": "SHOW CREATE TABLE critica",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "critica",
+    "CREATE TABLE `critica` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `id_pelicula` int DEFAULT NULL,\n  `texto` varchar(200) DEFAULT NULL,\n  `autor` varchar(40) DEFAULT NULL,\n  `fecha` date DEFAULT NULL,\n  `puntuacion` tinyint unsigned DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `fk_critica_pelicula` (`id_pelicula`),\n  KEY `idx_critica_fecha` (`fecha`),\n  CONSTRAINT `fk_critica_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id`) ON DELETE CASCADE,\n  CONSTRAINT `critica_chk_1` CHECK ((`puntuacion` <= 10))\n) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Críticas de prensa'"
+   ]
+  ]
+ },
+ {
+  "linea": 134,
+  "texto": "SELECT TABLE_NAME, AUTO_INCREMENT, TABLE_COMMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'cine' ORDER BY TABLE_NAME",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "TABLE_NAME",
+   "AUTO_INCREMENT",
+   "TABLE_COMMENT"
+  ],
+  "filas": [
+   [
+    "critica",
+    "101",
+    "Críticas de prensa"
+   ],
+   [
+    "pelicula",
+    "4",
+    ""
+   ],
+   [
+    "sala",
+    null,
+    ""
+   ],
+   [
+    "sesion",
+    "3",
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 136,
+  "texto": "CREATE INDEX idx_titulo ON pelicula (titulo)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 137,
+  "texto": "CREATE UNIQUE INDEX uq_titulo_anio ON pelicula (titulo, anio DESC)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 138,
+  "texto": "CREATE INDEX idx_titulo ON pelicula (anio)",
+  "ok": false,
+  "codigo": 1061,
+  "mensaje": "Duplicate key name 'idx_titulo'"
+ },
+ {
+  "linea": 139,
+  "texto": "CREATE INDEX idx_x ON no_existe (a)",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'cine.no_existe' doesn't exist"
+ },
+ {
+  "linea": 140,
+  "texto": "CREATE INDEX idx_y ON pelicula (no_existe)",
+  "ok": false,
+  "codigo": 1072,
+  "mensaje": "Key column 'no_existe' doesn't exist in table"
+ },
+ {
+  "linea": 141,
+  "texto": "CREATE INDEX idx_prefijo ON critica (texto(20))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 142,
+  "texto": "SHOW INDEX FROM pelicula",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Non_unique",
+   "Key_name",
+   "Seq_in_index",
+   "Column_name",
+   "Collation",
+   "Cardinality",
+   "Sub_part",
+   "Packed",
+   "Null",
+   "Index_type",
+   "Comment",
+   "Index_comment",
+   "Visible",
+   "Expression"
+  ],
+  "filas": [
+   [
+    "pelicula",
+    "0",
+    "PRIMARY",
+    "1",
+    "id",
+    "A",
+    "3",
+    null,
+    null,
+    "",
+    "BTREE",
+    "",
+    "",
+    "YES",
+    null
+   ],
+   [
+    "pelicula",
+    "0",
+    "uq_titulo_anio",
+    "1",
+    "titulo",
+    "A",
+    "3",
+    null,
+    null,
+    "",
+    "BTREE",
+    "",
+    "",
+    "YES",
+    null
+   ],
+   [
+    "pelicula",
+    "0",
+    "uq_titulo_anio",
+    "2",
+    "anio",
+    "D",
+    "3",
+    null,
+    null,
+    "YES",
+    "BTREE",
+    "",
+    "",
+    "YES",
+    null
+   ],
+   [
+    "pelicula",
+    "1",
+    "idx_titulo",
+    "1",
+    "titulo",
+    "A",
+    "3",
+    null,
+    null,
+    "",
+    "BTREE",
+    "",
+    "",
+    "YES",
+    null
+   ]
+  ]
+ },
+ {
+  "linea": 143,
+  "texto": "DROP INDEX idx_titulo ON pelicula",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 144,
+  "texto": "DROP INDEX no_existe ON pelicula",
+  "ok": false,
+  "codigo": 1091,
+  "mensaje": "Can't DROP 'no_existe'; check that column/key exists"
+ },
+ {
+  "linea": 145,
+  "texto": "DROP INDEX `PRIMARY` ON sala",
+  "ok": false,
+  "codigo": 1553,
+  "mensaje": "Cannot drop index 'PRIMARY': needed in a foreign key constraint"
+ },
+ {
+  "linea": 146,
+  "texto": "SELECT TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX, COLUMN_NAME, NON_UNIQUE, COLLATION FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'cine' ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "TABLE_NAME",
+   "INDEX_NAME",
+   "SEQ_IN_INDEX",
+   "COLUMN_NAME",
+   "NON_UNIQUE",
+   "COLLATION"
+  ],
+  "filas": [
+   [
+    "critica",
+    "fk_critica_pelicula",
+    "1",
+    "id_pelicula",
+    "1",
+    "A"
+   ],
+   [
+    "critica",
+    "idx_critica_fecha",
+    "1",
+    "fecha",
+    "1",
+    "A"
+   ],
+   [
+    "critica",
+    "idx_prefijo",
+    "1",
+    "texto",
+    "1",
+    "A"
+   ],
+   [
+    "critica",
+    "PRIMARY",
+    "1",
+    "id",
+    "0",
+    "A"
+   ],
+   [
+    "pelicula",
+    "PRIMARY",
+    "1",
+    "id",
+    "0",
+    "A"
+   ],
+   [
+    "pelicula",
+    "uq_titulo_anio",
+    "1",
+    "titulo",
+    "0",
+    "A"
+   ],
+   [
+    "pelicula",
+    "uq_titulo_anio",
+    "2",
+    "anio",
+    "0",
+    "D"
+   ],
+   [
+    "sala",
+    "PRIMARY",
+    "1",
+    "numero",
+    "0",
+    "A"
+   ],
+   [
+    "sesion",
+    "fk_sesion_pelicula",
+    "1",
+    "id_pelicula",
+    "1",
+    "A"
+   ],
+   [
+    "sesion",
+    "numero_sala",
+    "1",
+    "sala",
+    "1",
+    "A"
+   ],
+   [
+    "sesion",
+    "PRIMARY",
+    "1",
+    "id",
+    "0",
+    "A"
+   ]
+  ]
+ },
+ {
+  "linea": 148,
+  "texto": "TRUNCATE TABLE sala",
+  "ok": false,
+  "codigo": 1701,
+  "mensaje": "Cannot truncate a table referenced in a foreign key constraint (`cine`.`sesion`, CONSTRAINT `sesion_ibfk_1`)"
+ },
+ {
+  "linea": 149,
+  "texto": "TRUNCATE TABLE critica",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 150,
+  "texto": "SHOW CREATE TABLE critica",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "critica",
+    "CREATE TABLE `critica` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `id_pelicula` int DEFAULT NULL,\n  `texto` varchar(200) DEFAULT NULL,\n  `autor` varchar(40) DEFAULT NULL,\n  `fecha` date DEFAULT NULL,\n  `puntuacion` tinyint unsigned DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  KEY `fk_critica_pelicula` (`id_pelicula`),\n  KEY `idx_critica_fecha` (`fecha`),\n  KEY `idx_prefijo` (`texto`(20)),\n  CONSTRAINT `fk_critica_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id`) ON DELETE CASCADE,\n  CONSTRAINT `critica_chk_1` CHECK ((`puntuacion` <= 10))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Críticas de prensa'"
+   ]
+  ]
+ },
+ {
+  "linea": 151,
+  "texto": "TRUNCATE sesion",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 152,
+  "texto": "INSERT INTO sesion (id_pelicula, sala, hora) VALUES (1, 1, '2026-11-03 18:00:00')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 153,
+  "texto": "SELECT * FROM sesion",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id",
+   "id_pelicula",
+   "sala",
+   "hora"
+  ],
+  "filas": [
+   [
+    "1",
+    "1",
+    "1",
+    "2026-11-03 18:00:00"
+   ]
+  ]
+ },
+ {
+  "linea": 154,
+  "texto": "TRUNCATE TABLE no_existe",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'cine.no_existe' doesn't exist"
+ },
+ {
+  "linea": 156,
+  "texto": "RENAME TABLE pelicula TO film",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 157,
+  "texto": "SHOW CREATE TABLE sesion",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "sesion",
+    "CREATE TABLE `sesion` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `id_pelicula` int NOT NULL,\n  `sala` tinyint unsigned NOT NULL,\n  `hora` datetime NOT NULL,\n  PRIMARY KEY (`id`),\n  KEY `fk_sesion_pelicula` (`id_pelicula`),\n  KEY `numero_sala` (`sala`),\n  CONSTRAINT `fk_sesion_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `film` (`id`),\n  CONSTRAINT `sesion_ibfk_1` FOREIGN KEY (`sala`) REFERENCES `sala` (`numero`) ON DELETE CASCADE\n) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 158,
+  "texto": "SHOW TABLES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Tables_in_cine"
+  ],
+  "filas": [
+   [
+    "critica"
+   ],
+   [
+    "film"
+   ],
+   [
+    "sala"
+   ],
+   [
+    "sesion"
+   ]
+  ]
+ },
+ {
+  "linea": 159,
+  "texto": "INSERT INTO sesion (id_pelicula, sala, hora) VALUES (99, 1, '2026-11-03 18:00:00')",
+  "ok": false,
+  "codigo": 1452,
+  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`cine`.`sesion`, CONSTRAINT `fk_sesion_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `film` (`id`))"
+ },
+ {
+  "linea": 160,
+  "texto": "DELETE FROM film WHERE id = 1",
+  "ok": false,
+  "codigo": 1451,
+  "mensaje": "Cannot delete or update a parent row: a foreign key constraint fails (`cine`.`sesion`, CONSTRAINT `fk_sesion_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `film` (`id`))"
+ },
+ {
+  "linea": 161,
+  "texto": "RENAME TABLE film TO pelicula, sala TO pelicula",
+  "ok": false,
+  "codigo": 1050,
+  "mensaje": "Table 'pelicula' already exists"
+ },
+ {
+  "linea": 162,
+  "texto": "RENAME TABLE no_existe TO otra",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'cine.no_existe' doesn't exist"
+ },
+ {
+  "linea": 163,
+  "texto": "ALTER TABLE film RENAME TO pelicula",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 164,
+  "texto": "ALTER TABLE pelicula RENAME AS peliculas, ADD COLUMN genero VARCHAR(20)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "Records: 0  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 165,
+  "texto": "SHOW TABLES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Tables_in_cine"
+  ],
+  "filas": [
+   [
+    "critica"
+   ],
+   [
+    "peliculas"
+   ],
+   [
+    "sala"
+   ],
+   [
+    "sesion"
+   ]
+  ]
+ },
+ {
+  "linea": 166,
+  "texto": "SHOW CREATE TABLE peliculas",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "peliculas",
+    "CREATE TABLE `peliculas` (\n  `id` int NOT NULL AUTO_INCREMENT,\n  `titulo` varchar(80) NOT NULL,\n  `clasificacion` char(2) DEFAULT NULL,\n  `anio` year DEFAULT NULL,\n  `nacionalidad` varchar(40),\n  `duracion` smallint unsigned NOT NULL DEFAULT '90',\n  `genero` varchar(20) DEFAULT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uq_titulo_anio` (`titulo`,`anio` DESC),\n  CONSTRAINT `chk_anio_grande` CHECK ((`anio` > 1950)),\n  CONSTRAINT `chk_duracion` CHECK ((`duracion` > 60))\n) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 167,
+  "texto": "SELECT CONSTRAINT_NAME, TABLE_NAME, REFERENCED_TABLE_NAME FROM information_schema.REFERENTIAL_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = 'cine' ORDER BY CONSTRAINT_NAME",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "CONSTRAINT_NAME",
+   "TABLE_NAME",
+   "REFERENCED_TABLE_NAME"
+  ],
+  "filas": [
+   [
+    "fk_critica_pelicula",
+    "critica",
+    "peliculas"
+   ],
+   [
+    "fk_sesion_pelicula",
+    "sesion",
+    "peliculas"
+   ],
+   [
+    "sesion_ibfk_1",
+    "sesion",
+    "sala"
+   ]
+  ]
+ },
+ {
+  "linea": 168,
+  "texto": "DROP TABLE peliculas",
+  "ok": false,
+  "codigo": 3730,
+  "mensaje": "Cannot drop table 'peliculas' referenced by a foreign key constraint 'fk_sesion_pelicula' on table 'sesion'."
+ },
+ {
+  "linea": 169,
+  "texto": "DROP DATABASE cine",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 4,
+  "info": "",
+  "avisos": 0
+ }
+]

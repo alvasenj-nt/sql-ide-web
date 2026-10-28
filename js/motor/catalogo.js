@@ -67,13 +67,16 @@
     return tabla.columnas.find((c) => c.nombre.toLowerCase() === n) || null;
   }
 
-  // Índices en el orden en que los muestra MySQL: primaria, únicos y el
-  // resto, cada grupo en orden de creación
+  // Índices en el orden en que los muestra MySQL: primaria, únicos sobre
+  // columnas NOT NULL, el resto de únicos y los demás, cada grupo en orden
+  // de creación
   function indicesOrdenados(tabla) {
     const pk = tabla.indices.filter((i) => i.primaria);
-    const unicos = tabla.indices.filter((i) => i.unico && !i.primaria);
+    const noNulo = (i) => i.columnas.every((c) => { const col = columna(tabla, c.nombre); return col && !col.nulo; });
+    const unicosNoNulos = tabla.indices.filter((i) => i.unico && !i.primaria && noNulo(i));
+    const unicos = tabla.indices.filter((i) => i.unico && !i.primaria && !noNulo(i));
     const otros = tabla.indices.filter((i) => !i.unico);
-    return pk.concat(unicos, otros);
+    return pk.concat(unicosNoNulos, unicos, otros);
   }
 
   // ---------- expresiones normalizadas (CHECK) ----------
@@ -161,7 +164,7 @@
     const d = col.defecto;
     const sinDefectoNulo = T.TEXTOS[col.tipo.base] || T.BLOBS[col.tipo.base] || col.tipo.base === 'json';
     if (d === undefined) {
-      if (col.nulo && !sinDefectoNulo) s += ' DEFAULT NULL';
+      if (col.nulo && !sinDefectoNulo && !col.sinDefecto) s += ' DEFAULT NULL';
     } else if (d.nulo) {
       s += ' DEFAULT NULL';
     } else if (d.ahora) {
