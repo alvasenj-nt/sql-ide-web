@@ -27,10 +27,10 @@ Cada práctica es una carpeta `practicas/<id>/` con un manifiesto `practica.json
 ```json
 {
   "esquema": 1,
-  "id": "bd-ut3-veterinaria-3vz13l",
+  "id": "bd-ut3-taller-52d05p",
   "version": 1,
-  "titulo": "UT3 · Clínica veterinaria Huellas",
-  "proyecto": "veterinaria",
+  "titulo": "UT3 · Taller mecánico Ruedas",
+  "proyecto": "taller",
   "readme": "README.txt",
   "inicial": "inicial.sql",
   "ejercicios": [
