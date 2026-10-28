@@ -1,0 +1,16 @@
+{
+  "esquema": 1,
+  "id": "bd-ut3-contacto-09u7nw",
+  "version": 1,
+  "titulo": "UT3 · Toma de contacto: recetario",
+  "proyecto": "recetario",
+  "readme": "README.txt",
+  "ejercicios": [
+    { "carpeta": "ejercicio1", "comprobaciones": "comprobaciones.json",
+      "archivos": [ { "nombre": "enunciado.txt", "editable": false },
+                    { "nombre": "script.sql", "editable": true } ] },
+    { "carpeta": "ejercicio2", "comprobaciones": "comprobaciones.json",
+      "archivos": [ { "nombre": "enunciado.txt", "editable": false },
+                    { "nombre": "script.sql", "editable": true } ] }
+  ]
+}

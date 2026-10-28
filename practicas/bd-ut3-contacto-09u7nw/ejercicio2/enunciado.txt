@@ -1,0 +1,38 @@
+EJERCICIO 2: UN SCRIPT QUE NO FUNCIONA
+
+El recetario ya guarda recetas y los ingredientes de cada una. Un compañero
+dejó escrito el script de creación, pero al ejecutarlo falla: tiene cinco
+errores. Tu trabajo es hacerlo funcionar sin cambiar las reglas del
+recetario.
+
+Esquema relacional (claves primarias entre corchetes, claves ajenas con ->)
+  ingrediente        ([id], nombre, unidad)
+  receta             ([id], titulo, raciones, dificultad)
+  receta_ingrediente ([id_receta -> receta, id_ingrediente -> ingrediente],
+                      cantidad)
+
+Reglas del recetario
+- Los ingredientes siguen las reglas del ejercicio 1.
+- La base de datos asigna el id de cada receta. El título es obligatorio,
+  tiene hasta 80 caracteres y no se repite.
+- Una receta es para 1 a 20 raciones; si no se indica, para 4.
+- La dificultad es fácil, media o difícil.
+- La cantidad de cada ingrediente en una receta es mayor que cero y se
+  anota con un decimal como mucho.
+- Al borrar una receta se borra la lista de sus ingredientes.
+- No se puede borrar un ingrediente que aparece en alguna receta.
+- Los datos que carga el script son correctos y deben quedar todos.
+
+Cómo trabajar
+1. Pulsa Ejecutar. El script se detiene en la primera sentencia con error:
+   en Output está marcada en rojo, con el código y el mensaje de MySQL.
+   Haz clic en ella para ir a su línea.
+2. Lee el mensaje: dice qué ha fallado y, a menudo, dónde (near '...' at
+   line N cuenta las líneas desde el principio de esa sentencia).
+3. Corrige solo lo que causa el error y vuelve a ejecutar. Repite hasta que
+   el script se ejecute entero sin errores.
+4. Anota cada error en el bloque Respuestas, al final del script.
+5. Pulsa Comprobar: si algún requisito falla, quizá la corrección cambió una
+   regla del recetario.
+6. Con script.sql abierto, pulsa Copiar código y pega el resultado en la
+   pregunta del ejercicio 2 del cuestionario.

@@ -1,0 +1,167 @@
+{
+ "esquema": 1,
+ "comprobaciones": [
+  {
+   "id": "tabla",
+   "texto": "Existe la tabla ingrediente en la base de datos recetario.",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'recetario' AND TABLE_NAME = 'ingrediente'",
+     "espera": {
+      "valor": "1"
+     },
+     "siFalla": "No está la tabla ingrediente en recetario."
+    }
+   ]
+  },
+  {
+   "id": "datos",
+   "texto": "El script carga harina (g), huevo (ud) y leche (ml).",
+   "pasos": [
+    {
+     "sql": "SELECT nombre, unidad FROM recetario.ingrediente ORDER BY nombre",
+     "espera": {
+      "filas": [
+       [
+        "harina",
+        "g"
+       ],
+       [
+        "huevo",
+        "ud"
+       ],
+       [
+        "leche",
+        "ml"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "id_automatico",
+   "texto": "La base de datos asigna el id de un ingrediente nuevo.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('sal', 'g')",
+     "espera": "ok"
+    },
+    {
+     "sql": "SELECT id FROM recetario.ingrediente WHERE nombre = 'sal'",
+     "espera": {
+      "valor": "4"
+     }
+    }
+   ]
+  },
+  {
+   "id": "nombre_unico",
+   "texto": "No se puede repetir el nombre de un ingrediente.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('pimienta', 'g')",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('pimienta', 'ud')",
+     "espera": {
+      "error": [
+       1062
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "nombre_obligatorio",
+   "texto": "El nombre es obligatorio.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('canela', 'g')",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES (NULL, 'g')",
+     "espera": {
+      "error": [
+       1048
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "nombre_40",
+   "texto": "El nombre admite 40 caracteres y no más.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES (REPEAT('a', 40), 'g')",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES (REPEAT('b', 41), 'g')",
+     "espera": {
+      "error": [
+       1406
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "unidad_lista",
+   "texto": "La unidad solo puede ser g, ml o ud.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('aceite', 'ml')",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('nata', 'ud')",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('arroz', 'kg')",
+     "espera": {
+      "error": [
+       1265,
+       3819
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "unidad_obligatoria",
+   "texto": "La unidad es obligatoria.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('nuez', 'ud')",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('miel', NULL)",
+     "espera": {
+      "error": [
+       1048
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "repetible",
+   "texto": "El script se puede ejecutar dos veces seguidas.",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM recetario.ingrediente",
+     "espera": {
+      "valor": "3"
+     }
+    }
+   ],
+   "repetirScript": true
+  }
+ ]
+}

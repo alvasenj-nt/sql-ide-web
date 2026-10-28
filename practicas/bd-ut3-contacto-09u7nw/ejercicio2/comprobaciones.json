@@ -1,0 +1,195 @@
+{
+ "esquema": 1,
+ "comprobaciones": [
+  {
+   "id": "tablas",
+   "texto": "Existen las tres tablas del recetario.",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'recetario' AND TABLE_NAME IN ('ingrediente', 'receta', 'receta_ingrediente')",
+     "espera": {
+      "valor": "3"
+     },
+     "siFalla": "No están las tres tablas: el script se detiene antes de crearlas."
+    }
+   ]
+  },
+  {
+   "id": "datos",
+   "texto": "Se cargan todos los datos del script.",
+   "pasos": [
+    {
+     "sql": "SELECT r.titulo, i.nombre, ri.cantidad FROM recetario.receta_ingrediente ri JOIN recetario.receta r ON r.id = ri.id_receta JOIN recetario.ingrediente i ON i.id = ri.id_ingrediente ORDER BY r.titulo, i.nombre",
+     "espera": {
+      "filas": [
+       [
+        "Bizcocho",
+        "azúcar",
+        "150.0"
+       ],
+       [
+        "Bizcocho",
+        "harina",
+        "200.0"
+       ],
+       [
+        "Bizcocho",
+        "huevo",
+        "4.0"
+       ],
+       [
+        "Bizcocho",
+        "mantequilla",
+        "100.5"
+       ],
+       [
+        "Crepes",
+        "harina",
+        "125.0"
+       ],
+       [
+        "Crepes",
+        "huevo",
+        "2.0"
+       ],
+       [
+        "Crepes",
+        "leche",
+        "250.0"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "receta_existente",
+   "texto": "Los ingredientes de una receta tienen que ser de una receta que existe.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.receta_ingrediente (id_receta, id_ingrediente, cantidad) VALUES ((SELECT id FROM recetario.receta WHERE titulo = 'Crepes'), (SELECT id FROM recetario.ingrediente WHERE nombre = 'azúcar'), 30)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO recetario.receta_ingrediente (id_receta, id_ingrediente, cantidad) VALUES (999, (SELECT id FROM recetario.ingrediente WHERE nombre = 'harina'), 30)",
+     "espera": {
+      "error": [
+       1452
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "ingrediente_existente",
+   "texto": "Los ingredientes de una receta tienen que existir.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.receta_ingrediente (id_receta, id_ingrediente, cantidad) VALUES ((SELECT id FROM recetario.receta WHERE titulo = 'Crepes'), (SELECT id FROM recetario.ingrediente WHERE nombre = 'mantequilla'), 20)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO recetario.receta_ingrediente (id_receta, id_ingrediente, cantidad) VALUES ((SELECT id FROM recetario.receta WHERE titulo = 'Crepes'), 999, 20)",
+     "espera": {
+      "error": [
+       1452
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "borrar_receta",
+   "texto": "Al borrar una receta se borra la lista de sus ingredientes.",
+   "pasos": [
+    {
+     "sql": "DELETE FROM recetario.receta WHERE titulo = 'Crepes'",
+     "espera": "ok"
+    },
+    {
+     "sql": "SELECT COUNT(*) FROM recetario.receta_ingrediente",
+     "espera": {
+      "valor": "4"
+     }
+    }
+   ]
+  },
+  {
+   "id": "borrar_ingrediente",
+   "texto": "No se puede borrar un ingrediente que aparece en una receta.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.ingrediente (nombre, unidad) VALUES ('sal', 'g')",
+     "espera": "ok"
+    },
+    {
+     "sql": "DELETE FROM recetario.ingrediente WHERE nombre = 'sal'",
+     "espera": "ok"
+    },
+    {
+     "sql": "DELETE FROM recetario.ingrediente WHERE nombre = 'harina'",
+     "espera": {
+      "error": [
+       1451
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "raciones",
+   "texto": "Una receta es para 4 raciones si no se indica, y nunca para más de 20.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.receta (titulo, dificultad) VALUES ('Tortilla', 'media')",
+     "espera": "ok"
+    },
+    {
+     "sql": "SELECT raciones FROM recetario.receta WHERE titulo = 'Tortilla'",
+     "espera": {
+      "valor": "4"
+     }
+    },
+    {
+     "sql": "INSERT INTO recetario.receta (titulo, raciones, dificultad) VALUES ('Paella', 21, 'difícil')",
+     "espera": {
+      "error": [
+       3819
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "cantidad",
+   "texto": "La cantidad de un ingrediente es mayor que cero.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO recetario.receta_ingrediente (id_receta, id_ingrediente, cantidad) VALUES ((SELECT id FROM recetario.receta WHERE titulo = 'Crepes'), (SELECT id FROM recetario.ingrediente WHERE nombre = 'mantequilla'), 0.5)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO recetario.receta_ingrediente (id_receta, id_ingrediente, cantidad) VALUES ((SELECT id FROM recetario.receta WHERE titulo = 'Bizcocho'), (SELECT id FROM recetario.ingrediente WHERE nombre = 'leche'), 0)",
+     "espera": {
+      "error": [
+       3819
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "repetible",
+   "texto": "El script se puede ejecutar dos veces seguidas.",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM recetario.receta_ingrediente",
+     "espera": {
+      "valor": "7"
+     }
+    }
+   ],
+   "repetirScript": true
+  }
+ ]
+}

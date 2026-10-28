@@ -1,0 +1,51 @@
+EJERCICIO 1: TU PRIMERA BASE DE DATOS EN EL LABORATORIO
+
+Un recetario de cocina necesita guardar sus ingredientes. En este ejercicio
+creas la base de datos y su primera tabla y, de paso, recorres las partes
+del laboratorio.
+
+Paso 1. Ejecutar el script
+  script.sql ya trae las primeras sentencias: borran la base de datos
+  recetario si existe, la crean y la seleccionan. Pulsa Ejecutar (el rayo).
+  - En Output aparece una fila por sentencia con una marca verde, la hora,
+    la sentencia y el mensaje de MySQL.
+  - En SCHEMAS, a la izquierda, aparece recetario. Despliégala: todavía no
+    tiene tablas.
+  - Pulsa Ejecutar otra vez. El resultado es el mismo: el script se puede
+    repetir porque empieza borrando lo que va a crear.
+
+Paso 2. Crear la tabla ingrediente
+  Debajo de USE, escribe la sentencia que crea la tabla
+
+    ingrediente ([id], nombre, unidad)
+
+  con estas reglas:
+  - La base de datos asigna el id de cada ingrediente: 1, 2, 3...
+  - El nombre es obligatorio, tiene hasta 40 caracteres y no se repite.
+  - La unidad es obligatoria y solo puede ser g, ml o ud.
+  Ejecuta. En SCHEMAS despliega la tabla: Columns, Indexes y Checks.
+  Selecciona una columna y mira el panel Information.
+
+Paso 3. Cargar datos
+  Inserta harina (g), huevo (ud) y leche (ml) sin indicar el id, y termina el
+  script con una consulta que muestre la tabla completa. Ejecuta: las filas
+  aparecen en la pestaña Result.
+
+Paso 4. Probar sentencias sueltas
+  Escribe al final, en una línea nueva, otro INSERT de harina. Deja el cursor
+  en esa línea y pulsa Sentencia (Ctrl+Intro): se ejecuta solo esa sentencia,
+  sobre el estado actual del servidor. Output muestra el error 1062 de MySQL.
+  Haz clic en esa fila de Output: el editor salta a la línea.
+  Prueba también, con Sentencia, una por una:
+  - DESCRIBE ingrediente;
+  - SHOW CREATE TABLE ingrediente;  fíjate en lo que MySQL ha completado
+    por su cuenta (motor, juego de caracteres, nombres de los índices).
+  - un INSERT de pimienta con la unidad kg: ¿qué código de error da?
+  - un INSERT de sal con la unidad NULL: ¿qué código de error da?
+  Borra las líneas de prueba cuando termines: el script tiene que ejecutarse
+  entero sin errores.
+
+Paso 5. Comprobar y entregar
+  Pulsa Comprobar: ejecuta el script desde cero y revisa los requisitos.
+  Corrige lo que falle. Después, con script.sql abierto, pulsa Copiar código
+  y pega el resultado en la pregunta del ejercicio 1 del cuestionario.
