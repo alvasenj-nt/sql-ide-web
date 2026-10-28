@@ -28,6 +28,17 @@
       return b ? b.tablas.get(nombre) || null : null;
     }
 
+    vista(bd, nombre) {
+      const b = this.bases.get(bd);
+      return b && b.vistas ? b.vistas.get(nombre) || null : null;
+    }
+
+    todasLasVistas() {
+      const lista = [];
+      this.bases.forEach((b) => b.vistas && b.vistas.forEach((v) => lista.push(v)));
+      return lista;
+    }
+
     todasLasTablas() {
       const lista = [];
       this.bases.forEach((b) => b.tablas.forEach((t) => lista.push(t)));
@@ -88,16 +99,18 @@
   }
 
   // Texto de una expresión tal como MySQL la guarda en el diccionario
-  function textoExpresion(e) {
+  // o: { col(e), str(v), estrella } para el texto de las vistas
+  function textoExpresion(e, o = {}) {
+    const tx = (x) => textoExpresion(x, o);
     switch (e.t) {
       case 'num':
         return e.v.startsWith('-') ? '-(' + e.v.slice(1) + ')' : e.v;
-      case 'str': return cadenaMySQL(e.v);
+      case 'str': return o.str ? o.str(e.v) : cadenaMySQL(e.v);
       case 'null': return 'NULL';
       case 'bool': return e.v ? 'true' : 'false';
       case 'hex': return "0x" + (e.v || '').toLowerCase();
-      case 'col': return cita(e.partes[e.partes.length - 1]);
-      case 'par': return textoExpresion(e.a);
+      case 'col': return o.col ? o.col(e) : cita(e.partes[e.partes.length - 1]);
+      case 'par': return tx(e.a);
       case 'bin': {
         const op = OPERADORES_PALABRA[e.op] || e.op;
         if (e.op === 'AND' || e.op === 'OR') {
@@ -105,40 +118,40 @@
           const partes = [];
           const recoger = (x) => {
             while (x.t === 'par') x = x.a;
-            if (x.t === 'bin' && x.op === e.op) { recoger(x.a); recoger(x.b); } else partes.push(textoExpresion(x));
+            if (x.t === 'bin' && x.op === e.op) { recoger(x.a); recoger(x.b); } else partes.push(tx(x));
           };
           recoger(e);
           return '(' + partes.join(' ' + op + ' ') + ')';
         }
-        return '(' + textoExpresion(e.a) + ' ' + op + ' ' + textoExpresion(e.b) + ')';
+        return '(' + tx(e.a) + ' ' + op + ' ' + tx(e.b) + ')';
       }
       case 'un':
         if (e.op === 'NOT') {
           let a = e.a;
           while (a.t === 'par') a = a.a;
           const inversa = { '=': '<>', '<>': '=', '<': '>=', '>=': '<', '>': '<=', '<=': '>' };
-          if (a.t === 'bin' && inversa[a.op]) return textoExpresion({ t: 'bin', op: inversa[a.op], a: a.a, b: a.b });
+          if (a.t === 'bin' && inversa[a.op]) return tx({ t: 'bin', op: inversa[a.op], a: a.a, b: a.b });
           if (['como', 'en', 'entre', 'regexp', 'esNulo', 'esValor'].includes(a.t) || (a.t === 'bin' && ['AND', 'OR', 'XOR'].includes(a.op))) {
-            return '(not(' + textoExpresion(a) + '))';
+            return '(not(' + tx(a) + '))';
           }
-          return '(0 = ' + textoExpresion(a) + ')';
+          return '(0 = ' + tx(a) + ')';
         }
-        if (e.op === '-') return '-(' + textoExpresion(e.a) + ')';
-        return e.op + '(' + textoExpresion(e.a) + ')';
-      case 'esNulo': return '(' + textoExpresion(e.a) + ' is ' + (e.neg ? 'not ' : '') + 'null)';
-      case 'esValor': return '(' + textoExpresion(e.a) + ' is ' + (e.neg ? 'not ' : '') + (e.valor ? 'true' : 'false') + ')';
-      case 'entre': return '(' + textoExpresion(e.a) + (e.neg ? ' not' : '') + ' between ' + textoExpresion(e.b) + ' and ' + textoExpresion(e.c) + ')';
-      case 'en': return '(' + textoExpresion(e.a) + (e.neg ? ' not' : '') + ' in (' + (e.lista || []).map(textoExpresion).join(',') + '))';
+        if (e.op === '-') return '-(' + tx(e.a) + ')';
+        return e.op + '(' + tx(e.a) + ')';
+      case 'esNulo': return '(' + tx(e.a) + ' is ' + (e.neg ? 'not ' : '') + 'null)';
+      case 'esValor': return '(' + tx(e.a) + ' is ' + (e.neg ? 'not ' : '') + (e.valor ? 'true' : 'false') + ')';
+      case 'entre': return '(' + tx(e.a) + (e.neg ? ' not' : '') + ' between ' + tx(e.b) + ' and ' + tx(e.c) + ')';
+      case 'en': return '(' + tx(e.a) + (e.neg ? ' not' : '') + ' in (' + (e.lista || []).map(tx).join(',') + '))';
       case 'como': {
-        const base = '(' + textoExpresion(e.a) + ' like ' + textoExpresion(e.patron) + (e.escape ? ' escape ' + textoExpresion(e.escape) : '') + ')';
+        const base = '(' + tx(e.a) + ' like ' + tx(e.patron) + (e.escape ? ' escape ' + tx(e.escape) : '') + ')';
         return e.neg ? '(not(' + base + '))' : base;
       }
       case 'regexp': {
-        const base = 'regexp_like(' + textoExpresion(e.a) + ',' + textoExpresion(e.patron) + ')';
+        const base = 'regexp_like(' + tx(e.a) + ',' + tx(e.patron) + ')';
         return e.neg ? '(not(' + base + '))' : base;
       }
-      case 'func': return e.nombre.toLowerCase() + '(' + (e.estrella ? '*' : e.args.map(textoExpresion).join(',')) + ')';
-      case 'caso': return '(case ' + (e.base ? textoExpresion(e.base) + ' ' : '') + e.cuandos.map((w) => 'when ' + textoExpresion(w.c) + ' then ' + textoExpresion(w.r)).join(' ') + (e.sino ? ' else ' + textoExpresion(e.sino) : '') + ' end)';
+      case 'func': return e.nombre.toLowerCase() + '(' + (e.estrella ? (o.estrella || '*') : e.args.map(tx).join(',')) + ')';
+      case 'caso': return '(case ' + (e.base ? tx(e.base) + ' ' : '') + e.cuandos.map((w) => 'when ' + tx(w.c) + ' then ' + tx(w.r)).join(' ') + (e.sino ? ' else ' + tx(e.sino) : '') + ' end)';
       case 'literalTipado': return e.tipo + "'" + e.v + "'";
       default: return '?';
     }
@@ -292,6 +305,8 @@
       ['INDEX_SCHEMA', 'v'], ['INDEX_NAME', 'v'], ['SEQ_IN_INDEX', 'i'], ['COLUMN_NAME', 'v'], ['COLLATION', 'v'],
       ['CARDINALITY', 'i'], ['SUB_PART', 'i'], ['PACKED', 'v'], ['NULLABLE', 'v'], ['INDEX_TYPE', 'v'], ['COMMENT', 'v'],
       ['INDEX_COMMENT', 'v'], ['IS_VISIBLE', 'v'], ['EXPRESSION', 'v']],
+    VIEWS: [['TABLE_CATALOG', 'v'], ['TABLE_SCHEMA', 'v'], ['TABLE_NAME', 'v'], ['VIEW_DEFINITION', 'v'], ['CHECK_OPTION', 'v'],
+      ['IS_UPDATABLE', 'v'], ['DEFINER', 'v'], ['SECURITY_TYPE', 'v'], ['CHARACTER_SET_CLIENT', 'v'], ['COLLATION_CONNECTION', 'v']],
     ENGINES: [['ENGINE', 'v'], ['SUPPORT', 'v'], ['COMMENT', 'v'], ['TRANSACTIONS', 'v'], ['XA', 'v'], ['SAVEPOINTS', 'v']],
   };
 
@@ -340,6 +355,8 @@
     const filas = [];
     const porNombre = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
     const tablas = cat.todasLasTablas().sort((a, b) => porNombre(a.bd, b.bd) || porNombre(a.nombre, b.nombre));
+    const vistas = cat.todasLasVistas().sort((a, b) => porNombre(a.bd, b.bd) || porNombre(a.nombre, b.nombre));
+    const ordenarFilas = () => filas.sort((a, b) => porNombre(a[1], b[1]) || porNombre(a[2], b[2]));
     switch (vista) {
       case 'SCHEMATA':
         ['information_schema', 'mysql', 'performance_schema', 'sys'].forEach((n) => filas.push(['def', n,
@@ -350,6 +367,13 @@
       case 'TABLES':
         tablas.forEach((t) => filas.push(['def', t.bd, t.nombre, 'BASE TABLE', t.motor, 10, 'Dynamic', 0,
           t.columnas.some((c) => c.autoInc) ? t.autoInc || 1 : null, t.collation, '', t.comentario || '']));
+        vistas.forEach((v) => filas.push(['def', v.bd, v.nombre, 'VIEW', null, null, null, null, null, null, null, 'VIEW']));
+        ordenarFilas();
+        break;
+      case 'VIEWS':
+        vistas.forEach((v) => filas.push(['def', v.bd, v.nombre, v.definicion, v.opcion, v.actualizable ? 'YES' : 'NO',
+          (v.definidor || { usuario: 'root', host: '%' }).usuario + '@' + (v.definidor || { usuario: 'root', host: '%' }).host,
+          v.seguridad, 'utf8mb4', 'utf8mb4_general_ci']));
         break;
       case 'COLUMNS':
         tablas.forEach((t) => t.columnas.forEach((c, k) => {
@@ -360,6 +384,15 @@
             c.tipo.charset || null, c.tipo.collation || null, T.textoTipo(c.tipo), claveDeColumna(t, c), extraDeColumna(c),
             'select,insert,update,references', c.comentario || '', '']);
         }));
+        vistas.forEach((v) => (v.columnas || []).forEach((c, k) => {
+          const d = datosColumna(c);
+          const def = defectoMostrado(c);
+          filas.push(['def', v.bd, v.nombre, c.nombre, k + 1, def === undefined || def === 'NULL' ? null : String(def),
+            c.nulo ? 'YES' : 'NO', c.tipo.base, d.maxLen, d.octetos, d.precision, d.escala, d.fsp,
+            c.tipo.charset || null, c.tipo.collation || null, T.textoTipo(c.tipo), '', '',
+            'select,insert,update,references', c.comentario || '', '']);
+        }));
+        ordenarFilas();
         break;
       case 'TABLE_CONSTRAINTS':
         tablas.forEach((t) => {

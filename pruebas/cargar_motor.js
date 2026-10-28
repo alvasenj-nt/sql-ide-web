@@ -3,7 +3,7 @@
 // index.html. Requiere sql.js en NODE_PATH (npm install sql.js@1.15.2).
 const path = require('path');
 
-const ARCHIVOS = ['lexico', 'sintaxis', 'tipos', 'catalogo', 'traductor', 'funciones', 'servidor', 'alterar'];
+const ARCHIVOS = ['lexico', 'sintaxis', 'tipos', 'catalogo', 'traductor', 'funciones', 'servidor', 'alterar', 'vistas'];
 
 async function cargarMotor() {
   ARCHIVOS.forEach((a) => require(path.join(__dirname, '..', 'js', 'motor', a + '.js')));

@@ -186,7 +186,7 @@
       const resto = this.actual.valor.toUpperCase();
       if (['FULLTEXT', 'SPATIAL'].includes(resto)) throw new NoDisponible('índices ' + resto);
       if (resto === 'UNIQUE' || resto === 'INDEX') return this.crearIndice();
-      if (['VIEW', 'OR', 'ALGORITHM', 'DEFINER', 'SQL'].includes(resto)) throw new NoDisponible('CREATE VIEW');
+      if (['VIEW', 'OR', 'ALGORITHM', 'DEFINER', 'SQL'].includes(resto)) return this.vista(false);
       if (['USER', 'ROLE', 'PROCEDURE', 'FUNCTION', 'TRIGGER', 'EVENT', 'TABLESPACE', 'SERVER', 'SPATIAL',
         'LOGFILE', 'RESOURCE', 'UNDO', 'AGGREGATE'].includes(resto)) throw new NoDisponible('CREATE ' + resto);
       throw this.error();
@@ -612,6 +612,75 @@
       return o;
     }
 
+    // Cuenta 'usuario'@'host' (sin host: '%'). CURRENT_USER es la cuenta actual.
+    cuenta() {
+      if (this.es('CURRENT_USER')) {
+        this.i++;
+        if (this.aceptaOp('(')) this.esperaOp(')');
+        return { actual: true };
+      }
+      const t = this.actual;
+      if (!(t.tipo === 'str' || t.tipo === 'qid' || t.tipo === 'id')) throw this.error();
+      this.i++;
+      const usuario = t.valor;
+      let host = '%';
+      const v = this.actual;
+      if (v.tipo === 'var' && v.valor.startsWith('@') && !v.valor.startsWith('@@')) {
+        this.i++;
+        host = v.valor.slice(1);
+        if (host === '') {
+          const h = this.actual;
+          if (!(h.tipo === 'str' || h.tipo === 'qid' || h.tipo === 'id')) throw this.error();
+          this.i++;
+          host = h.valor;
+        }
+      }
+      return { usuario, host };
+    }
+
+    // CREATE [OR REPLACE] [ALGORITHM = ...] [DEFINER = ...] [SQL SECURITY ...] VIEW
+    // y ALTER [ALGORITHM = ...] ... VIEW
+    vista(alterar) {
+      const v = { tipo: 'crearVista', alterar, reemplazar: false, algoritmo: 'UNDEFINED', definidor: null, seguridad: 'DEFINER' };
+      if (!alterar && this.acepta('OR')) { this.espera('REPLACE'); v.reemplazar = true; }
+      if (this.acepta('ALGORITHM')) {
+        this.esperaOp('=');
+        const a = this.actual.tipo === 'id' ? this.actual.valor.toUpperCase() : '';
+        if (!['UNDEFINED', 'MERGE', 'TEMPTABLE'].includes(a)) throw this.error();
+        this.i++;
+        v.algoritmo = a;
+      }
+      if (this.acepta('DEFINER')) {
+        this.esperaOp('=');
+        v.definidor = this.cuenta();
+      }
+      if (this.acepta('SQL', 'SECURITY')) {
+        if (this.acepta('DEFINER')) v.seguridad = 'DEFINER';
+        else if (this.acepta('INVOKER')) v.seguridad = 'INVOKER';
+        else throw this.error();
+      }
+      this.espera('VIEW');
+      v.vista = this.nombreTabla();
+      v.columnas = null;
+      if (this.aceptaOp('(')) {
+        v.columnas = [];
+        do v.columnas.push(this.identificador()); while (this.aceptaOp(','));
+        this.esperaOp(')');
+      }
+      this.espera('AS');
+      const inicio = this.actual.pos;
+      v.consulta = this.consulta();
+      v.opcion = 'NONE';
+      if (this.acepta('WITH')) {
+        if (this.acepta('CASCADED')) v.opcion = 'CASCADED';
+        else if (this.acepta('LOCAL')) v.opcion = 'LOCAL';
+        else v.opcion = 'CASCADED';
+        this.espera('CHECK', 'OPTION');
+      }
+      v.texto = this.texto.slice(inicio, this.actual.pos).trim();
+      return v;
+    }
+
     // CREATE [UNIQUE] INDEX nombre ON tabla (columnas): un ALTER TABLE ... ADD INDEX
     crearIndice() {
       const unico = this.acepta('UNIQUE');
@@ -667,7 +736,8 @@
       if (this.acepta('DATABASE') || this.acepta('SCHEMA')) throw new NoDisponible('ALTER DATABASE');
       if (!this.acepta('TABLE')) {
         const resto = this.actual.tipo === 'id' ? this.actual.valor.toUpperCase() : '';
-        if (['VIEW', 'ALGORITHM', 'DEFINER', 'SQL', 'USER', 'PROCEDURE', 'FUNCTION', 'EVENT', 'TABLESPACE', 'SERVER',
+        if (['VIEW', 'ALGORITHM', 'DEFINER', 'SQL'].includes(resto)) return this.vista(true);
+        if (['USER', 'PROCEDURE', 'FUNCTION', 'EVENT', 'TABLESPACE', 'SERVER',
           'LOGFILE', 'INSTANCE', 'UNDO', 'RESOURCE', 'ONLINE', 'OFFLINE', 'IGNORE'].includes(resto)) throw new NoDisponible('ALTER ' + resto);
         throw this.error();
       }
@@ -804,8 +874,15 @@
         this.opcionesAlgoritmo();
         return { tipo: 'alterarTabla', tabla, ops: [{ op: 'borrarIndice', nombre }], deIndice: true };
       }
+      if (this.acepta('VIEW')) {
+        const siExiste = this.acepta('IF', 'EXISTS');
+        const vistas = [];
+        do vistas.push(this.nombreTabla()); while (this.aceptaOp(','));
+        if (!this.acepta('RESTRICT')) this.acepta('CASCADE');
+        return { tipo: 'borrarVista', vistas, siExiste };
+      }
       const resto = this.actual.tipo === 'id' ? this.actual.valor.toUpperCase() : '';
-      if (['VIEW', 'USER', 'ROLE', 'PROCEDURE', 'FUNCTION', 'TRIGGER', 'EVENT', 'TABLESPACE', 'SERVER',
+      if (['USER', 'ROLE', 'PROCEDURE', 'FUNCTION', 'TRIGGER', 'EVENT', 'TABLESPACE', 'SERVER',
         'SPATIAL', 'LOGFILE', 'RESOURCE', 'UNDO', 'ONLINE', 'OFFLINE'].includes(resto)) throw new NoDisponible('DROP ' + resto);
       throw this.error();
     }
@@ -924,6 +1001,7 @@
       }
       if (completo) throw this.error();
       if (this.acepta('CREATE', 'TABLE')) return { tipo: 'mostrar', que: 'crearTabla', tabla: this.nombreTabla() };
+      if (this.acepta('CREATE', 'VIEW')) return { tipo: 'mostrar', que: 'crearVista', tabla: this.nombreTabla() };
       if (this.acepta('CREATE', 'DATABASE') || this.acepta('CREATE', 'SCHEMA')) {
         const siNoExiste = this.acepta('IF', 'NOT', 'EXISTS');
         return { tipo: 'mostrar', que: 'crearBD', nombre: this.identificador(), siNoExiste };

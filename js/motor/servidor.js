@@ -164,6 +164,8 @@
         case 'alterarTabla': return this.alterarTabla(ast, avisos);
         case 'vaciarTabla': return this.vaciarTabla(ast, avisos);
         case 'renombrarTablas': return this.renombrarTablas(ast, avisos);
+        case 'crearVista': return this.crearVista(ast, avisos);
+        case 'borrarVista': return this.borrarVista(ast, avisos);
         case 'nada': return { tipo: 'cambio', afectadas: 0 };
         default: throw new NoDisponible(ast.tipo);
       }
@@ -200,6 +202,8 @@
       }
       if (this.cat.esSistema(bd)) throw new NoDisponible('consultar la base de datos ' + bd);
       if (!this.cat.bd(bd)) throw new ErrorSQL(1049, '42000', "Unknown database '" + bd + "'");
+      const vista = this.cat.vista(bd, r.nombre);
+      if (vista) return this.fuenteVista(r, vista);
       const t = this.cat.tabla(bd, r.nombre);
       if (!t) throw new ErrorSQL(1146, '42S02', "Table '" + bd + '.' + r.nombre + "' doesn't exist");
       return {
@@ -321,7 +325,7 @@
         throw new ErrorSQL(1007, 'HY000', "Can't create database '" + nombre + "'; database exists");
       }
       const [charset, collation] = T.resolverCharset(ast.charset, ast.collation, this.cat.charset, this.cat.collation, avisos);
-      this.cat.bases.set(nombre, { nombre, charset, collation, tablas: new Map() });
+      this.cat.bases.set(nombre, { nombre, charset, collation, tablas: new Map(), vistas: new Map() });
       this.cambioCatalogo();
       return { tipo: 'cambio', afectadas: 1 };
     }
@@ -337,7 +341,7 @@
         }
         throw new ErrorSQL(1008, 'HY000', "Can't drop database '" + nombre + "'; database doesn't exist");
       }
-      const n = bd.tablas.size;
+      const n = bd.tablas.size + (bd.vistas ? bd.vistas.size : 0);
       this.db.run('PRAGMA foreign_keys = OFF');
       try {
         bd.tablas.forEach((t) => this.db.run('DROP TABLE ' + nombreTablaSQL(t.bd, t.nombre)));
@@ -369,7 +373,7 @@
       if (!base) throw new ErrorSQL(1049, '42000', "Unknown database '" + bd + "'");
       const nombre = ast.tabla.nombre;
       if (nombre.length > 64) throw new ErrorSQL(1059, '42000', "Identifier name '" + nombre + "' is too long");
-      if (base.tablas.has(nombre)) {
+      if (base.tablas.has(nombre) || (base.vistas && base.vistas.has(nombre))) {
         if (ast.siNoExiste) {
           avisos.push(['Note', 1050, "Table '" + nombre + "' already exists"]);
           return { tipo: 'cambio', afectadas: 0 };
@@ -767,6 +771,8 @@
     }
 
     insertar(ast, avisos) {
+      const vista = this.vistaDe(ast.tabla);
+      if (vista) return this.insertarVista(vista, ast, avisos);
       const tabla = this.tablaExistente(ast.tabla);
       let columnas;
       let filas;
@@ -872,6 +878,8 @@
     }
 
     actualizar(ast, avisos) {
+      const vista = this.vistaDe(ast.tabla);
+      if (vista) return this.actualizarVista(vista, ast, avisos);
       const tabla = this.tablaExistente(ast.tabla);
       const alias = ast.alias || ast.tabla.nombre;
       const fuente = { alias, conAlias: !!ast.alias, bd: tabla.bd, nombre: tabla.nombre,
@@ -890,6 +898,8 @@
       asignaciones.forEach((a) => { if (a.sql) sql += ', ' + a.sql.sql; });
       sql += ' FROM ' + nombreTablaSQL(tabla.bd, tabla.nombre) + ' AS ' + id(alias);
       if (ast.donde) sql += ' WHERE ' + TR.traducir(ast.donde, Object.assign({}, ctx, { clausula: 'where clause' })).sql;
+      // Filas elegidas a través de una vista
+      if (ast.filas) sql += (ast.donde ? ' AND ' : ' WHERE ') + id(alias) + '.rowid IN (' + ast.filas.join(', ') + ')';
       if (ast.ordenar.length) sql += ' ORDER BY ' + ast.ordenar.map((o) => TR.traducir(o.expr, Object.assign({}, ctx, { clausula: 'order clause' })).sql + (o.desc ? ' DESC' : '')).join(', ');
       if (ast.limite !== null) sql += ' LIMIT ' + ast.limite;
       let cambiadas = 0;
@@ -948,6 +958,8 @@
     }
 
     eliminar(ast) {
+      const vista = this.vistaDe(ast.tabla);
+      if (vista) return this.eliminarVista(vista, ast);
       const tabla = this.tablaExistente(ast.tabla);
       const alias = ast.alias || ast.tabla.nombre;
       const fuente = { alias, conAlias: !!ast.alias, bd: tabla.bd, nombre: tabla.nombre,
@@ -955,6 +967,7 @@
       const ctx = { srv: this, ambito: { fuentes: [fuente], padre: null, aliasSelect: null }, clausula: 'where clause', sinAgregados: true };
       let sub = 'SELECT ' + id(alias) + '.rowid FROM ' + nombreTablaSQL(tabla.bd, tabla.nombre) + ' AS ' + id(alias);
       if (ast.donde) sub += ' WHERE ' + TR.traducir(ast.donde, ctx).sql;
+      if (ast.filas) sub += (ast.donde ? ' AND ' : ' WHERE ') + id(alias) + '.rowid IN (' + ast.filas.join(', ') + ')';
       if (ast.ordenar.length) sub += ' ORDER BY ' + ast.ordenar.map((o) => TR.traducir(o.expr, Object.assign({}, ctx, { clausula: 'order clause' })).sql + (o.desc ? ' DESC' : '')).join(', ');
       if (ast.limite !== null) sub += ' LIMIT ' + ast.limite;
       let n = 0;
@@ -1007,13 +1020,15 @@
           const base = this.cat.bd(bd);
           if (!base) throw new ErrorSQL(1049, '42000', "Unknown database '" + bd + "'");
           const f = patron(ast.patron);
-          const nombres = Array.from(base.tablas.keys()).sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)).filter(f);
+          const nombres = Array.from(base.tablas.keys()).concat(Array.from(base.vistas ? base.vistas.keys() : []))
+            .sort((a, b) => (a < b ? -1 : a > b ? 1 : 0)).filter(f);
           const cab = ['Tables_in_' + bd + (ast.patron ? ' (' + ast.patron + ')' : '')];
-          if (ast.completo) return filas(cab.concat(['Table_type']), nombres.map((n) => [n, 'BASE TABLE']));
+          if (ast.completo) return filas(cab.concat(['Table_type']), nombres.map((n) => [n, base.tablas.has(n) ? 'BASE TABLE' : 'VIEW']));
           return filas(cab, nombres.map((n) => [n]));
         }
         case 'columnas': {
-          const t = this.tablaExistente(ast.tabla);
+          const vista = this.vistaDe(ast.tabla);
+          const t = vista ? { columnas: vista.columnas, indices: [] } : this.tablaExistente(ast.tabla);
           let lista = C.describir(t, ast.completo);
           if (ast.columna) {
             const f = patron(ast.columna);
@@ -1026,8 +1041,12 @@
             : ['Field', 'Type', 'Null', 'Key', 'Default', 'Extra'];
           return filas(cab, lista);
         }
-        case 'crearTabla': {
+        case 'crearVista': case 'crearTabla': {
+          const vista = this.vistaDe(ast.tabla);
+          const cabVista = ['View', 'Create View', 'character_set_client', 'collation_connection'];
+          if (vista) return filas(cabVista, [[vista.nombre, this.mostrarCrearVista(vista), 'utf8mb4', 'utf8mb4_general_ci']]);
           const t = this.tablaExistente(ast.tabla);
+          if (ast.que === 'crearVista') throw new ErrorSQL(1347, 'HY000', "'" + t.bd + '.' + t.nombre + "' is not VIEW");
           return filas(['Table', 'Create Table'], [[t.nombre, C.mostrarCrearTabla(t)]]);
         }
         case 'crearBD': {
@@ -1115,6 +1134,10 @@
           fks: t.fks.map((f) => ({ nombre: f.nombre, columnas: f.columnas, ref: (f.refBd !== t.bd ? f.refBd + '.' : '') + f.refTabla,
             refColumnas: f.refColumnas, alBorrar: f.alBorrar || 'NO ACTION', alActualizar: f.alActualizar || 'NO ACTION' })),
           checks: t.checks.map((k) => ({ nombre: k.nombre, texto: k.texto })),
+        })),
+        vistas: Array.from(b.vistas ? b.vistas.values() : []).map((v) => ({
+          nombre: v.nombre, texto: this.mostrarCrearVista(v), actualizable: v.actualizable, opcion: v.opcion,
+          columnas: (v.columnas || []).map((c) => ({ nombre: c.nombre, tipo: T.textoTipo(c.tipo), nulo: c.nulo })),
         })),
       }));
     }

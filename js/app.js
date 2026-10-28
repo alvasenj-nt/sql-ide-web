@@ -432,8 +432,10 @@ function pintarNavegador() {
     arbol.appendChild(li);
   }
   esquemas.forEach((b) => {
-    const tablas = b.tablas.filter((t) => !filtro || b.nombre.toLowerCase().includes(filtro) || t.nombre.toLowerCase().includes(filtro));
-    if (filtro && !tablas.length && !b.nombre.toLowerCase().includes(filtro)) return;
+    const pasa = (n) => !filtro || b.nombre.toLowerCase().includes(filtro) || n.toLowerCase().includes(filtro);
+    const tablas = b.tablas.filter((t) => pasa(t.nombre));
+    const vistas = (b.vistas || []).filter((v) => pasa(v.nombre));
+    if (filtro && !tablas.length && !vistas.length && !b.nombre.toLowerCase().includes(filtro)) return;
     const liBD = nodo(arbol, 'bd:' + b.nombre, 'ico-esquema', b.nombre, true, 'nodo-esquema' + (srv.bdActual === b.nombre ? ' por-defecto' : ''));
     liBD.querySelector('.nodo').addEventListener('dblclick', () => usarEsquema(b.nombre));
     liBD.querySelector('.nodo').addEventListener('click', () => informarEsquema(b));
@@ -465,7 +467,23 @@ function pintarNavegador() {
       if (!t.checks.length) vacio(chk);
       t.checks.forEach((k) => nodo(chk, null, 'ico-check', k.nombre, false));
     });
-    ['Views', 'Stored Procedures', 'Functions'].forEach((n) => vacio(nodo(ulBD, null, 'ico-carpeta', n, true).querySelector('ul')));
+    const ulV = nodo(ulBD, 'vistas:' + b.nombre, 'ico-carpeta', 'Views', true).querySelector('ul');
+    if (!vistas.length) vacio(ulV);
+    vistas.sort((x, y) => (x.nombre < y.nombre ? -1 : 1)).forEach((v) => {
+      const liV = nodo(ulV, 'v:' + b.nombre + '.' + v.nombre, 'ico-vista', v.nombre, true);
+      liV.querySelector('.nodo').addEventListener('click', () => informarVista(v));
+      liV.querySelector('.nodo').addEventListener('dblclick', () => insertarTexto(v.nombre));
+      const cols = nodo(liV.querySelector('ul'), 'vc:' + b.nombre + '.' + v.nombre, 'ico-carpeta', 'Columns', true).querySelector('ul');
+      v.columnas.forEach((c) => {
+        const li = nodo(cols, null, 'ico-columna', c.nombre, false);
+        const tipo = document.createElement('span');
+        tipo.className = 'tipo-nodo';
+        tipo.textContent = c.tipo;
+        li.querySelector('.nodo').appendChild(tipo);
+        li.querySelector('.nodo').addEventListener('dblclick', () => insertarTexto(c.nombre));
+      });
+    });
+    ['Stored Procedures', 'Functions'].forEach((n) => vacio(nodo(ulBD, null, 'ico-carpeta', n, true).querySelector('ul')));
   });
 }
 
@@ -545,6 +563,29 @@ function informarTabla(b, tabla) {
     tab.appendChild(tr);
   });
   info.append(t, tab);
+}
+
+function informarVista(vista) {
+  const info = $('info-objeto');
+  info.innerHTML = '';
+  const t = document.createElement('div');
+  t.className = 'info-titulo';
+  t.textContent = 'View: ' + vista.nombre + (vista.actualizable ? ' (updatable)' : ' (read only)')
+    + (vista.opcion !== 'NONE' ? ', ' + vista.opcion + ' CHECK OPTION' : '');
+  const tab = document.createElement('table');
+  vista.columnas.forEach((c) => {
+    const tr = document.createElement('tr');
+    [c.nombre, c.tipo + (c.nulo ? '' : ' NOT NULL')].forEach((v) => {
+      const td = document.createElement('td');
+      td.textContent = v;
+      tr.appendChild(td);
+    });
+    tab.appendChild(tr);
+  });
+  const def = document.createElement('pre');
+  def.className = 'info-definicion';
+  def.textContent = vista.texto;
+  info.append(t, tab, def);
 }
 
 function usarEsquema(nombre) {

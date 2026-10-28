@@ -162,6 +162,8 @@
         }
         if (ctx.sinColumnas) throw new ErrorSQL(1054, '42S22', "Unknown column '" + e.partes.join('.') + "' in '" + (ctx.clausula || 'field list') + "'");
         const r = resolverColumna(e.partes, ctx);
+        // Origen de la columna (las vistas lo usan para su texto y para escribir)
+        if (r.fuente) Object.defineProperty(e, 'origen', { value: { fuente: r.fuente, columna: r.columna }, configurable: true, writable: true });
         if (ctx.usadas && r.fuente && ctx.ambito.fuentes.includes(r.fuente)) ctx.usadas.push({ fuente: r.fuente, columna: r.columna, agregada: !!ctx.dentroAgregado });
         return r;
       }
@@ -266,6 +268,7 @@
         return { sql: '(' + a.sql + ' COLLATE BINARY)', tipo: a.tipo };
       }
       case 'func': return funcion(e, ctx);
+      case 'crudo': return { sql: e.sql, tipo: e.tipo || TIPO_ENTERO };
       case 'intervalo': throw new ErrorSQL(1064, '42000', 'You have an error in your SQL syntax; INTERVAL is only valid in date arithmetic');
       case 'estrella': throw new ErrorSQL(1064, '42000', "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '*'");
       case 'defecto': throw new ErrorSQL(1064, '42000', "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DEFAULT'");
@@ -539,8 +542,11 @@
             && (!c.expr.bd || f.bd === c.expr.bd));
           if (!fuentes.length) throw new ErrorSQL(1051, '42S02', "Unknown table '" + c.expr.tabla + "'");
         } else if (!fuentes.length) throw new ErrorSQL(1096, 'HY000', 'No tables used');
+        const expansion = [];
+        Object.defineProperty(c.expr, 'expansion', { value: expansion, configurable: true, writable: true });
         fuentes.forEach((f) => f.columnas.forEach((col) => {
           if (!c.expr.tabla && f.ocultas && f.ocultas.has(col.nombre.toLowerCase())) return;
+          expansion.push({ fuente: f, columna: col });
           partes.push((f.sql || id(f.alias)) + '.' + id(col.nombre) + ' AS ' + id(col.nombre));
           columnas.push({ nombre: col.nombre, tipo: col.tipo });
         }));
