@@ -1,0 +1,698 @@
+[
+ {
+  "linea": 2,
+  "texto": "CREATE DATABASE recetario CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 3,
+  "texto": "CREATE TABLE ingrediente (id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, nombre VARCHAR(40) NOT NULL)",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ },
+ {
+  "linea": 4,
+  "texto": "USE recetario",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 5,
+  "texto": "CREATE TABLE ingrediente (\n  id      INT UNSIGNED          NOT NULL AUTO_INCREMENT,\n  nombre  VARCHAR(40)           NOT NULL,\n  unidad  ENUM('g', 'ml', 'ud') NOT NULL,\n  CONSTRAINT pk_ingrediente PRIMARY KEY (id),\n  CONSTRAINT uq_ingrediente_nombre UNIQUE (nombre)\n) ENGINE = InnoDB",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 12,
+  "texto": "CREATE TABLE receta_ingrediente (\n  id_receta       INT UNSIGNED  NOT NULL,\n  id_ingrediente  INT           NOT NULL,\n  cantidad        DECIMAL(6,1)  NOT NULL,\n  CONSTRAINT pk_receta_ingrediente PRIMARY KEY (id_receta, id_ingrediente),\n  CONSTRAINT fk_ri_receta FOREIGN KEY (id_receta) REFERENCES receta (id)\n    ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT fk_ri_ingrediente FOREIGN KEY (id_ingrediente) REFERENCES ingrediente (id)\n    ON DELETE RESTRICT ON UPDATE CASCADE,\n  CONSTRAINT chk_ri_cantidad CHECK (cantidad > 0)\n) ENGINE = InnoDB",
+  "ok": false,
+  "codigo": 1824,
+  "mensaje": "Failed to open the referenced table 'receta'"
+ },
+ {
+  "linea": 23,
+  "texto": "CREATE TABLE receta (\n  id          INT UNSIGNED      NOT NULL AUTO_INCREMENT,\n  titulo      VARCHAR(80)       NOT NULL\n  raciones    TINYINT UNSIGNED  NOT NULL DEFAULT 4,\n  dificultad  ENUM('fácil', 'media', 'difícil') NOT NULL,\n  CONSTRAINT pk_receta PRIMARY KEY (id),\n  CONSTRAINT uq_receta_titulo UNIQUE (titulo),\n  CONSTRAINT chk_receta_raciones CHECK (raciones BETWEEN 1 AND 20)\n) ENGINE = InnoDB",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'raciones    TINYINT UNSIGNED  NOT NULL DEFAULT 4,\n  dificultad  ENUM('fácil', '' at line 4"
+ },
+ {
+  "linea": 32,
+  "texto": "CREATE TABLE receta (\n  id          INT UNSIGNED      NOT NULL AUTO_INCREMENT,\n  titulo      VARCHAR(80)       NOT NULL,\n  raciones    TINYINT UNSIGNED  NOT NULL DEFAULT 4,\n  dificultad  ENUM('fácil', 'media', 'difícil') NOT NULL,\n  CONSTRAINT pk_receta PRIMARY KEY (id),\n  CONSTRAINT uq_receta_titulo UNIQUE (titulo),\n  CONSTRAINT chk_receta_raciones CHECK (raciones BETWEEN 1 AND 20)\n) ENGINE = InnoDB",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 41,
+  "texto": "CREATE TABLE receta_ingrediente (\n  id_receta       INT UNSIGNED  NOT NULL,\n  id_ingrediente  INT           NOT NULL,\n  cantidad        DECIMAL(6,1)  NOT NULL,\n  CONSTRAINT pk_receta_ingrediente PRIMARY KEY (id_receta, id_ingrediente),\n  CONSTRAINT fk_ri_receta FOREIGN KEY (id_receta) REFERENCES receta (id)\n    ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT fk_ri_ingrediente FOREIGN KEY (id_ingrediente) REFERENCES ingrediente (id)\n    ON DELETE RESTRICT ON UPDATE CASCADE,\n  CONSTRAINT chk_ri_cantidad CHECK (cantidad > 0)\n) ENGINE = InnoDB",
+  "ok": false,
+  "codigo": 3780,
+  "mensaje": "Referencing column 'id_ingrediente' and referenced column 'id' in foreign key constraint 'fk_ri_ingrediente' are incompatible."
+ },
+ {
+  "linea": 52,
+  "texto": "SHOW TABLES",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Tables_in_recetario"
+  ],
+  "filas": [
+   [
+    "ingrediente"
+   ],
+   [
+    "receta"
+   ]
+  ]
+ },
+ {
+  "linea": 53,
+  "texto": "CREATE TABLE receta_ingrediente (\n  id_receta       INT UNSIGNED  NOT NULL,\n  id_ingrediente  INT UNSIGNED  NOT NULL,\n  cantidad        DECIMAL(6,1)  NOT NULL,\n  CONSTRAINT pk_receta_ingrediente PRIMARY KEY (id_receta, id_ingrediente),\n  CONSTRAINT fk_ri_receta FOREIGN KEY (id_receta) REFERENCES receta (id)\n    ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT fk_ri_ingrediente FOREIGN KEY (id_ingrediente) REFERENCES ingrediente (id)\n    ON DELETE RESTRICT ON UPDATE CASCADE,\n  CONSTRAINT chk_ri_cantidad CHECK (cantidad > 0)\n) ENGINE = InnoDB",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 64,
+  "texto": "INSERT INTO ingrediente (nombre, unidad) VALUES ('harina', 'g'), ('huevo', 'ud'), ('leche', 'ml'), ('azúcar', 'g'), ('mantequilla', 'g')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 5,
+  "info": "Records: 5  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 65,
+  "texto": "INSERT INTO receta_ingrediente (id_receta, id_ingrediente, cantidad) VALUES (1, 1, 125), (1, 2, 2), (1, 3, 250)",
+  "ok": false,
+  "codigo": 1452,
+  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`recetario`.`receta_ingrediente`, CONSTRAINT `fk_ri_receta` FOREIGN KEY (`id_receta`) REFERENCES `receta` (`id`) ON DELETE CASCADE ON UPDATE CASCADE)"
+ },
+ {
+  "linea": 66,
+  "texto": "INSERT INTO receta (titulo, raciones, dificultad) VALUES ('Crepes', 6, 'fácil'), ('Bizcocho', 8, 'media')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "Records: 2  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 67,
+  "texto": "INSERT INTO receta_ingrediente (id_receta, id_ingrediente, cantidad) VALUES (1, 1, 125), (1, 2, 2), (1, 3, 250), (2, 1, 200), (2, 2, 4), (2, 4, 150), (2, 5, 100.5)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 7,
+  "info": "Records: 7  Duplicates: 0  Warnings: 0",
+  "avisos": 0
+ },
+ {
+  "linea": 68,
+  "texto": "SELECT r.titulo, i.nombre, ri.cantidad, i.unidad FROM receta_ingrediente ri JOIN receta r ON r.id = ri.id_receta JOIN ingrediente i ON i.id = ri.id_ingrediente ORDER BY r.titulo, i.nombre",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "titulo",
+   "nombre",
+   "cantidad",
+   "unidad"
+  ],
+  "filas": [
+   [
+    "Bizcocho",
+    "azúcar",
+    "150.0",
+    "g"
+   ],
+   [
+    "Bizcocho",
+    "harina",
+    "200.0",
+    "g"
+   ],
+   [
+    "Bizcocho",
+    "huevo",
+    "4.0",
+    "ud"
+   ],
+   [
+    "Bizcocho",
+    "mantequilla",
+    "100.5",
+    "g"
+   ],
+   [
+    "Crepes",
+    "harina",
+    "125.0",
+    "g"
+   ],
+   [
+    "Crepes",
+    "huevo",
+    "2.0",
+    "ud"
+   ],
+   [
+    "Crepes",
+    "leche",
+    "250.0",
+    "ml"
+   ]
+  ]
+ },
+ {
+  "linea": 69,
+  "texto": "SELECT * FROM ingrediente",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id",
+   "nombre",
+   "unidad"
+  ],
+  "filas": [
+   [
+    "1",
+    "harina",
+    "g"
+   ],
+   [
+    "2",
+    "huevo",
+    "ud"
+   ],
+   [
+    "3",
+    "leche",
+    "ml"
+   ],
+   [
+    "4",
+    "azúcar",
+    "g"
+   ],
+   [
+    "5",
+    "mantequilla",
+    "g"
+   ]
+  ]
+ },
+ {
+  "linea": 70,
+  "texto": "INSERT INTO ingrediente (nombre, unidad) VALUES ('harina', 'g')",
+  "ok": false,
+  "codigo": 1062,
+  "mensaje": "Duplicate entry 'harina' for key 'ingrediente.uq_ingrediente_nombre'"
+ },
+ {
+  "linea": 71,
+  "texto": "INSERT INTO ingrediente (nombre, unidad) VALUES ('Harina', 'g')",
+  "ok": false,
+  "codigo": 1062,
+  "mensaje": "Duplicate entry 'Harina' for key 'ingrediente.uq_ingrediente_nombre'"
+ },
+ {
+  "linea": 72,
+  "texto": "INSERT INTO ingrediente (nombre, unidad) VALUES ('pimienta', 'kg')",
+  "ok": false,
+  "codigo": 1265,
+  "mensaje": "Data truncated for column 'unidad' at row 1"
+ },
+ {
+  "linea": 73,
+  "texto": "INSERT INTO ingrediente (nombre, unidad) VALUES ('sal', NULL)",
+  "ok": false,
+  "codigo": 1048,
+  "mensaje": "Column 'unidad' cannot be null"
+ },
+ {
+  "linea": 74,
+  "texto": "INSERT INTO ingrediente (nombre) VALUES ('sal')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 75,
+  "texto": "INSERT INTO ingrediente (unidad) VALUES ('g')",
+  "ok": false,
+  "codigo": 1364,
+  "mensaje": "Field 'nombre' doesn't have a default value"
+ },
+ {
+  "linea": 76,
+  "texto": "INSERT INTO ingrediente (nombre, unidad) VALUES (REPEAT('b', 41), 'g')",
+  "ok": false,
+  "codigo": 1406,
+  "mensaje": "Data too long for column 'nombre' at row 1"
+ },
+ {
+  "linea": 77,
+  "texto": "INSERT INTO receta (titulo) VALUES ('Tortilla')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 78,
+  "texto": "INSERT INTO receta (titulo, raciones, dificultad) VALUES ('Paella', 21, 'difícil')",
+  "ok": false,
+  "codigo": 3819,
+  "mensaje": "Check constraint 'chk_receta_raciones' is violated."
+ },
+ {
+  "linea": 79,
+  "texto": "INSERT INTO receta (titulo, raciones, dificultad) VALUES ('Paella', 4, 'dificil')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 80,
+  "texto": "INSERT INTO receta_ingrediente VALUES (1, 4, 0)",
+  "ok": false,
+  "codigo": 3819,
+  "mensaje": "Check constraint 'chk_ri_cantidad' is violated."
+ },
+ {
+  "linea": 81,
+  "texto": "INSERT INTO receta_ingrediente VALUES (1, 4, 12.25)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 82,
+  "texto": "SELECT * FROM receta_ingrediente WHERE id_receta = 1 ORDER BY id_ingrediente",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id_receta",
+   "id_ingrediente",
+   "cantidad"
+  ],
+  "filas": [
+   [
+    "1",
+    "1",
+    "125.0"
+   ],
+   [
+    "1",
+    "2",
+    "2.0"
+   ],
+   [
+    "1",
+    "3",
+    "250.0"
+   ],
+   [
+    "1",
+    "4",
+    "12.3"
+   ]
+  ]
+ },
+ {
+  "linea": 83,
+  "texto": "DELETE FROM ingrediente WHERE nombre = 'harina'",
+  "ok": false,
+  "codigo": 1451,
+  "mensaje": "Cannot delete or update a parent row: a foreign key constraint fails (`recetario`.`receta_ingrediente`, CONSTRAINT `fk_ri_ingrediente` FOREIGN KEY (`id_ingrediente`) REFERENCES `ingrediente` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE)"
+ },
+ {
+  "linea": 84,
+  "texto": "DELETE FROM receta WHERE titulo = 'Crepes'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 85,
+  "texto": "SELECT COUNT(*) FROM receta_ingrediente",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)"
+  ],
+  "filas": [
+   [
+    "4"
+   ]
+  ]
+ },
+ {
+  "linea": 86,
+  "texto": "DESCRIBE ingrediente",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "id",
+    "int unsigned",
+    "NO",
+    "PRI",
+    null,
+    "auto_increment"
+   ],
+   [
+    "nombre",
+    "varchar(40)",
+    "NO",
+    "UNI",
+    null,
+    ""
+   ],
+   [
+    "unidad",
+    "enum('g','ml','ud')",
+    "NO",
+    "",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 87,
+  "texto": "DESCRIBE receta",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Field",
+   "Type",
+   "Null",
+   "Key",
+   "Default",
+   "Extra"
+  ],
+  "filas": [
+   [
+    "id",
+    "int unsigned",
+    "NO",
+    "PRI",
+    null,
+    "auto_increment"
+   ],
+   [
+    "titulo",
+    "varchar(80)",
+    "NO",
+    "UNI",
+    null,
+    ""
+   ],
+   [
+    "raciones",
+    "tinyint unsigned",
+    "NO",
+    "",
+    "4",
+    ""
+   ],
+   [
+    "dificultad",
+    "enum('fácil','media','difícil')",
+    "NO",
+    "",
+    null,
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 88,
+  "texto": "SHOW CREATE TABLE ingrediente",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "ingrediente",
+    "CREATE TABLE `ingrediente` (\n  `id` int unsigned NOT NULL AUTO_INCREMENT,\n  `nombre` varchar(40) NOT NULL,\n  `unidad` enum('g','ml','ud') NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uq_ingrediente_nombre` (`nombre`)\n) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 89,
+  "texto": "SHOW CREATE TABLE receta",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "receta",
+    "CREATE TABLE `receta` (\n  `id` int unsigned NOT NULL AUTO_INCREMENT,\n  `titulo` varchar(80) NOT NULL,\n  `raciones` tinyint unsigned NOT NULL DEFAULT '4',\n  `dificultad` enum('fácil','media','difícil') NOT NULL,\n  PRIMARY KEY (`id`),\n  UNIQUE KEY `uq_receta_titulo` (`titulo`),\n  CONSTRAINT `chk_receta_raciones` CHECK ((`raciones` between 1 and 20))\n) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 90,
+  "texto": "SHOW CREATE TABLE receta_ingrediente",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "receta_ingrediente",
+    "CREATE TABLE `receta_ingrediente` (\n  `id_receta` int unsigned NOT NULL,\n  `id_ingrediente` int unsigned NOT NULL,\n  `cantidad` decimal(6,1) NOT NULL,\n  PRIMARY KEY (`id_receta`,`id_ingrediente`),\n  KEY `fk_ri_ingrediente` (`id_ingrediente`),\n  CONSTRAINT `fk_ri_ingrediente` FOREIGN KEY (`id_ingrediente`) REFERENCES `ingrediente` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,\n  CONSTRAINT `fk_ri_receta` FOREIGN KEY (`id_receta`) REFERENCES `receta` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,\n  CONSTRAINT `chk_ri_cantidad` CHECK ((`cantidad` > 0))\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 91,
+  "texto": "SELECT * FROM receta ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id",
+   "titulo",
+   "raciones",
+   "dificultad"
+  ],
+  "filas": [
+   [
+    "2",
+    "Bizcocho",
+    "8",
+    "media"
+   ],
+   [
+    "3",
+    "Tortilla",
+    "4",
+    "fácil"
+   ],
+   [
+    "4",
+    "Paella",
+    "4",
+    "difícil"
+   ]
+  ]
+ },
+ {
+  "linea": 92,
+  "texto": "CREATE TABLE valores (\n  id INT AUTO_INCREMENT PRIMARY KEY,\n  e  ENUM('fácil', 'media') NOT NULL,\n  eb ENUM('Sí', 'no') CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT 'no',\n  ea ENUM('sí', 'no') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci,\n  s  SET('a', 'b') NOT NULL\n)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 99,
+  "texto": "INSERT INTO valores (id) VALUES (1)",
+  "ok": false,
+  "codigo": 1364,
+  "mensaje": "Field 's' doesn't have a default value"
+ },
+ {
+  "linea": 100,
+  "texto": "INSERT INTO valores (e, s) VALUES ('MEDIA', 'A,b')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 101,
+  "texto": "INSERT INTO valores (e, eb, s) VALUES ('Facil', 'Sí', '')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 102,
+  "texto": "INSERT INTO valores (e, eb, s) VALUES ('media', 'sí', 'a')",
+  "ok": false,
+  "codigo": 1265,
+  "mensaje": "Data truncated for column 'eb' at row 1"
+ },
+ {
+  "linea": 103,
+  "texto": "INSERT INTO valores (e, ea, s) VALUES ('media', 'SÍ', 'a')",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 104,
+  "texto": "INSERT INTO valores (e, ea, s) VALUES ('media', 'si', 'a')",
+  "ok": false,
+  "codigo": 1265,
+  "mensaje": "Data truncated for column 'ea' at row 1"
+ },
+ {
+  "linea": 105,
+  "texto": "INSERT INTO valores VALUES (DEFAULT, DEFAULT, DEFAULT, DEFAULT, DEFAULT)",
+  "ok": false,
+  "codigo": 1364,
+  "mensaje": "Field 's' doesn't have a default value"
+ },
+ {
+  "linea": 106,
+  "texto": "SELECT * FROM valores ORDER BY id",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "id",
+   "e",
+   "eb",
+   "ea",
+   "s"
+  ],
+  "filas": [
+   [
+    "1",
+    "media",
+    "no",
+    null,
+    "a,b"
+   ],
+   [
+    "2",
+    "fácil",
+    "Sí",
+    null,
+    ""
+   ],
+   [
+    "3",
+    "media",
+    "no",
+    "sí",
+    "a"
+   ]
+  ]
+ },
+ {
+  "linea": 107,
+  "texto": "CREATE TABLE dup (e ENUM('fácil', 'Facil'))",
+  "ok": false,
+  "codigo": 1291,
+  "mensaje": "Column 'e' has duplicated value 'fácil' in ENUM"
+ },
+ {
+  "linea": 108,
+  "texto": "CREATE TABLE dup (e ENUM('fácil', 'Facil') COLLATE utf8mb4_0900_as_ci)",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 109,
+  "texto": "SHOW CREATE TABLE dup",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Table",
+   "Create Table"
+  ],
+  "filas": [
+   [
+    "dup",
+    "CREATE TABLE `dup` (\n  `e` enum('fácil','Facil') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_as_ci DEFAULT NULL\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci"
+   ]
+  ]
+ },
+ {
+  "linea": 110,
+  "texto": "DROP TABLE ingrediente",
+  "ok": false,
+  "codigo": 3730,
+  "mensaje": "Cannot drop table 'ingrediente' referenced by a foreign key constraint 'fk_ri_ingrediente' on table 'receta_ingrediente'."
+ },
+ {
+  "linea": 111,
+  "texto": "DROP DATABASE recetario",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 5,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 112,
+  "texto": "SELECT * FROM ingrediente",
+  "ok": false,
+  "codigo": 1046,
+  "mensaje": "No database selected"
+ }
+]

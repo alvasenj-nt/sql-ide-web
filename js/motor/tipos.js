@@ -76,6 +76,18 @@
   }
 
   const distingueMayusculas = (col) => !col || /_(cs|bin)$/.test(col) || col === 'binary';
+  // Forma de comparación de un texto en una colación: tal cual en las que
+  // distinguen mayúsculas, sin mayúsculas en las as_ci y además sin acentos
+  // en el resto (las españolas distinguen la eñe)
+  const claveColacion = (v, col) => {
+    if (distingueMayusculas(col)) return v;
+    let k = v.toLowerCase();
+    if (/_as_/.test(col)) return k;
+    const enye = /spanish|_es_/.test(col);
+    if (enye) k = k.replace(/ñ/g, '\u0000');
+    k = k.normalize('NFD').replace(/[̀-ͯ]/g, '');
+    return enye ? k.replace(/\u0000/g, 'ñ') : k;
+  };
 
   // Normaliza el tipo analizado de una columna. Lanza los errores que MySQL
   // da al crear la tabla y añade sus avisos.
@@ -125,7 +137,7 @@
         t.valores = t.valores.map((v) => v.replace(/ +$/, ''));
         const vistos = new Map();
         t.valores.forEach((v) => {
-          const k = distingueMayusculas(t.collation) ? v : v.toLowerCase();
+          const k = claveColacion(v, t.collation);
           if (vistos.has(k)) {
             throw new ErrorSQL(1291, 'HY000', "Column '" + nombreCol + "' has duplicated value '" + vistos.get(k) + "' in " + t.base.toUpperCase());
           }
@@ -362,10 +374,9 @@
 
   function convertirEnum(valor, col, fila) {
     const t = col.tipo;
-    const ci = !distingueMayusculas(t.collation);
     const buscar = (v) => {
-      const k = v.replace(/ +$/, '');
-      return t.valores.find((x) => (ci ? x.toLowerCase() === k.toLowerCase() : x === k));
+      const k = claveColacion(v.replace(/ +$/, ''), t.collation);
+      return t.valores.find((x) => claveColacion(x, t.collation) === k);
     };
     if (typeof valor === 'number' || typeof valor === 'bigint') {
       const n = Number(valor);

@@ -732,6 +732,8 @@
       if (col.defecto === undefined) {
         if (col.autoInc) return { auto: true };
         if (col.nulo) return { valor: null };
+        // Un ENUM NOT NULL sin DEFAULT toma su primer valor, también en modo estricto
+        if (col.tipo.base === 'enum') return { valor: col.tipo.valores[0] };
         throw new ErrorSQL(1364, 'HY000', "Field '" + col.nombre + "' doesn't have a default value");
       }
       if (col.defecto.nulo) return { valor: null };
