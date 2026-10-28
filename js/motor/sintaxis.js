@@ -43,6 +43,12 @@
 
   const ACCIONES = ['RESTRICT', 'CASCADE', 'SET NULL', 'NO ACTION', 'SET DEFAULT'];
 
+  // Privilegios estáticos de MySQL 8.0 (GRANT y REVOKE)
+  const PRIVILEGIOS = new Set(['ALL', 'ALTER', 'ALTER ROUTINE', 'CREATE', 'CREATE ROLE', 'CREATE ROUTINE', 'CREATE TABLESPACE',
+    'CREATE TEMPORARY TABLES', 'CREATE USER', 'CREATE VIEW', 'DELETE', 'DROP', 'DROP ROLE', 'EVENT', 'EXECUTE', 'FILE',
+    'GRANT OPTION', 'INDEX', 'INSERT', 'LOCK TABLES', 'PROCESS', 'PROXY', 'REFERENCES', 'RELOAD', 'REPLICATION CLIENT',
+    'REPLICATION SLAVE', 'SELECT', 'SHOW DATABASES', 'SHOW VIEW', 'SHUTDOWN', 'SUPER', 'TRIGGER', 'UPDATE', 'USAGE']);
+
   class Analizador {
     constructor(texto) {
       this.texto = texto;
@@ -160,9 +166,14 @@
         case 'ALTER': s = this.alterar(); break;
         case 'TRUNCATE': s = this.vaciar(); break;
         case 'RENAME': s = this.renombrarTablas(); break;
-        case 'GRANT': case 'REVOKE': case 'START': case 'BEGIN':
+        case 'GRANT': s = this.conceder(); break;
+        case 'REVOKE': s = this.revocar(); break;
+        case 'FLUSH':
+          if (this.acepta('FLUSH', 'PRIVILEGES')) { s = { tipo: 'nada' }; break; }
+          throw new NoDisponible('FLUSH');
+        case 'START': case 'BEGIN':
         case 'COMMIT': case 'ROLLBACK': case 'SAVEPOINT': case 'RELEASE': case 'CALL': case 'LOCK': case 'UNLOCK':
-        case 'LOAD': case 'ANALYZE': case 'OPTIMIZE': case 'FLUSH': case 'KILL': case 'REPLACE': case 'HANDLER':
+        case 'LOAD': case 'ANALYZE': case 'OPTIMIZE': case 'KILL': case 'REPLACE': case 'HANDLER':
         case 'DO': case 'PREPARE': case 'EXECUTE': case 'DEALLOCATE': case 'CHECKSUM': case 'REPAIR': case 'CHECK':
         case 'XA': case 'INSTALL': case 'UNINSTALL': case 'RESET': case 'PURGE': case 'CHANGE': case 'IMPORT':
         case 'TABLE': case 'VALUES': case 'HELP': case 'SHUTDOWN': case 'RESTART': case 'CLONE':
@@ -185,9 +196,11 @@
       if (this.acepta('TABLE')) return this.crearTabla();
       const resto = this.actual.valor.toUpperCase();
       if (['FULLTEXT', 'SPATIAL'].includes(resto)) throw new NoDisponible('índices ' + resto);
+      if (this.acepta('USER')) return this.crearCuenta(false);
+      if (this.acepta('ROLE')) return this.crearCuenta(true);
       if (resto === 'UNIQUE' || resto === 'INDEX') return this.crearIndice();
       if (['VIEW', 'OR', 'ALGORITHM', 'DEFINER', 'SQL'].includes(resto)) return this.vista(false);
-      if (['USER', 'ROLE', 'PROCEDURE', 'FUNCTION', 'TRIGGER', 'EVENT', 'TABLESPACE', 'SERVER', 'SPATIAL',
+      if (['PROCEDURE', 'FUNCTION', 'TRIGGER', 'EVENT', 'TABLESPACE', 'SERVER', 'SPATIAL',
         'LOGFILE', 'RESOURCE', 'UNDO', 'AGGREGATE'].includes(resto)) throw new NoDisponible('CREATE ' + resto);
       throw this.error();
     }
@@ -681,6 +694,202 @@
       return v;
     }
 
+    // Lista de cuentas separadas por comas
+    cuentas() {
+      const lista = [];
+      do lista.push(this.cuenta()); while (this.aceptaOp(','));
+      return lista;
+    }
+
+    // Autenticación de CREATE y ALTER USER: se acepta y no se guarda
+    autenticacion() {
+      if (!this.acepta('IDENTIFIED')) return;
+      if (this.acepta('BY')) {
+        if (this.acepta('RANDOM', 'PASSWORD')) throw new NoDisponible('IDENTIFIED BY RANDOM PASSWORD');
+        this.cadena();
+      } else {
+        this.espera('WITH');
+        this.nombreLibre();
+        if (this.acepta('BY')) this.cadena();
+        else if (this.acepta('AS')) this.cadena();
+      }
+      if (this.acepta('REPLACE')) this.cadena();
+      this.acepta('RETAIN', 'CURRENT', 'PASSWORD');
+    }
+
+    // Opciones de cuenta tras CREATE o ALTER USER
+    opcionesCuenta(c) {
+      for (;;) {
+        if (this.acepta('DEFAULT', 'ROLE')) { c.rolesDefecto = this.cuentas(); continue; }
+        if (this.acepta('ACCOUNT')) {
+          if (this.acepta('LOCK')) c.bloqueo = true;
+          else { this.espera('UNLOCK'); c.bloqueo = false; }
+          continue;
+        }
+        if (this.acepta('REQUIRE')) {
+          if (!this.acepta('NONE') && !this.acepta('SSL') && !this.acepta('X509')) throw new NoDisponible('REQUIRE');
+          continue;
+        }
+        if (this.acepta('PASSWORD')) {
+          if (this.acepta('EXPIRE')) {
+            if (this.acepta('INTERVAL')) { this.entero(); this.espera('DAY'); } else if (!this.acepta('DEFAULT')) this.acepta('NEVER');
+          } else if (this.acepta('HISTORY') || this.acepta('REUSE')) {
+            if (this.acepta('INTERVAL')) { if (!this.acepta('DEFAULT')) { this.entero(); this.espera('DAY'); } } else if (!this.acepta('DEFAULT')) this.entero();
+          } else if (this.acepta('REQUIRE', 'CURRENT')) {
+            if (!this.acepta('DEFAULT')) this.acepta('OPTIONAL');
+          } else throw this.error();
+          continue;
+        }
+        if (this.acepta('FAILED_LOGIN_ATTEMPTS')) { this.entero(); continue; }
+        if (this.acepta('PASSWORD_LOCK_TIME')) { if (!this.acepta('UNBOUNDED')) this.entero(); continue; }
+        if (this.acepta('COMMENT') || this.acepta('ATTRIBUTE')) { this.cadena(); continue; }
+        if (this.acepta('WITH')) {
+          do {
+            if (!['MAX_QUERIES_PER_HOUR', 'MAX_UPDATES_PER_HOUR', 'MAX_CONNECTIONS_PER_HOUR', 'MAX_USER_CONNECTIONS'].some((k) => this.acepta(k))) throw this.error();
+            this.entero();
+          } while (['MAX_QUERIES_PER_HOUR', 'MAX_UPDATES_PER_HOUR', 'MAX_CONNECTIONS_PER_HOUR', 'MAX_USER_CONNECTIONS'].some((k) => this.es(k)));
+          continue;
+        }
+        break;
+      }
+    }
+
+    // CREATE USER y CREATE ROLE
+    crearCuenta(rol) {
+      const siNoExiste = this.acepta('IF', 'NOT', 'EXISTS');
+      const lista = [];
+      do {
+        lista.push(this.cuenta());
+        if (!rol) this.autenticacion();
+      } while (this.aceptaOp(','));
+      const c = { tipo: 'crearCuenta', rol, siNoExiste, cuentas: lista };
+      if (!rol) this.opcionesCuenta(c);
+      return c;
+    }
+
+    alterarCuenta() {
+      const siExiste = this.acepta('IF', 'EXISTS');
+      const lista = [];
+      if (this.es('USER') && this.esOp('(', this.mira())) throw new NoDisponible('ALTER USER USER()');
+      do {
+        lista.push(this.cuenta());
+        this.autenticacion();
+      } while (this.aceptaOp(','));
+      const c = { tipo: 'alterarCuenta', siExiste, cuentas: lista };
+      this.opcionesCuenta(c);
+      return c;
+    }
+
+    // Privilegios de GRANT y REVOKE, o los roles si no hay ON
+    privilegiosORoles() {
+      const lista = [];
+      do {
+        const t = this.actual;
+        if (t.tipo === 'id') {
+          const p = this.privilegio();
+          if (p) { lista.push(p); continue; }
+        }
+        lista.push({ rol: this.cuenta() });
+      } while (this.aceptaOp(','));
+      return lista;
+    }
+
+    privilegio() {
+      const inicio = this.i;
+      const palabras = [];
+      for (let k = 0; k < 3; k++) {
+        const t = this.mira(k);
+        if (t.tipo !== 'id') break;
+        palabras.push(t.valor.toUpperCase());
+      }
+      let nombre = null;
+      for (let n = palabras.length; n > 0 && !nombre; n--) {
+        const cand = palabras.slice(0, n).join(' ');
+        if (PRIVILEGIOS.has(cand)) { nombre = cand; this.i += n; }
+      }
+      if (!nombre) return null;
+      if (nombre === 'ALL') { this.acepta('PRIVILEGES'); nombre = 'ALL PRIVILEGES'; }
+      if (nombre === 'PROXY') throw new NoDisponible('GRANT PROXY');
+      // Tras un privilegio solo puede venir ',', ON, TO, FROM o la lista de columnas
+      const sig = this.actual;
+      if (!(this.esOp(',') || this.esOp('(') || this.es('ON') || this.es('TO') || this.es('FROM'))) { this.i = inicio; return null; }
+      let columnas = null;
+      if (this.esOp('(')) {
+        if (!['SELECT', 'INSERT', 'UPDATE', 'REFERENCES'].includes(nombre)) throw this.error(sig);
+        this.i++;
+        columnas = [];
+        do columnas.push(this.identificador()); while (this.aceptaOp(','));
+        this.esperaOp(')');
+      }
+      return { privilegio: nombre, columnas };
+    }
+
+    // ON *.* | ON * | ON bd.* | ON bd.tabla | ON tabla
+    objetoPrivilegio() {
+      this.espera('ON');
+      if (this.acepta('PROCEDURE') || this.acepta('FUNCTION')) throw new NoDisponible('privilegios sobre rutinas');
+      this.acepta('TABLE');
+      if (this.aceptaOp('*')) {
+        if (this.aceptaOp('.')) { this.esperaOp('*'); return { nivel: 'global' }; }
+        return { nivel: 'bd', bd: null };
+      }
+      const a = this.identificador();
+      if (this.aceptaOp('.')) {
+        if (this.aceptaOp('*')) return { nivel: 'bd', bd: a };
+        return { nivel: 'tabla', bd: a, tabla: this.identificadorTrasPunto() };
+      }
+      return { nivel: 'tabla', bd: null, tabla: a };
+    }
+
+    conceder() {
+      this.espera('GRANT');
+      const lista = this.privilegiosORoles();
+      if (this.es('ON')) {
+        if (lista.some((x) => x.rol)) throw this.error();
+        const objeto = this.objetoPrivilegio();
+        this.espera('TO');
+        const cuentas = this.cuentas();
+        let opcion = false;
+        if (this.acepta('WITH', 'GRANT', 'OPTION')) opcion = true;
+        if (this.es('AS')) throw new NoDisponible('GRANT ... AS');
+        return { tipo: 'conceder', privilegios: lista, objeto, cuentas, opcion };
+      }
+      this.espera('TO');
+      const cuentas = this.cuentas();
+      const admin = this.acepta('WITH', 'ADMIN', 'OPTION');
+      return { tipo: 'concederRoles', roles: lista.map((x) => x.rol || { usuario: x.privilegio.toLowerCase(), host: '%' }), cuentas, admin };
+    }
+
+    revocar() {
+      this.espera('REVOKE');
+      if (this.acepta('IF', 'EXISTS')) throw new NoDisponible('REVOKE IF EXISTS');
+      const lista = this.privilegiosORoles();
+      if (this.es('ON')) {
+        if (lista.some((x) => x.rol)) throw this.error();
+        const objeto = this.objetoPrivilegio();
+        this.espera('FROM');
+        return { tipo: 'revocar', privilegios: lista, objeto, cuentas: this.cuentas() };
+      }
+      this.espera('FROM');
+      const cuentas = this.cuentas();
+      // REVOKE ALL [PRIVILEGES], GRANT OPTION FROM ...
+      if (lista.some((x) => x.privilegio === 'ALL PRIVILEGES')) {
+        if (!lista.every((x) => x.privilegio === 'ALL PRIVILEGES' || x.privilegio === 'GRANT OPTION')) throw this.error();
+        return { tipo: 'revocarTodo', cuentas };
+      }
+      return { tipo: 'revocarRoles', roles: lista.map((x) => x.rol || { usuario: x.privilegio.toLowerCase(), host: '%' }), cuentas };
+    }
+
+    // SET DEFAULT ROLE {NONE | ALL | roles} TO cuentas
+    rolesPorDefecto() {
+      let roles;
+      if (this.acepta('NONE')) roles = 'NONE';
+      else if (this.acepta('ALL')) roles = 'ALL';
+      else roles = this.cuentas();
+      this.espera('TO');
+      return { tipo: 'rolesDefecto', roles, cuentas: this.cuentas() };
+    }
+
     // CREATE [UNIQUE] INDEX nombre ON tabla (columnas): un ALTER TABLE ... ADD INDEX
     crearIndice() {
       const unico = this.acepta('UNIQUE');
@@ -711,10 +920,16 @@
 
     renombrarTablas() {
       this.espera('RENAME');
-      if (!this.acepta('TABLE') && !this.acepta('TABLES')) {
-        if (this.es('USER')) throw new NoDisponible('RENAME USER');
-        throw this.error();
+      if (this.acepta('USER')) {
+        const pares = [];
+        do {
+          const de = this.cuenta();
+          this.espera('TO');
+          pares.push({ de, a: this.cuenta() });
+        } while (this.aceptaOp(','));
+        return { tipo: 'renombrarCuentas', pares };
       }
+      if (!this.acepta('TABLE') && !this.acepta('TABLES')) throw this.error();
       const pares = [];
       do {
         const de = this.nombreTabla();
@@ -737,7 +952,8 @@
       if (!this.acepta('TABLE')) {
         const resto = this.actual.tipo === 'id' ? this.actual.valor.toUpperCase() : '';
         if (['VIEW', 'ALGORITHM', 'DEFINER', 'SQL'].includes(resto)) return this.vista(true);
-        if (['USER', 'PROCEDURE', 'FUNCTION', 'EVENT', 'TABLESPACE', 'SERVER',
+        if (this.acepta('USER')) return this.alterarCuenta();
+        if (['PROCEDURE', 'FUNCTION', 'EVENT', 'TABLESPACE', 'SERVER',
           'LOGFILE', 'INSTANCE', 'UNDO', 'RESOURCE', 'ONLINE', 'OFFLINE', 'IGNORE'].includes(resto)) throw new NoDisponible('ALTER ' + resto);
         throw this.error();
       }
@@ -874,6 +1090,11 @@
         this.opcionesAlgoritmo();
         return { tipo: 'alterarTabla', tabla, ops: [{ op: 'borrarIndice', nombre }], deIndice: true };
       }
+      if (this.acepta('USER') || this.acepta('ROLE')) {
+        const rol = this.c[this.i - 1].valor.toUpperCase() === 'ROLE';
+        const siExiste = this.acepta('IF', 'EXISTS');
+        return { tipo: 'borrarCuenta', rol, siExiste, cuentas: this.cuentas() };
+      }
       if (this.acepta('VIEW')) {
         const siExiste = this.acepta('IF', 'EXISTS');
         const vistas = [];
@@ -1002,6 +1223,15 @@
       if (completo) throw this.error();
       if (this.acepta('CREATE', 'TABLE')) return { tipo: 'mostrar', que: 'crearTabla', tabla: this.nombreTabla() };
       if (this.acepta('CREATE', 'VIEW')) return { tipo: 'mostrar', que: 'crearVista', tabla: this.nombreTabla() };
+      if (this.acepta('CREATE', 'USER')) return { tipo: 'mostrar', que: 'crearCuenta', cuenta: this.cuenta() };
+      if (this.acepta('GRANTS')) {
+        const m = { tipo: 'mostrar', que: 'privilegios', cuenta: null, roles: null };
+        if (this.acepta('FOR')) {
+          m.cuenta = this.cuenta();
+          if (this.acepta('USING')) m.roles = this.cuentas();
+        }
+        return m;
+      }
       if (this.acepta('CREATE', 'DATABASE') || this.acepta('CREATE', 'SCHEMA')) {
         const siNoExiste = this.acepta('IF', 'NOT', 'EXISTS');
         return { tipo: 'mostrar', que: 'crearBD', nombre: this.identificador(), siNoExiste };
@@ -1053,6 +1283,14 @@
         return { tipo: 'nada' };
       }
       if (this.acepta('CHARACTER', 'SET') || this.acepta('CHARSET')) { this.nombreLibre(); return { tipo: 'nada' }; }
+      if (this.acepta('DEFAULT', 'ROLE')) return this.rolesPorDefecto();
+      if (this.acepta('PASSWORD')) {
+        const cuenta = this.acepta('FOR') ? this.cuenta() : null;
+        this.esperaOp('=');
+        this.cadena();
+        return { tipo: 'alterarCuenta', siExiste: false, cuentas: cuenta ? [cuenta] : [{ actual: true }] };
+      }
+      if (this.es('ROLE')) throw new NoDisponible('SET ROLE (el laboratorio solo tiene la sesión de root)');
       const lista = [];
       do {
         const t = this.actual;

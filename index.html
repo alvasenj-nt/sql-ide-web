@@ -7,7 +7,7 @@
   <title>Laboratorio MySQL BD</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.css">
-  <link rel="stylesheet" href="css/workbench.css?v=1">
+  <link rel="stylesheet" href="css/workbench.css?v=2">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/sql/sql.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
@@ -17,15 +17,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/show-hint.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/hint/sql-hint.min.js"></script>
   <script src="lib/sql-wasm-browser.js"></script>
-  <script src="js/motor/lexico.js?v=1"></script>
-  <script src="js/motor/sintaxis.js?v=1"></script>
-  <script src="js/motor/tipos.js?v=1"></script>
-  <script src="js/motor/catalogo.js?v=1"></script>
-  <script src="js/motor/traductor.js?v=1"></script>
-  <script src="js/motor/funciones.js?v=1"></script>
-  <script src="js/motor/servidor.js?v=1"></script>
-  <script src="js/motor/alterar.js?v=1"></script>
-  <script src="js/motor/vistas.js?v=1"></script>
+  <script src="js/motor/lexico.js?v=2"></script>
+  <script src="js/motor/sintaxis.js?v=2"></script>
+  <script src="js/motor/tipos.js?v=2"></script>
+  <script src="js/motor/catalogo.js?v=2"></script>
+  <script src="js/motor/traductor.js?v=2"></script>
+  <script src="js/motor/funciones.js?v=2"></script>
+  <script src="js/motor/servidor.js?v=2"></script>
+  <script src="js/motor/alterar.js?v=2"></script>
+  <script src="js/motor/vistas.js?v=2"></script>
+  <script src="js/motor/cuentas.js?v=2"></script>
 </head>
 <body>
   <header class="barra-titulo">
@@ -60,14 +61,14 @@
     <aside class="navegador">
       <div class="panel-titulo">Navigator</div>
       <div class="seccion-titulo">
-        <span>SCHEMAS</span>
+        <span id="titulo-navegador">SCHEMAS</span>
         <button id="btn-refrescar" class="mini" title="Actualizar"><span class="icono refrescar" aria-hidden="true"></span></button>
       </div>
       <input id="filtro" class="filtro" type="search" placeholder="Filter objects" autocomplete="off" spellcheck="false">
       <ul id="arbol-esquemas" class="arbol" role="tree"></ul>
       <div class="pestanas-navegador">
-        <span class="pestana-nav inactiva" title="No disponible en el laboratorio">Administration</span>
-        <span class="pestana-nav activa">Schemas</span>
+        <span id="pestana-admin" class="pestana-nav" role="button" tabindex="0" title="Cuentas, roles y privilegios">Administration</span>
+        <span id="pestana-esquemas" class="pestana-nav activa" role="button" tabindex="0">Schemas</span>
       </div>
       <div class="panel-titulo">Information</div>
       <div id="info-objeto" class="info-objeto">No object selected</div>
@@ -122,6 +123,6 @@
     <span id="cronometro"></span>
   </footer>
 
-  <script src="js/app.js?v=1"></script>
+  <script src="js/app.js?v=2"></script>
 </body>
 </html>

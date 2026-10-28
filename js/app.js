@@ -422,6 +422,7 @@ function pintarNavegador() {
   const arbol = $('arbol-esquemas');
   arbol.innerHTML = '';
   if (!srv) return;
+  if (estado.administracion) { pintarAdministracion(arbol); return; }
   const filtro = $('filtro').value.trim().toLowerCase();
   const esquemas = srv.esquemas().sort((a, b) => (a.nombre < b.nombre ? -1 : 1));
   $('bd-actual').textContent = srv.bdActual ? 'Default schema: ' + srv.bdActual : 'Sin base de datos por defecto';
@@ -485,6 +486,46 @@ function pintarNavegador() {
     });
     ['Stored Procedures', 'Functions'].forEach((n) => vacio(nodo(ulBD, null, 'ico-carpeta', n, true).querySelector('ul')));
   });
+}
+
+// Pestaña Administration: cuentas y roles creados, como Users and Privileges de Workbench
+function pintarAdministracion(arbol) {
+  const filtro = $('filtro').value.trim().toLowerCase();
+  const cuentas = srv.resumenCuentas().filter((c) => !filtro || c.nombre.toLowerCase().includes(filtro));
+  const grupo = (clave, titulo, lista, icono) => {
+    const ul = nodo(arbol, clave, 'ico-carpeta', titulo, true).querySelector('ul');
+    if (!lista.length) vacio(ul);
+    lista.forEach((c) => {
+      const li = nodo(ul, null, icono, c.nombre, false);
+      li.querySelector('.nodo').addEventListener('click', () => informarCuenta(c));
+    });
+  };
+  grupo('adm:usuarios', 'Users and Privileges', cuentas.filter((c) => !c.rol), 'ico-usuario');
+  grupo('adm:roles', 'Roles', cuentas.filter((c) => c.rol), 'ico-rol');
+}
+
+function informarCuenta(c) {
+  const info = $('info-objeto');
+  info.innerHTML = '';
+  const t = document.createElement('div');
+  t.className = 'info-titulo';
+  t.textContent = (c.rol ? 'Role: ' : 'User: ') + c.nombre + (c.bloqueada && !c.rol ? ' (locked)' : '');
+  info.appendChild(t);
+  c.privilegios.forEach((l) => {
+    const d = document.createElement('div');
+    d.className = 'info-grant';
+    d.textContent = l;
+    info.appendChild(d);
+  });
+}
+
+function alternarNavegador(administracion) {
+  estado.administracion = administracion;
+  $('pestana-admin').classList.toggle('activa', administracion);
+  $('pestana-esquemas').classList.toggle('activa', !administracion);
+  $('titulo-navegador').textContent = administracion ? 'MANAGEMENT' : 'SCHEMAS';
+  $('filtro').placeholder = administracion ? 'Filter accounts' : 'Filter objects';
+  pintarNavegador();
 }
 
 function nodo(padre, clave, icono, texto, conHijos, claseExtra) {
@@ -919,6 +960,10 @@ function enlazarUI() {
   $('btn-diagnostico').addEventListener('click', accionDiagnostico);
   $('btn-copiar-informe').addEventListener('click', async () => { await copiarTexto(textoInforme()); setEstado('Informe copiado.'); });
   $('btn-refrescar').addEventListener('click', pintarNavegador);
+  [['pestana-admin', true], ['pestana-esquemas', false]].forEach(([id, admin]) => {
+    $(id).addEventListener('click', () => alternarNavegador(admin));
+    $(id).addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); alternarNavegador(admin); } });
+  });
   $('filtro').addEventListener('input', pintarNavegador);
   estado.continuar = leerAlmacen('continuar') === '1';
   $('btn-continuar').setAttribute('aria-pressed', String(estado.continuar));

@@ -3,6 +3,7 @@
    Las pruebas con sesiones de otros usuarios están al final, comentadas: se lanzan aparte.
    Verificado con MySQL 8.0.46. */
 
+CREATE DATABASE demo;
 USE demo;
 DROP USER IF EXISTS 'ana'@'localhost', 'ana'@'%', 'luis'@'localhost';
 DROP ROLE IF EXISTS 'rol_lectura';

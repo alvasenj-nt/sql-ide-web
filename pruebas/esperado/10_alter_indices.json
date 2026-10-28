@@ -887,7 +887,7 @@
   "texto": "ALTER TABLE critica ADD CONSTRAINT fk_critica_pelicula FOREIGN KEY (id_pelicula) REFERENCES pelicula (id) /*ignorar*/",
   "ok": false,
   "codigo": 1452,
-  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`cine`.`#sql-1_c`, CONSTRAINT `fk_critica_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id`))"
+  "mensaje": "Cannot add or update a child row: a foreign key constraint fails (`cine`.`#sql-1_f`, CONSTRAINT `fk_critica_pelicula` FOREIGN KEY (`id_pelicula`) REFERENCES `pelicula` (`id`))"
  },
  {
   "linea": 101,

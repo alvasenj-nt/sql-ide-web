@@ -462,8 +462,10 @@
         aridad(0);
         return { sql: T.literalSQLite(ctx.srv.bdActual), tipo: TIPO_TEXTO };
       case 'VERSION': aridad(0); return { sql: textoSQL(ctx.srv.variableSistema('version')), tipo: TIPO_TEXTO };
-      case 'USER': case 'CURRENT_USER': case 'SESSION_USER': case 'SYSTEM_USER':
+      case 'CURRENT_USER': return { sql: textoSQL('root@%'), tipo: TIPO_TEXTO };
+      case 'USER': case 'SESSION_USER': case 'SYSTEM_USER':
         return { sql: textoSQL('root@localhost'), tipo: TIPO_TEXTO };
+      case 'CURRENT_ROLE': aridad(0); return { sql: textoSQL('NONE'), tipo: TIPO_TEXTO };
       case 'CONNECTION_ID': return { sql: '8', tipo: TIPO_ENTERO };
       case 'LAST_INSERT_ID': aridad(0); return { sql: String(ctx.srv.ultimoId), tipo: TIPO_ENTERO };
       case 'ROW_COUNT': aridad(0); return { sql: String(ctx.srv.filasUltima), tipo: TIPO_ENTERO };

@@ -6,7 +6,7 @@
 //   Sin argumentos graba todo pruebas/corpus/. Necesita mysql2 en NODE_PATH
 //   y un MySQL 8.0 en MYSQL_HOST:MYSQL_PORT (127.0.0.1:3399) con usuario
 //   root y contraseña MYSQL_PWD (root_pass_2026). Antes de cada archivo
-//   borra todas las bases de datos que no son del sistema.
+//   borra todas las bases de datos y cuentas que no son del sistema.
 const fs = require('fs');
 const path = require('path');
 const mysql = require('mysql2/promise');
@@ -23,6 +23,9 @@ async function limpiar(con) {
     const n = Object.values(b)[0];
     if (!SISTEMA.includes(n)) await con.query('DROP DATABASE `' + n + '`');
   }
+  // Cuentas y roles creados por los archivos anteriores
+  const [cuentas] = await con.query("SELECT user, host FROM mysql.user WHERE user NOT IN ('root', 'mysql.infoschema', 'mysql.session', 'mysql.sys')");
+  for (const c of cuentas) await con.query('DROP USER ?@?', [c.user, c.host]);
 }
 
 async function grabarArchivo(con, M, archivo) {

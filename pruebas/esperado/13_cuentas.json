@@ -1,0 +1,1660 @@
+[
+ {
+  "linea": 2,
+  "texto": "CREATE DATABASE club",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 1,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 3,
+  "texto": "USE club",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 4,
+  "texto": "CREATE TABLE socio (dni CHAR(9) PRIMARY KEY, nombre VARCHAR(60) NOT NULL, ciudad VARCHAR(40), cuota DECIMAL(6,2))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 5,
+  "texto": "CREATE TABLE actividad (codigo INT PRIMARY KEY, nombre VARCHAR(40))",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 6,
+  "texto": "CREATE VIEW cuotas_madrid AS SELECT dni, nombre, cuota FROM socio WHERE ciudad = 'Madrid'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 8,
+  "texto": "CREATE USER 'ana'@'%' IDENTIFIED BY 'Ana_2026!'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 9,
+  "texto": "CREATE USER 'ana'@'localhost' IDENTIFIED BY 'Local_2026!'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 10,
+  "texto": "CREATE USER ana@'192.168.1.%' IDENTIFIED BY 'Red_2026!'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 11,
+  "texto": "CREATE USER 'pepe' IDENTIFIED BY 'Pepe_2026!', 'eva'@'localhost'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 12,
+  "texto": "CREATE USER 'ana'@'%' IDENTIFIED BY 'otra'",
+  "ok": false,
+  "codigo": 1396,
+  "mensaje": "Operation CREATE USER failed for 'ana'@'%'"
+ },
+ {
+  "linea": 13,
+  "texto": "CREATE USER IF NOT EXISTS 'ana'@'%' IDENTIFIED BY 'otra'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 14,
+  "texto": "CREATE USER 'ana'@'%', 'nuevo'@'%'",
+  "ok": false,
+  "codigo": 1396,
+  "mensaje": "Operation CREATE USER failed for 'ana'@'%'"
+ },
+ {
+  "linea": 15,
+  "texto": "SELECT user, host FROM mysql.user WHERE user NOT LIKE 'mysql.%' AND user <> 'root' ORDER BY user, host",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "user",
+   "host"
+  ],
+  "filas": [
+   [
+    "ana",
+    "%"
+   ],
+   [
+    "ana",
+    "192.168.1.%"
+   ],
+   [
+    "ana",
+    "localhost"
+   ],
+   [
+    "eva",
+    "localhost"
+   ],
+   [
+    "pepe",
+    "%"
+   ]
+  ]
+ },
+ {
+  "linea": 16,
+  "texto": "SELECT user, host, account_locked, plugin FROM mysql.user WHERE user IN ('ana', 'pepe', 'eva') ORDER BY user, host",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "user",
+   "host",
+   "account_locked",
+   "plugin"
+  ],
+  "filas": [
+   [
+    "ana",
+    "%",
+    "N",
+    "caching_sha2_password"
+   ],
+   [
+    "ana",
+    "192.168.1.%",
+    "N",
+    "caching_sha2_password"
+   ],
+   [
+    "ana",
+    "localhost",
+    "N",
+    "caching_sha2_password"
+   ],
+   [
+    "eva",
+    "localhost",
+    "N",
+    "caching_sha2_password"
+   ],
+   [
+    "pepe",
+    "%",
+    "N",
+    "caching_sha2_password"
+   ]
+  ]
+ },
+ {
+  "linea": 17,
+  "texto": "SELECT CURRENT_USER()",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "CURRENT_USER()"
+  ],
+  "filas": [
+   [
+    "root@%"
+   ]
+  ]
+ },
+ {
+  "linea": 18,
+  "texto": "SHOW GRANTS FOR 'ana'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for ana@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `ana`@`%`"
+   ]
+  ]
+ },
+ {
+  "linea": 19,
+  "texto": "SHOW GRANTS FOR 'pepe'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for pepe@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `pepe`@`%`"
+   ]
+  ]
+ },
+ {
+  "linea": 20,
+  "texto": "SHOW GRANTS FOR 'nadie'@'%'",
+  "ok": false,
+  "codigo": 1141,
+  "mensaje": "There is no such grant defined for user 'nadie' on host '%'"
+ },
+ {
+  "linea": 21,
+  "texto": "DROP USER 'ana'@'192.168.1.%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 22,
+  "texto": "DROP USER 'nadie'@'%'",
+  "ok": false,
+  "codigo": 1396,
+  "mensaje": "Operation DROP USER failed for 'nadie'@'%'"
+ },
+ {
+  "linea": 23,
+  "texto": "DROP USER IF EXISTS 'nadie'@'%', 'eva'@'localhost'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 24,
+  "texto": "DROP USER 'nadie'@'%', 'otro'@'%'",
+  "ok": false,
+  "codigo": 1396,
+  "mensaje": "Operation DROP USER failed for 'nadie'@'%','otro'@'%'"
+ },
+ {
+  "linea": 25,
+  "texto": "ALTER USER 'ana'@'%' IDENTIFIED BY 'Nueva_2026!'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 26,
+  "texto": "ALTER USER 'nadie'@'%' IDENTIFIED BY 'x'",
+  "ok": false,
+  "codigo": 1396,
+  "mensaje": "Operation ALTER USER failed for 'nadie'@'%'"
+ },
+ {
+  "linea": 28,
+  "texto": "GRANT SELECT ON club.* TO 'fantasma'@'%'",
+  "ok": false,
+  "codigo": 1410,
+  "mensaje": "You are not allowed to create a user with GRANT"
+ },
+ {
+  "linea": 29,
+  "texto": "GRANT SELECT ON club.actividad TO 'ana'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 30,
+  "texto": "GRANT SELECT, INSERT ON club.* TO 'pepe'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 31,
+  "texto": "GRANT SELECT (dni, nombre), UPDATE (cuota) ON club.socio TO 'ana'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 32,
+  "texto": "GRANT SELECT ON club.cuotas_madrid TO 'ana'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 33,
+  "texto": "GRANT DELETE ON club.no_existe TO 'ana'@'%'",
+  "ok": false,
+  "codigo": 1146,
+  "mensaje": "Table 'club.no_existe' doesn't exist"
+ },
+ {
+  "linea": 34,
+  "texto": "GRANT SELECT (no_existe) ON club.socio TO 'ana'@'%'",
+  "ok": false,
+  "codigo": 1054,
+  "mensaje": "Unknown column 'no_existe' in 'socio'"
+ },
+ {
+  "linea": 35,
+  "texto": "GRANT SELECT ON otra_bd.* TO 'ana'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 36,
+  "texto": "GRANT UPDATE, DELETE ON club.socio TO 'pepe'@'%' WITH GRANT OPTION",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 37,
+  "texto": "GRANT ALL PRIVILEGES ON club.* TO 'ana'@'localhost'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 38,
+  "texto": "GRANT ALL ON club.actividad TO 'ana'@'localhost'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 39,
+  "texto": "GRANT CREATE USER ON club.* TO 'ana'@'%'",
+  "ok": false,
+  "codigo": 1221,
+  "mensaje": "Incorrect usage of DB GRANT and GLOBAL PRIVILEGES"
+ },
+ {
+  "linea": 40,
+  "texto": "GRANT DELETE (dni) ON club.socio TO 'ana'@'%'",
+  "ok": false,
+  "codigo": 1064,
+  "mensaje": "You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '(dni) ON club.socio TO 'ana'@'%'' at line 1"
+ },
+ {
+  "linea": 41,
+  "texto": "GRANT SELECT ON *.* TO 'pepe'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 42,
+  "texto": "GRANT SELECT ON actividad TO 'ana'@'localhost'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 43,
+  "texto": "SHOW GRANTS FOR 'ana'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for ana@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `otra_bd`.* TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.`actividad` TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.`cuotas_madrid` TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT (`dni`, `nombre`), UPDATE (`cuota`) ON `club`.`socio` TO `ana`@`%`"
+   ]
+  ]
+ },
+ {
+  "linea": 44,
+  "texto": "SHOW GRANTS FOR 'pepe'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for pepe@%"
+  ],
+  "filas": [
+   [
+    "GRANT SELECT ON *.* TO `pepe`@`%`"
+   ],
+   [
+    "GRANT SELECT, INSERT ON `club`.* TO `pepe`@`%`"
+   ],
+   [
+    "GRANT UPDATE, DELETE ON `club`.`socio` TO `pepe`@`%` WITH GRANT OPTION"
+   ]
+  ]
+ },
+ {
+  "linea": 45,
+  "texto": "SHOW GRANTS FOR 'ana'@'localhost'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for ana@localhost"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `ana`@`localhost`"
+   ],
+   [
+    "GRANT ALL PRIVILEGES ON `club`.* TO `ana`@`localhost`"
+   ],
+   [
+    "GRANT ALL PRIVILEGES ON `club`.`actividad` TO `ana`@`localhost`"
+   ]
+  ]
+ },
+ {
+  "linea": 46,
+  "texto": "SELECT GRANTEE, PRIVILEGE_TYPE, IS_GRANTABLE FROM information_schema.USER_PRIVILEGES WHERE GRANTEE LIKE '%ana%' OR GRANTEE LIKE '%pepe%' ORDER BY GRANTEE, PRIVILEGE_TYPE",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "GRANTEE",
+   "PRIVILEGE_TYPE",
+   "IS_GRANTABLE"
+  ],
+  "filas": [
+   [
+    "'ana'@'%'",
+    "USAGE",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "USAGE",
+    "NO"
+   ],
+   [
+    "'pepe'@'%'",
+    "SELECT",
+    "NO"
+   ]
+  ]
+ },
+ {
+  "linea": 47,
+  "texto": "SELECT GRANTEE, TABLE_SCHEMA, PRIVILEGE_TYPE, IS_GRANTABLE FROM information_schema.SCHEMA_PRIVILEGES WHERE GRANTEE NOT LIKE '%mysql.%' ORDER BY GRANTEE, TABLE_SCHEMA, PRIVILEGE_TYPE",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "GRANTEE",
+   "TABLE_SCHEMA",
+   "PRIVILEGE_TYPE",
+   "IS_GRANTABLE"
+  ],
+  "filas": [
+   [
+    "'ana'@'%'",
+    "otra_bd",
+    "SELECT",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "ALTER",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "ALTER ROUTINE",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "CREATE",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "CREATE ROUTINE",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "CREATE TEMPORARY TABLES",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "CREATE VIEW",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "DELETE",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "DROP",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "EVENT",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "EXECUTE",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "INDEX",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "INSERT",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "LOCK TABLES",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "REFERENCES",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "SELECT",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "SHOW VIEW",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "TRIGGER",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "UPDATE",
+    "NO"
+   ],
+   [
+    "'pepe'@'%'",
+    "club",
+    "INSERT",
+    "NO"
+   ],
+   [
+    "'pepe'@'%'",
+    "club",
+    "SELECT",
+    "NO"
+   ]
+  ]
+ },
+ {
+  "linea": 48,
+  "texto": "SELECT GRANTEE, TABLE_SCHEMA, TABLE_NAME, PRIVILEGE_TYPE, IS_GRANTABLE FROM information_schema.TABLE_PRIVILEGES WHERE GRANTEE NOT LIKE '%mysql.%' ORDER BY GRANTEE, TABLE_NAME, PRIVILEGE_TYPE",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "GRANTEE",
+   "TABLE_SCHEMA",
+   "TABLE_NAME",
+   "PRIVILEGE_TYPE",
+   "IS_GRANTABLE"
+  ],
+  "filas": [
+   [
+    "'ana'@'%'",
+    "club",
+    "actividad",
+    "SELECT",
+    "NO"
+   ],
+   [
+    "'ana'@'%'",
+    "club",
+    "cuotas_madrid",
+    "SELECT",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "ALTER",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "CREATE",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "CREATE VIEW",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "DELETE",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "DROP",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "INDEX",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "INSERT",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "REFERENCES",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "SELECT",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "SHOW VIEW",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "TRIGGER",
+    "NO"
+   ],
+   [
+    "'ana'@'localhost'",
+    "club",
+    "actividad",
+    "UPDATE",
+    "NO"
+   ],
+   [
+    "'pepe'@'%'",
+    "club",
+    "socio",
+    "DELETE",
+    "YES"
+   ],
+   [
+    "'pepe'@'%'",
+    "club",
+    "socio",
+    "UPDATE",
+    "YES"
+   ]
+  ]
+ },
+ {
+  "linea": 49,
+  "texto": "SELECT GRANTEE, TABLE_NAME, COLUMN_NAME, PRIVILEGE_TYPE FROM information_schema.COLUMN_PRIVILEGES ORDER BY GRANTEE, TABLE_NAME, COLUMN_NAME, PRIVILEGE_TYPE",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "GRANTEE",
+   "TABLE_NAME",
+   "COLUMN_NAME",
+   "PRIVILEGE_TYPE"
+  ],
+  "filas": [
+   [
+    "'ana'@'%'",
+    "socio",
+    "cuota",
+    "UPDATE"
+   ],
+   [
+    "'ana'@'%'",
+    "socio",
+    "dni",
+    "SELECT"
+   ],
+   [
+    "'ana'@'%'",
+    "socio",
+    "nombre",
+    "SELECT"
+   ]
+  ]
+ },
+ {
+  "linea": 50,
+  "texto": "SELECT user, host, db, Select_priv, Insert_priv, Update_priv, Delete_priv FROM mysql.db WHERE user IN ('ana', 'pepe') ORDER BY user, host, db",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "user",
+   "host",
+   "db",
+   "Select_priv",
+   "Insert_priv",
+   "Update_priv",
+   "Delete_priv"
+  ],
+  "filas": [
+   [
+    "ana",
+    "%",
+    "otra_bd",
+    "Y",
+    "N",
+    "N",
+    "N"
+   ],
+   [
+    "ana",
+    "localhost",
+    "club",
+    "Y",
+    "Y",
+    "Y",
+    "Y"
+   ],
+   [
+    "pepe",
+    "%",
+    "club",
+    "Y",
+    "Y",
+    "N",
+    "N"
+   ]
+  ]
+ },
+ {
+  "linea": 51,
+  "texto": "SELECT user, host, db, table_name, table_priv, column_priv FROM mysql.tables_priv WHERE user IN ('ana', 'pepe') ORDER BY user, host, table_name",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "user",
+   "host",
+   "db",
+   "table_name",
+   "table_priv",
+   "column_priv"
+  ],
+  "filas": [
+   [
+    "ana",
+    "%",
+    "club",
+    "actividad",
+    "Select",
+    ""
+   ],
+   [
+    "ana",
+    "%",
+    "club",
+    "cuotas_madrid",
+    "Select",
+    ""
+   ],
+   [
+    "ana",
+    "%",
+    "club",
+    "socio",
+    "",
+    "Select,Update"
+   ],
+   [
+    "ana",
+    "localhost",
+    "club",
+    "actividad",
+    "Select,Insert,Update,Delete,Create,Drop,References,Index,Alter,Create View,Show view,Trigger",
+    ""
+   ],
+   [
+    "pepe",
+    "%",
+    "club",
+    "socio",
+    "Update,Delete,Grant",
+    ""
+   ]
+  ]
+ },
+ {
+  "linea": 52,
+  "texto": "SELECT user, host, db, table_name, column_name, column_priv FROM mysql.columns_priv ORDER BY user, host, table_name, column_name",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "user",
+   "host",
+   "db",
+   "table_name",
+   "column_name",
+   "column_priv"
+  ],
+  "filas": [
+   [
+    "ana",
+    "%",
+    "club",
+    "socio",
+    "cuota",
+    "Update"
+   ],
+   [
+    "ana",
+    "%",
+    "club",
+    "socio",
+    "dni",
+    "Select"
+   ],
+   [
+    "ana",
+    "%",
+    "club",
+    "socio",
+    "nombre",
+    "Select"
+   ]
+  ]
+ },
+ {
+  "linea": 54,
+  "texto": "REVOKE UPDATE (cuota) ON club.socio FROM 'ana'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 55,
+  "texto": "REVOKE UPDATE (cuota) ON club.socio FROM 'ana'@'%'",
+  "ok": false,
+  "codigo": 1147,
+  "mensaje": "There is no such grant defined for user 'ana' on host '%' on table 'socio'"
+ },
+ {
+  "linea": 56,
+  "texto": "REVOKE INSERT ON club.* FROM 'pepe'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 57,
+  "texto": "REVOKE INSERT ON club.* FROM 'pepe'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 58,
+  "texto": "REVOKE DELETE ON club.socio FROM 'pepe'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 59,
+  "texto": "REVOKE SELECT ON club.no_existe FROM 'ana'@'%'",
+  "ok": false,
+  "codigo": 1147,
+  "mensaje": "There is no such grant defined for user 'ana' on host '%' on table 'no_existe'"
+ },
+ {
+  "linea": 60,
+  "texto": "REVOKE SELECT ON club.* FROM 'nadie'@'%'",
+  "ok": false,
+  "codigo": 1141,
+  "mensaje": "There is no such grant defined for user 'nadie' on host '%'"
+ },
+ {
+  "linea": 61,
+  "texto": "REVOKE GRANT OPTION ON club.socio FROM 'pepe'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 62,
+  "texto": "SHOW GRANTS FOR 'ana'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for ana@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `otra_bd`.* TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.`actividad` TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.`cuotas_madrid` TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT (`dni`, `nombre`) ON `club`.`socio` TO `ana`@`%`"
+   ]
+  ]
+ },
+ {
+  "linea": 63,
+  "texto": "SHOW GRANTS FOR 'pepe'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for pepe@%"
+  ],
+  "filas": [
+   [
+    "GRANT SELECT ON *.* TO `pepe`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.* TO `pepe`@`%`"
+   ],
+   [
+    "GRANT UPDATE ON `club`.`socio` TO `pepe`@`%`"
+   ]
+  ]
+ },
+ {
+  "linea": 64,
+  "texto": "REVOKE ALL PRIVILEGES, GRANT OPTION FROM 'ana'@'localhost'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 65,
+  "texto": "SHOW GRANTS FOR 'ana'@'localhost'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for ana@localhost"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `ana`@`localhost`"
+   ]
+  ]
+ },
+ {
+  "linea": 67,
+  "texto": "CREATE ROLE 'rol_lectura', 'rol_recepcion'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 68,
+  "texto": "CREATE ROLE rol_admin@localhost",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 69,
+  "texto": "CREATE ROLE 'rol_lectura'",
+  "ok": false,
+  "codigo": 1396,
+  "mensaje": "Operation CREATE ROLE failed for 'rol_lectura'@'%'"
+ },
+ {
+  "linea": 70,
+  "texto": "CREATE ROLE IF NOT EXISTS 'rol_lectura'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 71,
+  "texto": "GRANT SELECT ON club.* TO 'rol_lectura'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 72,
+  "texto": "GRANT INSERT, UPDATE ON club.socio TO 'rol_recepcion'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 73,
+  "texto": "CREATE USER 'luis'@'%' IDENTIFIED BY 'Luis_2026!'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 74,
+  "texto": "GRANT 'rol_lectura' TO 'luis'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 75,
+  "texto": "GRANT 'rol_lectura', 'rol_recepcion' TO 'pepe'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 76,
+  "texto": "GRANT 'rol_inexistente' TO 'luis'@'%'",
+  "ok": false,
+  "codigo": 3523,
+  "mensaje": "Unknown authorization ID `rol_inexistente`@`%`"
+ },
+ {
+  "linea": 77,
+  "texto": "GRANT 'rol_lectura' TO 'nadie'@'%'",
+  "ok": false,
+  "codigo": 3523,
+  "mensaje": "Unknown authorization ID `nadie`@`%`"
+ },
+ {
+  "linea": 78,
+  "texto": "GRANT 'rol_recepcion' TO 'luis'@'%' WITH ADMIN OPTION",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 79,
+  "texto": "SHOW GRANTS FOR 'luis'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for luis@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `luis`@`%`"
+   ],
+   [
+    "GRANT `rol_lectura`@`%` TO `luis`@`%`"
+   ],
+   [
+    "GRANT `rol_recepcion`@`%` TO `luis`@`%` WITH ADMIN OPTION"
+   ]
+  ]
+ },
+ {
+  "linea": 80,
+  "texto": "SHOW GRANTS FOR 'luis'@'%' USING 'rol_lectura'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for luis@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `luis`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.* TO `luis`@`%`"
+   ],
+   [
+    "GRANT `rol_lectura`@`%` TO `luis`@`%`"
+   ],
+   [
+    "GRANT `rol_recepcion`@`%` TO `luis`@`%` WITH ADMIN OPTION"
+   ]
+  ]
+ },
+ {
+  "linea": 81,
+  "texto": "SHOW GRANTS FOR 'luis'@'%' USING 'rol_lectura', 'rol_recepcion'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for luis@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `luis`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.* TO `luis`@`%`"
+   ],
+   [
+    "GRANT INSERT, UPDATE ON `club`.`socio` TO `luis`@`%`"
+   ],
+   [
+    "GRANT `rol_lectura`@`%` TO `luis`@`%`"
+   ],
+   [
+    "GRANT `rol_recepcion`@`%` TO `luis`@`%` WITH ADMIN OPTION"
+   ]
+  ]
+ },
+ {
+  "linea": 82,
+  "texto": "SHOW GRANTS FOR 'luis'@'%' USING 'rol_admin'@'localhost'",
+  "ok": false,
+  "codigo": 3530,
+  "mensaje": "`rol_admin`@`localhost` is not granted to `luis`@`%`"
+ },
+ {
+  "linea": 83,
+  "texto": "SHOW GRANTS FOR 'rol_lectura'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for rol_lectura@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `rol_lectura`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.* TO `rol_lectura`@`%`"
+   ]
+  ]
+ },
+ {
+  "linea": 84,
+  "texto": "SELECT user, host, account_locked FROM mysql.user WHERE user LIKE 'rol%' ORDER BY user",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "user",
+   "host",
+   "account_locked"
+  ],
+  "filas": [
+   [
+    "rol_admin",
+    "localhost",
+    "Y"
+   ],
+   [
+    "rol_lectura",
+    "%",
+    "Y"
+   ],
+   [
+    "rol_recepcion",
+    "%",
+    "Y"
+   ]
+  ]
+ },
+ {
+  "linea": 85,
+  "texto": "SELECT * FROM mysql.role_edges ORDER BY TO_USER, FROM_USER",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "FROM_HOST",
+   "FROM_USER",
+   "TO_HOST",
+   "TO_USER",
+   "WITH_ADMIN_OPTION"
+  ],
+  "filas": [
+   [
+    "%",
+    "rol_lectura",
+    "%",
+    "luis",
+    "N"
+   ],
+   [
+    "%",
+    "rol_recepcion",
+    "%",
+    "luis",
+    "Y"
+   ],
+   [
+    "%",
+    "rol_lectura",
+    "%",
+    "pepe",
+    "N"
+   ],
+   [
+    "%",
+    "rol_recepcion",
+    "%",
+    "pepe",
+    "N"
+   ]
+  ]
+ },
+ {
+  "linea": 86,
+  "texto": "SET DEFAULT ROLE 'rol_lectura' TO 'luis'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 87,
+  "texto": "SET DEFAULT ROLE ALL TO 'pepe'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 88,
+  "texto": "SELECT * FROM mysql.default_roles ORDER BY USER, DEFAULT_ROLE_USER",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "HOST",
+   "USER",
+   "DEFAULT_ROLE_HOST",
+   "DEFAULT_ROLE_USER"
+  ],
+  "filas": [
+   [
+    "%",
+    "luis",
+    "%",
+    "rol_lectura"
+   ],
+   [
+    "%",
+    "pepe",
+    "%",
+    "rol_lectura"
+   ],
+   [
+    "%",
+    "pepe",
+    "%",
+    "rol_recepcion"
+   ]
+  ]
+ },
+ {
+  "linea": 89,
+  "texto": "SHOW GRANTS FOR 'luis'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for luis@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `luis`@`%`"
+   ],
+   [
+    "GRANT `rol_lectura`@`%` TO `luis`@`%`"
+   ],
+   [
+    "GRANT `rol_recepcion`@`%` TO `luis`@`%` WITH ADMIN OPTION"
+   ]
+  ]
+ },
+ {
+  "linea": 90,
+  "texto": "SET DEFAULT ROLE 'rol_admin'@'localhost' TO 'luis'@'%'",
+  "ok": false,
+  "codigo": 3530,
+  "mensaje": "`rol_admin`@`localhost` is not granted to `luis`@`%`"
+ },
+ {
+  "linea": 91,
+  "texto": "SET DEFAULT ROLE NONE TO 'pepe'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 92,
+  "texto": "SELECT * FROM mysql.default_roles ORDER BY USER, DEFAULT_ROLE_USER",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "HOST",
+   "USER",
+   "DEFAULT_ROLE_HOST",
+   "DEFAULT_ROLE_USER"
+  ],
+  "filas": [
+   [
+    "%",
+    "luis",
+    "%",
+    "rol_lectura"
+   ]
+  ]
+ },
+ {
+  "linea": 93,
+  "texto": "SELECT @@activate_all_roles_on_login, CURRENT_ROLE()",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "@@activate_all_roles_on_login",
+   "CURRENT_ROLE()"
+  ],
+  "filas": [
+   [
+    "0",
+    "NONE"
+   ]
+  ]
+ },
+ {
+  "linea": 94,
+  "texto": "REVOKE 'rol_lectura' FROM 'luis'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 95,
+  "texto": "REVOKE 'rol_lectura' FROM 'luis'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 96,
+  "texto": "SHOW GRANTS FOR 'luis'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for luis@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `luis`@`%`"
+   ],
+   [
+    "GRANT `rol_recepcion`@`%` TO `luis`@`%` WITH ADMIN OPTION"
+   ]
+  ]
+ },
+ {
+  "linea": 97,
+  "texto": "SELECT * FROM mysql.default_roles ORDER BY USER, DEFAULT_ROLE_USER",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "HOST",
+   "USER",
+   "DEFAULT_ROLE_HOST",
+   "DEFAULT_ROLE_USER"
+  ],
+  "filas": []
+ },
+ {
+  "linea": 98,
+  "texto": "DROP ROLE 'rol_recepcion'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 99,
+  "texto": "SHOW GRANTS FOR 'pepe'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for pepe@%"
+  ],
+  "filas": [
+   [
+    "GRANT SELECT ON *.* TO `pepe`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.* TO `pepe`@`%`"
+   ],
+   [
+    "GRANT UPDATE ON `club`.`socio` TO `pepe`@`%`"
+   ],
+   [
+    "GRANT `rol_lectura`@`%` TO `pepe`@`%`"
+   ]
+  ]
+ },
+ {
+  "linea": 100,
+  "texto": "SHOW GRANTS FOR 'luis'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for luis@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `luis`@`%`"
+   ]
+  ]
+ },
+ {
+  "linea": 101,
+  "texto": "DROP ROLE 'rol_recepcion'",
+  "ok": false,
+  "codigo": 1396,
+  "mensaje": "Operation DROP ROLE failed for 'rol_recepcion'@'%'"
+ },
+ {
+  "linea": 102,
+  "texto": "DROP ROLE IF EXISTS 'rol_recepcion', 'rol_lectura', rol_admin@localhost",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 1
+ },
+ {
+  "linea": 104,
+  "texto": "DROP TABLE actividad",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 105,
+  "texto": "SHOW GRANTS FOR 'ana'@'%'",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "Grants for ana@%"
+  ],
+  "filas": [
+   [
+    "GRANT USAGE ON *.* TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `otra_bd`.* TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.`actividad` TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT ON `club`.`cuotas_madrid` TO `ana`@`%`"
+   ],
+   [
+    "GRANT SELECT (`dni`, `nombre`) ON `club`.`socio` TO `ana`@`%`"
+   ]
+  ]
+ },
+ {
+  "linea": 106,
+  "texto": "DROP USER 'ana'@'%', 'ana'@'localhost', 'pepe'@'%', 'luis'@'%'",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 107,
+  "texto": "SELECT COUNT(*) FROM mysql.user WHERE user IN ('ana', 'pepe', 'luis', 'eva')",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)"
+  ],
+  "filas": [
+   [
+    "0"
+   ]
+  ]
+ },
+ {
+  "linea": 108,
+  "texto": "SELECT COUNT(*) FROM mysql.tables_priv WHERE user IN ('ana', 'pepe')",
+  "ok": true,
+  "tipo": "filas",
+  "columnas": [
+   "COUNT(*)"
+  ],
+  "filas": [
+   [
+    "0"
+   ]
+  ]
+ },
+ {
+  "linea": 109,
+  "texto": "FLUSH PRIVILEGES",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 0,
+  "info": "",
+  "avisos": 0
+ },
+ {
+  "linea": 110,
+  "texto": "DROP DATABASE club",
+  "ok": true,
+  "tipo": "cambio",
+  "afectadas": 2,
+  "info": "",
+  "avisos": 0
+ }
+]

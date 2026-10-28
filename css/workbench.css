@@ -115,6 +115,8 @@ li:not(.abierto) > ul { display: none; }
 .ico-vista { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1.5' y='2.5' width='13' height='11' fill='%23fff' stroke='%23b07d1a'/%3E%3Crect x='1.5' y='2.5' width='13' height='3' fill='%23b07d1a'/%3E%3Cpath d='M1.5 9h13M6 5.5v8M10.5 5.5v8' stroke='%23b07d1a' stroke-width='.8'/%3E%3C/svg%3E"); }
 .info-definicion { margin: 6px 0 0; white-space: pre-wrap; word-break: break-word; font: 11px/1.4 Consolas, monospace; color: var(--texto-suave, #555); }
 .ico-columna { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 3l5 5-5 5-5-5z' fill='%235b9bd5'/%3E%3C/svg%3E"); }
+.ico-usuario { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='5' r='3' fill='%234a6f96'/%3E%3Cpath d='M2.5 14.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5z' fill='%234a6f96'/%3E%3C/svg%3E"); }
+.ico-rol { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='5' r='3' fill='%23b07d1a'/%3E%3Cpath d='M2.5 14.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5z' fill='%23b07d1a'/%3E%3C/svg%3E"); }
 .ico-clave { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='5' cy='8' r='3.2' fill='none' stroke='%23c99a00' stroke-width='2'/%3E%3Cpath d='M8 8h7M12.5 8v3M14.5 8v2' stroke='%23c99a00' stroke-width='2'/%3E%3C/svg%3E"); }
 .ico-ajena { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 3l5 5-5 5-5-5z' fill='%23d9534f'/%3E%3C/svg%3E"); }
 .ico-indice { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 3h10M3 6.5h7M3 10h10M3 13.5h5' stroke='%23537aa1' stroke-width='1.6'/%3E%3C/svg%3E"); }
@@ -127,6 +129,8 @@ li:not(.abierto) > ul { display: none; }
 .pestana-nav { padding: 3px 10px; border-right: 1px solid var(--borde); }
 .pestana-nav.activa { background: var(--panel); font-weight: 600; }
 .pestana-nav.inactiva { color: #999; }
+.pestana-nav[role="button"] { cursor: pointer; }
+.info-objeto .info-grant { margin: 2px 0; white-space: pre-wrap; word-break: break-word; font: 11px/1.4 Consolas, monospace; }
 .info-objeto { height: 130px; overflow: auto; padding: 6px 8px; font-size: 11px; color: #333; }
 .info-objeto table { border-collapse: collapse; width: 100%; }
 .info-objeto td { padding: 1px 4px 1px 0; vertical-align: top; }

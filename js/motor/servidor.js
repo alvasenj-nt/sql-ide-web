@@ -35,6 +35,7 @@
       this.db = new this.SQL.Database();
       this.configurar();
       this.cat = new C.Catalogo();
+      this.cat.cuentas = this.cuentasIniciales();
       this.bdActual = null;
       this.variables = new Map();
       this.fkChecks = true;
@@ -67,7 +68,7 @@
     instantanea() {
       const bytes = this.db.export();
       this.configurar();
-      return { bytes, bases: structuredClone(this.cat.bases), bdActual: this.bdActual,
+      return { bytes, bases: structuredClone(this.cat.bases), cuentas: structuredClone(this.cuentas()), bdActual: this.bdActual,
         variables: new Map(this.variables), fkChecks: this.fkChecks, ultimoId: this.ultimoId, zona: this.zona,
         textoZona: this.textoZona };
     }
@@ -79,6 +80,7 @@
       this.configurar();
       this.cat = new C.Catalogo();
       this.cat.bases = structuredClone(inst.bases);
+      this.cat.cuentas = inst.cuentas ? structuredClone(inst.cuentas) : this.cuentasIniciales();
       this.bdActual = inst.bdActual;
       this.variables = new Map(inst.variables);
       this.ultimoId = inst.ultimoId;
@@ -166,6 +168,16 @@
         case 'renombrarTablas': return this.renombrarTablas(ast, avisos);
         case 'crearVista': return this.crearVista(ast, avisos);
         case 'borrarVista': return this.borrarVista(ast, avisos);
+        case 'crearCuenta': return this.crearCuenta(ast, avisos);
+        case 'alterarCuenta': return this.alterarCuenta(ast, avisos);
+        case 'borrarCuenta': return this.borrarCuenta(ast, avisos);
+        case 'renombrarCuentas': return this.renombrarCuentas(ast, avisos);
+        case 'conceder': return this.conceder(ast, avisos);
+        case 'revocar': return this.revocar(ast, avisos);
+        case 'revocarTodo': return this.revocarTodo(ast, avisos);
+        case 'concederRoles': return this.concederRoles(ast, avisos);
+        case 'revocarRoles': return this.revocarRoles(ast, avisos);
+        case 'rolesDefecto': return this.rolesDefecto(ast, avisos);
         case 'nada': return { tipo: 'cambio', afectadas: 0 };
         default: throw new NoDisponible(ast.tipo);
       }
@@ -200,6 +212,7 @@
           sql: id(alias), desde: id('information_schema.' + vista) + ' AS ' + id(alias),
         };
       }
+      if (bd.toLowerCase() === 'mysql') return this.fuenteMysql(r);
       if (this.cat.esSistema(bd)) throw new NoDisponible('consultar la base de datos ' + bd);
       if (!this.cat.bd(bd)) throw new ErrorSQL(1049, '42000', "Unknown database '" + bd + "'");
       const vista = this.cat.vista(bd, r.nombre);
@@ -221,7 +234,8 @@
       const binaria = (n) => /(SCHEMA|TABLE_NAME)$/.test(n);
       this.db.run('CREATE TABLE ' + nombre + ' (' + cols.map(([n, t]) => id(n) + (t === 'i' ? ' INTEGER'
         : ' TEXT COLLATE ' + (binaria(n) ? 'BINARY' : 'NOCASE'))).join(', ') + ')');
-      const filas = C.filasInfo(this.cat, vista);
+      const privilegios = ['USER_PRIVILEGES', 'SCHEMA_PRIVILEGES', 'TABLE_PRIVILEGES', 'COLUMN_PRIVILEGES'].includes(vista);
+      const filas = privilegios ? this.filasPrivilegios(vista) : C.filasInfo(this.cat, vista);
       if (filas.length) {
         const st = this.db.prepare('INSERT INTO ' + nombre + ' VALUES (' + cols.map(() => '?').join(', ') + ')');
         filas.forEach((f) => st.run(f.map((v) => (v === undefined ? null : v))));
@@ -1061,6 +1075,8 @@
           return filas(['Table', 'Non_unique', 'Key_name', 'Seq_in_index', 'Column_name', 'Collation', 'Cardinality', 'Sub_part',
             'Packed', 'Null', 'Index_type', 'Comment', 'Index_comment', 'Visible', 'Expression'], C.mostrarIndices(t, n));
         }
+        case 'privilegios': return this.mostrarPrivilegios(ast);
+        case 'crearCuenta': throw new NoDisponible('SHOW CREATE USER');
         case 'motores':
           return filas(['Engine', 'Support', 'Comment', 'Transactions', 'XA', 'Savepoints'], C.MOTORES);
         case 'avisos': return filas(['Level', 'Code', 'Message'], this.diagnostico);
