@@ -1,0 +1,129 @@
+{
+ "esquema": 1,
+ "comprobaciones": [
+  {
+   "id": "tabla",
+   "texto": "Existe la tabla sala en la base de datos club con el motor InnoDB.",
+   "pasos": [
+    {
+     "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'club' AND TABLE_NAME = 'sala'",
+     "espera": {
+      "valor": "InnoDB"
+     },
+     "siFalla": "No está la tabla sala en club o su motor no es InnoDB."
+    }
+   ]
+  },
+  {
+   "id": "datos_iniciales",
+   "texto": "El script carga las salas SAL01 (Piscina climatizada, 30, sede 1) y SAL02 (Estudio de yoga, 20, sede 2).",
+   "pasos": [
+    {
+     "sql": "SELECT codigo, nombre, aforo, codigo_sede FROM club.sala ORDER BY codigo",
+     "espera": {
+      "filas": [
+       [
+        "SAL01",
+        "Piscina climatizada",
+        "30",
+        "1"
+       ],
+       [
+        "SAL02",
+        "Estudio de yoga",
+        "20",
+        "2"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "clave_primaria",
+   "texto": "No se pueden registrar dos salas con el mismo código.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO club.sala (codigo, nombre, aforo, codigo_sede) VALUES ('SAL03', 'Sala de pesas', 25, 1)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO club.sala (codigo, nombre, aforo, codigo_sede) VALUES ('SAL03', 'Otra sala', 15, 2)",
+     "espera": {
+      "error": [
+       1062
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "nombre_unico",
+   "texto": "El nombre de la sala es obligatorio y no se puede repetir.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO club.sala (codigo, nombre, aforo, codigo_sede) VALUES ('SAL04', 'Pista de pádel', 12, 1)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO club.sala (codigo, nombre, aforo, codigo_sede) VALUES ('SAL05', 'Pista de pádel', 12, 2)",
+     "espera": {
+      "error": [
+       1062
+      ]
+     }
+    },
+    {
+     "sql": "INSERT INTO club.sala (codigo, nombre, aforo, codigo_sede) VALUES ('SAL06', NULL, 12, 1)",
+     "espera": {
+      "error": [
+       1048
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "aforo_defecto",
+   "texto": "Si no se indica el aforo de una sala nueva, toma el valor por defecto 20.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO club.sala (codigo, nombre, codigo_sede) VALUES ('SAL07', 'Sala multiusos', 1)",
+     "espera": "ok"
+    },
+    {
+     "sql": "SELECT aforo FROM club.sala WHERE codigo = 'SAL07'",
+     "espera": {
+      "valor": "20"
+     }
+    }
+   ]
+  },
+  {
+   "id": "clave_ajena_sede",
+   "texto": "La sala debe pertenecer a una sede existente en la tabla sede.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO club.sala (codigo, nombre, aforo, codigo_sede) VALUES ('SAL08', 'Sala exterior', 40, 2)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO club.sala (codigo, nombre, aforo, codigo_sede) VALUES ('SAL09', 'Sala fantasma', 20, 99)",
+     "espera": {
+      "error": [
+       1452
+      ]
+     }
+    },
+    {
+     "sql": "INSERT INTO club.sala (codigo, nombre, aforo, codigo_sede) VALUES ('SAL10', 'Sala sin sede', 20, NULL)",
+     "espera": {
+      "error": [
+       1048
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

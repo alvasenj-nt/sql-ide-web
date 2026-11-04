@@ -1,0 +1,28 @@
+{
+  "esquema": 1,
+  "id": "bd-ut3-introduccion-4jlxv9",
+  "version": 1,
+  "titulo": "UT3 · Introducción al laboratorio: club deportivo",
+  "proyecto": "club",
+  "readme": "README.txt",
+  "inicial": "inicial.sql",
+  "ejercicios": [
+    {
+      "carpeta": "ejercicio1",
+      "comprobaciones": "comprobaciones.json",
+      "archivos": [
+        { "nombre": "enunciado.txt", "editable": false },
+        { "nombre": "script.sql", "editable": true }
+      ]
+    },
+    {
+      "carpeta": "ejercicio2",
+      "comprobaciones": "comprobaciones.json",
+      "archivos": [
+        { "nombre": "enunciado.txt", "editable": false },
+        { "nombre": "script.sql", "editable": true }
+      ]
+    }
+  ]
+}
+

@@ -1,0 +1,52 @@
+EJERCICIO 2: CREACIÓN DE LA TABLA SALA EN CLUB
+
+Contexto
+  El club deportivo necesita registrar las salas de sus sedes (piscina, sala de
+  pesas, estudio de yoga) dentro de la base de datos club, que ya está creada
+  en el servidor.
+
+Especificación de la tabla
+  Abre la pestaña ejercicio2/script.sql y, después de USE club;, escribe la
+  sentencia CREATE TABLE que crea la tabla
+
+    sala ([codigo], nombre, aforo, codigo_sede)
+
+  con estas características:
+  - codigo: texto de longitud fija de 5 caracteres (CHAR(5)), obligatorio y
+    clave primaria de la tabla (PRIMARY KEY).
+  - nombre: texto de longitud variable de hasta 40 caracteres (VARCHAR(40)),
+    obligatorio (NOT NULL) y único para que no se repitan nombres de sala
+    (UNIQUE).
+  - aforo: número entero pequeño sin signo (TINYINT UNSIGNED), obligatorio y
+    con valor por defecto 20 (DEFAULT 20).
+  - codigo_sede: mismo tipo exacto que la columna codigo de la tabla sede
+    (puedes consultarlo en el panel izquierdo SCHEMAS desplegando club >
+    Tables > sede > Columns), obligatorio y clave ajena (FOREIGN KEY) que
+    referencia a sede (codigo).
+  - Motor de almacenamiento InnoDB.
+
+Ayuda de sintaxis
+  Puedes fijarte en cómo están creadas las tablas de club ejecutando con el
+  botón Sentencia:
+    SHOW CREATE TABLE monitor;
+  o siguiendo esta estructura:
+    CREATE TABLE nombre_tabla (
+      columna1 TIPO NOT NULL,
+      columna2 TIPO NOT NULL DEFAULT valor,
+      PRIMARY KEY (columna1),
+      UNIQUE (columna2),
+      FOREIGN KEY (columna_fk) REFERENCES tabla_padre (columna_pk)
+    ) ENGINE = InnoDB;
+
+Datos de prueba
+  Después de crear la tabla, inserta en ella estas dos salas:
+  - Código 'SAL01', nombre 'Piscina climatizada', aforo 30, sede 1.
+  - Código 'SAL02', nombre 'Estudio de yoga', aforo por defecto (20), sede 2.
+    (Por ejemplo: INSERT INTO sala VALUES ('SAL01', 'Piscina climatizada', 30, 1);)
+
+Comprobar y entregar
+  Pulsa Ejecutar para verificar que tu script no da errores y que sala aparece
+  en el panel izquierdo SCHEMAS bajo club > Tables.
+  Después pulsa Comprobar para validar todas las reglas de la tabla. Cuando se
+  cumplan, pulsa Copiar código y pégalo en la pregunta del ejercicio 2 del
+  cuestionario.

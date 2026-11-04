@@ -1,0 +1,48 @@
+{
+ "esquema": 1,
+ "comprobaciones": [
+  {
+   "id": "tabla_revisada",
+   "texto": "El script ha descomentado y ejecutado la creación de la tabla socio_revisado en club.",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'club' AND TABLE_NAME = 'socio_revisado'",
+     "espera": {
+      "valor": "1"
+     },
+     "siFalla": "Aún no existe la tabla socio_revisado en club: descomenta la última línea del Paso 4 y ejecuta el script."
+    }
+   ]
+  },
+  {
+   "id": "motor_revisado",
+   "texto": "La tabla socio_revisado usa el motor InnoDB y conserva las 8 columnas de socio.",
+   "pasos": [
+    {
+     "sql": "SELECT ENGINE FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'club' AND TABLE_NAME = 'socio_revisado'",
+     "espera": {
+      "valor": "InnoDB"
+     }
+    },
+    {
+     "sql": "SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'club' AND TABLE_NAME = 'socio_revisado'",
+     "espera": {
+      "valor": "8"
+     }
+    }
+   ]
+  },
+  {
+   "id": "tabla_vacia",
+   "texto": "La tabla socio_revisado se crea vacía (0 filas).",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM club.socio_revisado",
+     "espera": {
+      "valor": "0"
+     }
+    }
+   ]
+  }
+ ]
+}

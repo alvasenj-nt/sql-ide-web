@@ -1,0 +1,59 @@
+EJERCICIO 1: RECORRIDO GUIADO E INSPECCIÓN DEL SERVIDOR
+
+El servidor ya tiene cargada la base de datos club junto con una tabla
+heredada de un programa antiguo (comentario_antiguo). En este ejercicio vas a
+recorrer el laboratorio paso a paso y a inspeccionar el diccionario de datos.
+
+Paso 1. Explorar el panel SCHEMAS e Information
+  A la izquierda, en el panel SCHEMAS, despliega la base de datos club y la
+  carpeta Tables.
+  - Haz clic sobre la tabla socio y mira el panel Information (abajo a la
+    izquierda): entre paréntesis junto al nombre aparece su motor de
+    almacenamiento (InnoDB), y debajo sus columnas y claves.
+  - Despliega monitor > Foreign Keys e inscripcion > Foreign Keys para ver a
+    qué tablas apuntan sus claves ajenas.
+
+Paso 2. Ejecutar el script inicial y leer Result y Output
+  En la fila de pestañas de arriba, haz clic en ejercicio1/script.sql y pulsa
+  el botón Ejecutar (el rayo de la barra superior).
+  - En el panel Output (abajo del todo) aparece una fila por cada sentencia
+    ejecutada con una marca verde.
+  - En la franja central (debajo del código) se abren las pestañas Result 1 y
+    Result 2 con las tablas que devuelven las consultas. Haz clic en cada
+    pestaña para ver sus filas.
+
+Paso 3. Descomentar sentencias y probar el botón Sentencia
+  En ejercicio1/script.sql verás varias sentencias comentadas que empiezan por
+  dos guiones y un espacio ("-- "). Mientras tienen "-- " delante, el servidor
+  las ignora.
+  - Descomenta las líneas de SHOW TABLES;, DESCRIBE socio; y
+    SELECT * FROM actividad; borrando con el teclado los dos guiones y el
+    espacio ("-- ") del principio de cada una de esas tres líneas.
+  - Haz clic con el ratón encima de la palabra DESCRIBE para colocar ahí el
+    cursor y pulsa el botón Sentencia (el rayo con el cursor, o Ctrl+Intro):
+    verás que se ejecuta solo esa sentencia sobre el estado actual.
+  - Ahora pulsa Ejecutar (el rayo) para lanzar el script completo desde el
+    principio y revisa las nuevas pestañas Result que aparecen en el centro.
+
+Paso 4. Inspeccionar el diccionario de datos
+  Al final de script.sql hay dos consultas sobre information_schema comentadas:
+  - La primera consulta information_schema.TABLES para mostrar el nombre, el
+    motor (ENGINE) y la colación (TABLE_COLLATION) de todas las tablas de
+    club. Descoméntala y ejecútala.
+  - La segunda consulta information_schema.COLUMNS para ver el juego de
+    caracteres (CHARACTER_SET_NAME) de las columnas de comentario_antiguo.
+    Descoméntala y ejecútala.
+  - Descomenta también la última línea:
+      CREATE TABLE socio_revisado LIKE socio;
+    Al ejecutar el script completo, esta sentencia crea en club una tabla
+    vacía con la misma estructura de columnas, claves e índices que socio.
+    Refresca la vista mirando el panel SCHEMAS: verás aparecer socio_revisado.
+
+Paso 5. Anotar los hallazgos, comprobar y entregar
+  Completa las tres respuestas en el bloque /* Respuestas: ... */ al final de
+  script.sql con lo que has observado en las consultas.
+  Después pulsa Comprobar: revisará que el script se ejecuta sin errores, que
+  se ha creado socio_revisado y que has completado las respuestas.
+  Por último, pulsa Copiar código y pégalo en la pregunta del ejercicio 1 del
+  cuestionario.
+
