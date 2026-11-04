@@ -26,23 +26,15 @@ Especificación de la tabla
   - Motor de almacenamiento InnoDB.
 
 Ayuda de sintaxis
-  Puedes fijarte en cómo están creadas las tablas de club ejecutando con el
-  botón Sentencia:
+  Puedes consultar cómo están definidas las tablas existentes de club
+  ejecutando con el botón Sentencia:
     SHOW CREATE TABLE monitor;
-  o siguiendo esta estructura:
-    CREATE TABLE nombre_tabla (
-      columna1 TIPO NOT NULL,
-      columna2 TIPO NOT NULL DEFAULT valor,
-      PRIMARY KEY (columna1),
-      UNIQUE (columna2),
-      FOREIGN KEY (columna_fk) REFERENCES tabla_padre (columna_pk)
-    ) ENGINE = InnoDB;
+    SHOW CREATE TABLE actividad;
 
 Datos de prueba
   Después de crear la tabla, inserta en ella estas dos salas:
   - Código 'SAL01', nombre 'Piscina climatizada', aforo 30, sede 1.
   - Código 'SAL02', nombre 'Estudio de yoga', aforo por defecto (20), sede 2.
-    (Por ejemplo: INSERT INTO sala VALUES ('SAL01', 'Piscina climatizada', 30, 1);)
 
 Comprobar y entregar
   Pulsa Ejecutar para verificar que tu script no da errores y que sala aparece
