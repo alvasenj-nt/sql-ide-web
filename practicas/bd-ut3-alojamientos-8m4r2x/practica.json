@@ -1,0 +1,17 @@
+{
+  "esquema": 1,
+  "id": "bd-ut3-alojamientos-8m4r2x",
+  "version": 1,
+  "titulo": "UT3 · Creación de tablas y restricciones: alojamientos",
+  "proyecto": "alojamientos",
+  "readme": "README.txt",
+  "ejercicios": [
+    { "carpeta": "ejercicio1", "comprobaciones": "comprobaciones.json",
+      "archivos": [ { "nombre": "enunciado.txt", "editable": false },
+                    { "nombre": "script.sql", "editable": true } ] },
+    { "carpeta": "ejercicio2", "comprobaciones": "comprobaciones.json",
+      "archivos": [ { "nombre": "enunciado.txt", "editable": false },
+                    { "nombre": "script.sql", "editable": true } ] }
+  ]
+}
+

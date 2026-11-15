@@ -1,0 +1,136 @@
+{
+ "esquema": 1,
+ "comprobaciones": [
+  {
+   "id": "tabla",
+   "texto": "Existe la tabla apartamento en la base de datos alojamientos.",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'alojamientos' AND TABLE_NAME = 'apartamento'",
+     "espera": {
+      "valor": "1"
+     },
+     "siFalla": "No está la tabla apartamento en la base de datos alojamientos."
+    }
+   ]
+  },
+  {
+   "id": "datos_iniciales",
+   "texto": "Los INSERT de prueba cargan los dos apartamentos (con plazas=4 por defecto en APT002).",
+   "pasos": [
+    {
+     "sql": "SELECT codigo, nombre, telefono_contacto, plazas, precio_noche FROM alojamientos.apartamento ORDER BY codigo",
+     "espera": {
+      "filas": [
+       [
+        "APT001",
+        "Sol Centro",
+        "+34 600 111 222",
+        "4",
+        "85.50"
+       ],
+       [
+        "APT002",
+        "Mirador Norte",
+        "0034910223344",
+        "4",
+        "120.00"
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "codigo_primaria",
+   "texto": "El código tiene hasta 6 caracteres e identifica al apartamento sin permitir repetidos.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO alojamientos.apartamento (codigo, nombre, telefono_contacto, precio_noche) VALUES ('APT101', 'Loft Río', '600111001', 75.00)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO alojamientos.apartamento (codigo, nombre, telefono_contacto, precio_noche) VALUES ('APT101', 'Otro Loft', '600111002', 80.00)",
+     "espera": {
+      "error": [
+       1062
+      ]
+     }
+    },
+    {
+     "sql": "INSERT INTO alojamientos.apartamento (codigo, nombre, telefono_contacto, precio_noche) VALUES ('APT1017', 'Loft Largo', '600111003', 80.00)",
+     "espera": {
+      "error": [
+       1406
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "nombre_unico_obligatorio",
+   "texto": "El nombre es obligatorio, admite 60 caracteres y no se puede repetir.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO alojamientos.apartamento (codigo, nombre, telefono_contacto, precio_noche) VALUES ('APT102', REPEAT('a', 60), '600111004', 70.00)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO alojamientos.apartamento (codigo, nombre, telefono_contacto, precio_noche) VALUES ('APT103', 'Sol Centro', '600111005', 70.00)",
+     "espera": {
+      "error": [
+       1062
+      ]
+     }
+    },
+    {
+     "sql": "INSERT INTO alojamientos.apartamento (codigo, nombre, telefono_contacto, precio_noche) VALUES ('APT104', NULL, '600111006', 70.00)",
+     "espera": {
+      "error": [
+       1048
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "plazas_positivas",
+   "texto": "Las plazas son obligatorias y tienen que ser mayores que 0.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO alojamientos.apartamento (codigo, nombre, telefono_contacto, plazas, precio_noche) VALUES ('APT105', 'Estudio Mínimo', '600111007', 1, 55.00), ('APT106', 'Casa Grupo', '600111008', 8, 210.00)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO alojamientos.apartamento (codigo, nombre, telefono_contacto, plazas, precio_noche) VALUES ('APT107', 'Sin Plazas', '600111009', 0, 55.00)",
+     "espera": {
+      "error": [
+       3819
+      ]
+     }
+    },
+    {
+     "sql": "INSERT INTO alojamientos.apartamento (codigo, nombre, telefono_contacto, plazas, precio_noche) VALUES ('APT109', 'Plazas Nulas', '600111011', NULL, 55.00)",
+     "espera": {
+      "error": [
+       1048
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "repetible",
+   "texto": "El script se puede ejecutar dos veces seguidas sin errores.",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM alojamientos.apartamento",
+     "espera": {
+      "valor": "2"
+     }
+    }
+   ],
+   "repetirScript": true
+  }
+ ]
+}

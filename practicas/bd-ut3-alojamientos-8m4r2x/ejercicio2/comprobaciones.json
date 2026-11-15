@@ -1,0 +1,127 @@
+{
+ "esquema": 1,
+ "comprobaciones": [
+  {
+   "id": "tablas_y_motor",
+   "texto": "Las tablas apartamento y reserva existen en alojamientos con motor InnoDB.",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = 'alojamientos' AND TABLE_NAME IN ('apartamento', 'reserva') AND ENGINE = 'InnoDB'",
+     "espera": {
+      "valor": "2"
+     },
+     "siFalla": "Las tablas apartamento y reserva deben existir en alojamientos y usar InnoDB."
+    }
+   ]
+  },
+  {
+   "id": "datos_iniciales",
+   "texto": "Los INSERT de prueba cargan los dos apartamentos y las dos reservas (con regimen='solo_alojamiento' por defecto en APT002).",
+   "pasos": [
+    {
+     "sql": "SELECT codigo_apartamento, fecha_entrada, regimen, importe_total, descuento FROM alojamientos.reserva ORDER BY fecha_entrada",
+     "espera": {
+      "filas": [
+       [
+        "APT001",
+        "2026-12-01",
+        "desayuno",
+        "342.00",
+        "20.00"
+       ],
+       [
+        "APT002",
+        "2026-12-10",
+        "solo_alojamiento",
+        "240.00",
+        null
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "clave_primaria_compuesta",
+   "texto": "Un mismo apartamento no puede reservarse dos veces en la misma fecha de entrada, pero sí en fechas distintas.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO alojamientos.reserva (codigo_apartamento, fecha_entrada, dni_huesped, fecha_salida, importe_total) VALUES ('APT001', '2026-12-15', '33333333C', '2026-12-18', 256.50)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO alojamientos.reserva (codigo_apartamento, fecha_entrada, dni_huesped, fecha_salida, importe_total) VALUES ('APT001', '2026-12-01', '44444444D', '2026-12-03', 171.00)",
+     "espera": {
+      "error": [
+       1062
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "clave_ajena_apartamento",
+   "texto": "No se puede registrar una reserva de un apartamento que no existe en la tabla apartamento.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO alojamientos.reserva (codigo_apartamento, fecha_entrada, dni_huesped, fecha_salida, importe_total) VALUES ('APT002', '2026-12-20', '33333333C', '2026-12-22', 240.00)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO alojamientos.reserva (codigo_apartamento, fecha_entrada, dni_huesped, fecha_salida, importe_total) VALUES ('APT999', '2026-12-20', '33333333C', '2026-12-22', 240.00)",
+     "espera": {
+      "error": [
+       1452
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "fechas_y_regimen",
+   "texto": "La fecha de salida no puede ser anterior a la de entrada y el régimen solo admite solo_alojamiento, desayuno o media_pension.",
+   "pasos": [
+    {
+     "sql": "INSERT INTO alojamientos.reserva (codigo_apartamento, fecha_entrada, dni_huesped, fecha_salida, regimen, importe_total) VALUES ('APT001', '2026-12-20', '55555555E', '2026-12-20', 'media_pension', 85.50)",
+     "espera": "ok"
+    },
+    {
+     "sql": "INSERT INTO alojamientos.reserva (codigo_apartamento, fecha_entrada, dni_huesped, fecha_salida, importe_total) VALUES ('APT001', '2026-12-25', '55555555E', '2026-12-23', 171.00)",
+     "espera": {
+      "error": [
+       3819
+      ]
+     }
+    },
+    {
+     "sql": "INSERT INTO alojamientos.reserva (codigo_apartamento, fecha_entrada, dni_huesped, fecha_salida, regimen, importe_total) VALUES ('APT001', '2026-12-28', '55555555E', '2026-12-30', 'todo_incluido', 171.00)",
+     "espera": {
+      "error": [
+       1265,
+       3819
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "id": "repetible",
+   "texto": "El script completo se puede ejecutar dos veces seguidas sin errores.",
+   "pasos": [
+    {
+     "sql": "SELECT COUNT(*) FROM alojamientos.apartamento",
+     "espera": {
+      "valor": "2"
+     }
+    },
+    {
+     "sql": "SELECT COUNT(*) FROM alojamientos.reserva",
+     "espera": {
+      "valor": "2"
+     }
+    }
+   ],
+   "repetirScript": true
+  }
+ ]
+}

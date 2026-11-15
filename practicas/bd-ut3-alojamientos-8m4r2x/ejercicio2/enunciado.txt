@@ -1,0 +1,44 @@
+EJERCICIO 2: TABLA DE RESERVAS Y RELACIÓN CON APARTAMENTOS
+
+Contexto
+Una vez creada la tabla apartamento en el ejercicio 1, la empresa necesita
+añadir en la misma base de datos alojamientos la tabla reserva, enlazada con
+apartamento para que solo puedan registrarse reservas de apartamentos que
+existan en el catálogo.
+
+Cómo empezar
+Copia al principio de ejercicio2/script.sql la creación de la base de datos
+alojamientos y de la tabla apartamento que has escrito en el ejercicio 1, y
+añade debajo la creación de la tabla reserva antes de los INSERT de prueba.
+
+Esquema relacional (claves primarias entre corchetes, claves ajenas con ->)
+  apartamento ([codigo], nombre, telefono_contacto, plazas, precio_noche)
+  reserva     ([codigo_apartamento -> apartamento, fecha_entrada],
+               dni_huesped, fecha_salida, regimen, importe_total, descuento)
+
+Usa exactamente esos nombres de base de datos, tablas y columnas.
+
+Reglas del negocio de la tabla reserva
+
+ 1. Cada reserva se identifica por la combinación de codigo_apartamento
+    (6 caracteres) y fecha_entrada (fecha de calendario sin hora): un mismo
+    apartamento no puede tener dos reservas con la misma fecha de entrada.
+ 2. Todo codigo_apartamento de una reserva tiene que existir previamente en la
+    tabla apartamento.
+ 3. El dni_huesped (9 caracteres) y la fecha_salida (fecha de calendario sin
+    hora) son obligatorios, y la fecha_salida debe ser igual o posterior a la
+    fecha_entrada.
+ 4. El regimen es obligatorio, toma por defecto el valor 'solo_alojamiento' si
+    no se indica en el INSERT (como ocurre en la reserva de APT002) y solo
+    admite 'solo_alojamiento', 'desayuno' o 'media_pension' (sin tilde).
+ 5. El importe_total es obligatorio, se guarda en euros con dos decimales
+    exactos (hasta 99 999,99) y debe ser estrictamente mayor que 0.
+ 6. El descuento es opcional (admite el valor NULL). Cuando se indique, se
+    guarda con dos decimales exactos y no puede superar el importe_total de
+    esa misma reserva (menor o igual que importe_total).
+
+Requisitos del script
+ 7. Conserva sin borrar los INSERT y SELECT que ya vienen al final de
+    script.sql: sirven para comprobar que las dos tablas y su relación
+    funcionan.
+ 8. El script completo debe poder ejecutarse dos veces seguidas sin dar error.

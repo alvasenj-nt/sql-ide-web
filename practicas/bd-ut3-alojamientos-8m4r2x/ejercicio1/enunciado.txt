@@ -1,0 +1,34 @@
+EJERCICIO 1: CATÁLOGO DE APARTAMENTOS TURÍSTICOS
+
+Contexto
+Una empresa de apartamentos turísticos necesita crear la base de datos
+alojamientos y su primera tabla, apartamento. En script.sql ya tienes escritos
+al final los INSERT y el SELECT de prueba; tu trabajo es escribir encima la
+creación de la base de datos y de la tabla para que esos datos entren sin
+errores y el servidor valide las reglas del negocio.
+
+Esquema relacional (clave primaria entre corchetes)
+  apartamento ([codigo], nombre, telefono_contacto, plazas, precio_noche)
+
+Usa exactamente esos nombres de base de datos, tabla y columnas: la base de
+datos se llama alojamientos.
+
+Reglas del negocio
+
+ 1. Cada apartamento se identifica por su codigo, una referencia alfanumérica
+    de 6 caracteres (APT001).
+ 2. El nombre comercial es obligatorio, tiene hasta 60 caracteres y no puede
+    repetirse entre apartamentos.
+ 3. El telefono_contacto es obligatorio y tiene hasta 15 caracteres: debe
+    conservar tal cual los ceros a la izquierda o el prefijo internacional
+    (+34 600 111 222, 0034910223344).
+ 4. El número de plazas es un entero positivo obligatorio (estrictamente mayor
+    que 0). Si el INSERT no indica las plazas (como ocurre en APT002), toma el
+    valor 4 por defecto.
+ 5. El precio_noche es obligatorio, se guarda en euros con dos decimales
+    exactos (hasta 9999,99) y tiene que ser estrictamente mayor que 0.
+
+Requisitos del script
+ 6. Conserva sin borrar los INSERT y el SELECT que ya vienen al final de
+    script.sql: sirven para comprobar que tu tabla funciona.
+ 7. El script debe poder ejecutarse dos veces seguidas sin dar error.
